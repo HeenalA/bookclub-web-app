@@ -56,3 +56,6 @@ logs/
 # Build artifacts
 dist/
 build/
+
+# Vite
+frontend/.vite/

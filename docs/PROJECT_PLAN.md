@@ -106,7 +106,7 @@ read and write reviews, and see the next meeting countdown. Real data loaded.
 | Feature | Priority | Notes |
 |---|---|---|
 | Book search (Google Books API) | P0 | Search by title/author, pull cover + metadata |
-| Add book to club | P0 | Any member can add, assign picker |
+| Add book to club | P0 | Admins only. Max 3 admins per group. All members can be admins in small clubs. Assign picker when adding. |
 | Book status flow | P0 | To Read → Currently Reading → Finished |
 | Drag-and-drop ratings table | P0 | Per member, 1-10 rows, drag titles between rows |
 | Average rating calculation | P0 | Auto-updates when any member changes rating |
@@ -116,6 +116,7 @@ read and write reviews, and see the next meeting countdown. Real data loaded.
 | Announcements | P1 | Admin posts to group home page |
 | Google OAuth login | P2 | Add alongside email/password |
 | Multiple book clubs | P2 | One user can be in multiple clubs |
+| Half-star rating toggle | P2 | Per-group setting to allow 0.5 increments (e.g. 7.5, 8.5) or integers only |
 
 ---
 
@@ -126,6 +127,7 @@ read and write reviews, and see the next meeting countdown. Real data loaded.
 | Virtual bookshelf UI | P0 | Books displayed as spines on a shelf |
 | Currently reading shelf | P0 | Top shelf, most prominent |
 | Collectibles shelf | P1 | Items earned by completing books/reviews |
+| Jail shelf | P1 | Special shelf on group page — admins can send a book + member avatar to "jail" for rule violations (DNF, no-shows, strikes). Pairs with -1000 rating easter egg. |
 | Genre distribution chart | P1 | Pie chart, updates as books are added |
 | Character ratings | P2 | Per-book character rating tables |
 | Annual stats / points | P2 | Points scored per year per member |
@@ -151,13 +153,13 @@ read and write reviews, and see the next meeting countdown. Real data loaded.
 These need answers before development can proceed on the relevant feature.
 When resolved, move to `docs/DECISIONS.md`.
 
-| # | Question | Options | Status |
+| # | Question | Decision | Status |
 |---|---|---|---|
-| 1 | Half-star ratings (7.5, 8.5) — support or round to integers? | Support halves (matches existing data) / Round to integers (simpler) | ⏳ Open |
-| 2 | Negative ratings (-1000 for Flames of Chaos) — support as a joke feature or normalize to 1? | Keep as fun data point / Normalize to 1 | ⏳ Open |
-| 3 | Who can add books — any member or admin only? | Any member (described in spec) / Admin only | ⏳ Open |
-| 4 | Club picker order — enforce strict rotation or just display suggested picker? | Enforce / Suggest only | ⏳ Open |
-| 5 | App name — "To Read or Not to Read" confirmed or TBD? | Confirmed / Still deciding | ⏳ Open |
+| 1 | Half-star ratings (7.5, 8.5) — support or round to integers? | ✅ Supported. Configurable per group (groups can toggle on/off in settings) | ✅ Resolved |
+| 2 | Negative ratings (-1000 for Flames of Chaos) — support as a joke feature or normalize to 1? | ✅ Keep as joke feature. Normalize to 1 only if it breaks calculations. Pairs with new "Jail Shelf" feature (see Phase 2) | ✅ Resolved |
+| 3 | Who can add books — any member or admin only? | ✅ Admins only. All members can be admins (small clubs). Max 3 admins per group to prevent chaos in larger clubs | ✅ Resolved |
+| 4 | Club picker order — enforce strict rotation or just display suggested picker? | ✅ Display as suggestion only. Never enforce. | ✅ Resolved |
+| 5 | App name — "To Read or Not to Read" confirmed or TBD? | ✅ Confirmed for now. Stored in one config file — easy to change. | ✅ Resolved |
 
 ---
 
