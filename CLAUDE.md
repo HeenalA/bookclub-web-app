@@ -1,93 +1,92 @@
 # CLAUDE.md — To Read or Not to Read
-## AI Team Instructions & Project Rules
+## AI Team Instructions, Project Rules & Living Context
 
-This file is the single source of truth for all AI agents (Claude Code, Copilot) working on this project.
 Read this file completely before taking any action on the codebase.
+
+---
+
+## 🔄 SESSION HANDOFF SYSTEM
+
+This project uses a seamless handoff system so Heenal never loses context between sessions.
+
+### How it works
+1. START of every Claude Code session → read `docs/SESSION_STATE.md`
+2. During the session → track what was built, decided, changed
+3. END of every session → run `bash scripts/update_session.sh "what was done"`
+4. Autosave commits all changes every 30 min via `scripts/autosave.sh`
+
+### Starting a new chat (Claude Desktop)
+Heenal pastes the contents of `docs/SESSION_STATE.md` into the new chat.
+That single file contains everything needed to resume instantly.
 
 ---
 
 ## 🏢 The Team
 
-| Role | Who | Responsibilities |
+| Role | Who | How |
 |---|---|---|
-| **CEO / PM** | Heenal (human) | Vision, priorities, feature decisions, final approval on all code |
-| **Developer** | Claude Code (terminal) | Writing code, running tests, file operations, git staging |
-| **Advisor / PM Support** | Claude Desktop (chat) | Architecture, planning, learning explanations, resume, cost tracking |
-| **Pair Programmer** | GitHub Copilot (VS Code) | In-editor suggestions while Heenal writes code herself |
+| CEO / PM | Heenal | Makes all product and design decisions |
+| Developer | Claude Code terminal | `cd ~/Desktop/bookclub-web-app && claude` |
+| Advisor / Tutor | Claude Desktop chat | Paste SESSION_STATE.md to restore context |
+| Pair Programmer | GitHub Copilot | In VS Code during manual coding |
 
 ---
 
-## 🛑 ABSOLUTE RULES — Never Violate These
+## 🛑 ABSOLUTE RULES
 
-1. **Never run `sudo` commands** — if a task seems to require sudo, stop and ask Heenal
-2. **Never commit `.env` files** — all secrets live in `.env` and are listed in `.gitignore`
-3. **Never hardcode secrets, API keys, passwords, or credentials** in any file
-4. **Never push directly to `main`** — all changes go through a feature branch
-5. **Always use plan mode first** — show Heenal what you intend to do before doing it
-6. **Never delete data** without explicit confirmation from Heenal
-7. **Warn before any destructive operation** — dropping tables, deleting files, overwriting data
-8. **Never expose personal data** — member names, emails, and reviews are private; the repo is private
+1. Never run `sudo`
+2. Never commit `.env` files
+3. Never hardcode secrets or API keys
+4. Never push directly to `main`
+5. Always show a plan before writing code
+6. Never delete data without confirmation
+7. Always update `docs/SESSION_STATE.md` at end of session
 
 ---
 
-## 🚦 How Claude Code Should Work (Developer Workflow)
+## 🚦 Developer Workflow
 
-### Before Writing Any Code
-1. Read this file (`CLAUDE.md`) completely
-2. Read the relevant section of `docs/PROJECT_PLAN.md`
-3. State what you understand the task to be
-4. Show your plan — what files you'll create/edit, what the approach is
-5. Ask any clarifying questions before proceeding
-6. Wait for Heenal's approval before writing code
+**Before writing code:**
+- Read CLAUDE.md + SESSION_STATE.md
+- State your understanding of the task
+- Show your plan, ask questions if needed
+- Wait for Heenal's approval
 
-### When Writing Code
-- Write small, focused changes — one feature at a time
-- Add comments explaining *why*, not just *what*
-- Follow the coding standards below
-- If you hit an unexpected issue, stop and explain it — don't improvise solutions that touch other parts of the codebase
+**While writing code:**
+- One small change at a time
+- Comment the *why* not just the *what*
+- Add `/* LEARNING: ... */` notes for new concepts
+- Stop and explain if anything unexpected comes up
 
-### After Writing Code
-- Show a summary of what was changed and why
-- Point out anything Heenal should test manually
-- Suggest the git commit message using Conventional Commits format
-- Never run `git push` without explicit instruction from Heenal
-
-### When Unsure
-- Ask, don't assume
-- Heenal is learning — explain your reasoning so she can understand the decision
-- Offer 2-3 options when there are meaningful tradeoffs, explain each
+**After writing code:**
+- Summarize what changed
+- Tell Heenal exactly how to see the result
+- Suggest the git commit message
+- Run `bash scripts/update_session.sh "description"`
 
 ---
 
 ## 📚 Learning Mode
 
-This project is a learning environment. When writing or explaining code:
-- Explain new concepts in plain English before implementing them
-- Point out when something is an "industry best practice" and why
-- Note when there's a simpler way vs. a more scalable way — explain the tradeoff
-- If Heenal asks "why", always answer thoroughly
-- Label code sections with learning notes like: `# LEARNING: This is called a decorator in Python`
+Always explain concepts before implementing them.
+Label industry best practices and explain why they exist.
+Show simpler vs scalable approaches and explain the tradeoff.
+Heenal is learning full-stack development — never skip the explanation.
 
 ---
 
 ## 🏗️ Tech Stack
 
-| Layer | Technology | Version | Notes |
-|---|---|---|---|
-| Backend | Python + FastAPI | Python 3.11+ | REST API server |
-| Database | PostgreSQL via Supabase | Latest | Free hosted tier |
-| Auth | Supabase Auth | — | Email/password to start, Google OAuth in Phase 2 |
-| Frontend | React | 18+ | Vite for build tooling |
-| Styling | CSS Modules + CSS variables | — | No heavy UI framework to start |
-| Book Search | Google Books API | v1 | Free, no key needed for basic search |
-| Hosting (FE) | Vercel | — | Free tier |
-| Hosting (BE) | Render | — | Free tier, note: spins down after 15min idle |
-| CI/CD | GitHub Actions | — | Lint + test on every push |
-| Package Mgr (BE) | pip + requirements.txt | — | Simple to start |
-| Package Mgr (FE) | npm | — | Standard |
+| Layer | Phase 1 | Phase 2+ |
+|---|---|---|
+| Frontend | Plain HTML + CSS + vanilla JS | React 18 + Vite |
+| Backend | None yet | Python + FastAPI |
+| Database | None yet | PostgreSQL via Supabase |
+| Auth | None yet | Supabase Auth |
+| Hosting | localhost | Vercel (FE) + Render (BE) |
+| CI/CD | None yet | GitHub Actions |
 
-**Important:** The tech stack is modular. Each layer can be swapped independently.
-If hosting needs change, document the reason in `docs/DECISIONS.md`.
+**Current phase: Phase 1 — Static HTML on localhost. No backend, no database.**
 
 ---
 
@@ -95,205 +94,114 @@ If hosting needs change, document the reason in `docs/DECISIONS.md`.
 
 ```
 bookclub-web-app/
-├── CLAUDE.md                  ← You are here
-├── README.md                  ← Project overview for GitHub
-├── .env.example               ← Template showing required env vars (no real values)
-├── .gitignore                 ← Must include .env, __pycache__, node_modules, etc.
-│
-├── backend/
-│   ├── app/
-│   │   ├── main.py            ← FastAPI app entry point
-│   │   ├── config.py          ← Loads env vars (never hardcode here)
-│   │   ├── database.py        ← Database connection setup
-│   │   ├── models/            ← SQLAlchemy database models
-│   │   │   ├── book.py
-│   │   │   ├── member.py
-│   │   │   ├── meeting.py
-│   │   │   ├── rating.py
-│   │   │   └── review.py
-│   │   ├── routes/            ← API endpoint definitions
-│   │   │   ├── books.py
-│   │   │   ├── members.py
-│   │   │   ├── meetings.py
-│   │   │   └── ratings.py
-│   │   └── schemas/           ← Pydantic data validation schemas
-│   ├── tests/                 ← Backend tests (pytest)
-│   ├── requirements.txt       ← Python dependencies
-│   └── .env                   ← Local secrets (NEVER commit this)
+├── CLAUDE.md
+├── README.md
+├── .gitignore
+├── .env.example
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/        ← Reusable React components
-│   │   ├── pages/             ← Page-level components
-│   │   ├── hooks/             ← Custom React hooks
-│   │   ├── api/               ← Functions that call the backend
-│   │   ├── styles/            ← CSS modules and variables
-│   │   └── App.jsx
-│   ├── public/
-│   └── package.json
+│   ├── index.html             ← redirect or landing
+│   ├── styles/
+│   │   ├── main.css           ← CSS variables + global styles
+│   │   └── components.css     ← reusable component styles
+│   ├── pages/
+│   │   ├── home.html          ← group home page
+│   │   ├── ratings.html       ← drag-and-drop ratings table
+│   │   └── reviews.html       ← reviews grid
+│   └── js/
+│       └── main.js            ← static data + basic interactivity
 │
 ├── data/
-│   ├── seed_data.json         ← All existing book club data (78 books, 76 meetings, etc.)
-│   └── migrate.py             ← Script to load seed data into database
+│   └── seed_data.json         ← 78 books, 76 meetings, all ratings/reviews
 │
 ├── docs/
-│   ├── PROJECT_PLAN.md        ← PM document: phases, features, sprints
-│   ├── DECISIONS.md           ← Architecture decisions log (why we chose X over Y)
-│   ├── SCHEMA.md              ← Database schema documentation
-│   └── COST_TRACKER.md        ← CFO document: hosting costs, API usage, token spend
+│   ├── SESSION_STATE.md       ← ⭐ living project state, updated every session
+│   ├── PROJECT_PLAN.md
+│   ├── DESIGN_SPEC.md
+│   ├── DECISIONS.md
+│   └── COST_TRACKER.md
 │
-└── .github/
-    └── workflows/
-        ├── backend-ci.yml     ← Run tests on every push
-        └── frontend-ci.yml    ← Lint and build check on every push
+└── scripts/
+    ├── autosave.sh            ← auto-commit every 30 min
+    └── update_session.sh      ← update SESSION_STATE.md + stage it
 ```
 
 ---
 
-## 🗄️ Database — Key Entities
+## 🎨 Design System
 
-These are the core data models. Do not add or change models without PM approval.
+**Vibe:** Cozy bookshop meets playful social app. Warm paper tones, personality.
+**Fonts:** Lora (serif) for titles/numbers. DM Sans for body/UI. (Google Fonts)
 
+```css
+/* CSS Variables — defined in styles/main.css */
+--color-maya: #7B9EC9;
+--color-mina: #C97B9E;
+--color-heenal: #9E7BC9;
+
+--bg-primary: #f5f0eb;
+--bg-secondary: #ede4d8;
+--bg-dark: #1e130a;
+--text-primary: #2c3e50;
+--text-secondary: #8a7a6a;
+--border: #e0d8d0;
+
+/* Picker chips (ratings table) */
+--chip-maya-bg: #deeaf5;   --chip-maya-text: #185FA5;
+--chip-mina-bg: #f4c0d1;   --chip-mina-text: #72243E;
+--chip-heenal-bg: #e8dcf5; --chip-heenal-text: #3C3489;
 ```
-Member         — users of the app (name, email, color, role)
-BookClub       — a group (name, rules, founded date, picker order)
-Membership     — which members belong to which clubs
-Book           — a book (title, author, genre, google_books_id, cover_url)
-ClubBook       — a book added to a club (status: to_read/reading/finished, picked_by)
-Meeting        — a meeting (date, location, club_id)
-MeetingBook    — books discussed at a meeting
-Review         — one member's review of one book in one club
-Rating         — one member's numerical rating (supports 0.5 increments, range -1000 to 10)
-CharacterRating — one member's rating of a character from a book
-```
-
-**Color assignments (muted, adjustable):**
-- Maya: `#7B9EC9` (muted blue)
-- Mina: `#C97B9E` (muted pink)
-- Heenal: `#9E7BC9` (muted purple)
-
-These are defined in `frontend/src/styles/variables.css` and can be changed without touching logic.
 
 ---
 
-## 🔐 Environment Variables
+## 🗄️ Data Models
 
-All secrets live in `.env` in the relevant directory. Never commit this file.
-`.env.example` shows the required keys with placeholder values — this IS committed.
-
-Required backend variables:
 ```
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_KEY=your_supabase_anon_key
-DATABASE_URL=your_postgres_connection_string
-SECRET_KEY=a_random_string_for_jwt_signing
-ENVIRONMENT=development
+Member     name, email, color, role (admin max 3 per group)
+BookClub   name, rules, founded_date, picker_order
+Book       title, author, genre, cover_url
+ClubBook   book + club + status (to_read/reading/finished) + picked_by
+Meeting    date, location, club_id
+Review     member + book + text
+Rating     member + book + value (DECIMAL, -1000 to 10, supports 0.5)
 ```
 
-Required frontend variables:
-```
-VITE_API_URL=http://localhost:8000
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-⚠️ **Security reminder:** Before every commit, check `git status` and `git diff` to confirm
-no `.env` file or credentials are staged. When in doubt, run `git diff --staged` first.
+Rating rules:
+- `-1000` → jail row, counts as `1` in averages, syncs to shelf jail
+- `unrated` → bottom of ratings table
+- Half-stars supported (7.5, 8.5, 9.5), configurable per group
 
 ---
 
-## 🌿 Git Workflow
+## 🌿 Git Convention
 
-### Branch naming
 ```
-feature/add-book-search
-feature/drag-drop-ratings
-fix/meeting-date-display
-docs/update-schema
-chore/add-ci-workflow
-```
-
-### Commit message format (Conventional Commits)
-```
-feat: add book search by title and author
-fix: correct average rating calculation
-docs: add database schema documentation
-test: add unit tests for rating model
-chore: update Python dependencies
-refactor: extract review component
+feat: add group home page layout
+fix: correct member color variables
+docs: update session state
+chore: add autosave script
+style: adjust ratings table spacing
 ```
 
-### Daily commit rule
-At minimum, one commit per day. Even documentation counts.
-Small, focused commits are better than one large commit.
-
-### Never do
-- `git push --force` on any shared branch
-- Commit directly to `main`
-- Stage `.env` or any file with real credentials
+Daily commit rule: at least one commit per day. SESSION_STATE.md updates count.
 
 ---
 
-## 💰 Cost Awareness (CFO Notes)
+## 💰 Costs
 
-Track all costs in `docs/COST_TRACKER.md`. Flag Heenal when:
-- Supabase free tier is approaching limits (500MB storage, 2GB bandwidth/month)
-- Render free tier is being upgraded (keep it free unless there's a clear reason)
-- Any paid API is being introduced
-- Monthly estimated cost exceeds $5
-
-Current estimated monthly cost: **$0** (all free tiers)
+Current: ~$0/month. See docs/COST_TRACKER.md.
+Alert Heenal before introducing any paid service.
 
 ---
 
-## 🧪 Testing Standards
+## 📋 Current Sprint: Static HTML on localhost
 
-- Every API endpoint gets at least one test
-- Tests live in `backend/tests/`
-- Use `pytest` for Python tests
-- Run tests before suggesting a commit: `cd backend && pytest`
-- CI will run tests automatically on every push — a failing CI = do not merge
-
----
-
-## 📋 App Name & Branding
-
-- **Working name:** "To Read or Not to Read"
-- **Name is defined in one place:** `frontend/src/config/app.js` as `APP_NAME`
-- **Changing the name** = update that one file + README. Nothing else.
-- Do not hardcode the app name anywhere in components or backend responses
-
----
-
-## 🎯 Current Phase
-
-**Phase 1 — MVP** (Target: 2 weeks)
-See `docs/PROJECT_PLAN.md` for full sprint breakdown.
-
-Priority order:
-1. Project structure + database schema
-2. Seed data migration (existing 78 books, 76 meetings)
-3. Auth (login/signup)
-4. Book list page
-5. Reviews table
-6. Meeting list + countdown timer
-7. Deploy to Vercel + Render
-
----
-
-## 📝 How to Ask Heenal a Question
-
-When you need a decision from the PM (Heenal), format it clearly:
-
-```
-❓ QUESTION FOR PM
-Topic: [what area this affects]
-Question: [the specific question]
-Options:
-  A) [option] — [tradeoff]
-  B) [option] — [tradeoff]
-Recommendation: [your suggestion and why]
-Default if no response: [what you'll do if she says "go ahead"]
-```
-
-This keeps decisions documented and helps Heenal learn the reasoning behind choices.
+- [ ] frontend/styles/main.css — CSS variables and global styles
+- [ ] frontend/pages/home.html — group home page
+- [ ] frontend/pages/ratings.html — ratings table
+- [ ] frontend/pages/reviews.html — reviews table
+- [ ] frontend/js/main.js — static sample data
+- [ ] scripts/autosave.sh
+- [ ] scripts/update_session.sh
+- [ ] docs/SESSION_STATE.md — initial state
+- [ ] Commit all of the above

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To Read or Not to Read</title>
+  <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="topnav">
+    <span class="logo">To Read or Not to Read</span>
+    <div class="nav-links">
+      <a href="home.html" class="active">Home</a>
+      <a href="ratings.html">Ratings</a>
+      <a href="reviews.html">Reviews</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-section">
+    <div class="hero-bg">
+      <span class="hero-bg-label">[ group background photo — admin selectable ]</span>
+    </div>
+    <div class="hero-overlay"></div>
+    <button class="hero-edit-btn">✎ Edit background</button>
+    <div class="hero-content">
+      <div class="hero-info">
+        <h1 class="hero-title">To Read or Not to Read</h1>
+        <p class="hero-sub">Founded June 2020 · 78 books · 76 meetings</p>
+        <div class="flex gap-6 mt-8">
+          <div class="avatar avatar-lg" style="background:#7B9EC9;">M</div>
+          <div class="avatar avatar-lg" style="background:#C97B9E;">Mi</div>
+          <div class="avatar avatar-lg" style="background:#9E7BC9;">H</div>
+        </div>
+      </div>
+      <!-- COUNTDOWN -->
+      <div class="countdown-card" id="countdown">
+        <p class="countdown-label">Next meeting</p>
+        <div class="countdown-nums">
+          <div class="cnt-block"><span class="cnt-n cnt-days">12</span><span class="cnt-u">days</span></div>
+          <span class="cnt-sep">:</span>
+          <div class="cnt-block"><span class="cnt-n cnt-hours">04</span><span class="cnt-u">hrs</span></div>
+          <span class="cnt-sep">:</span>
+          <div class="cnt-block"><span class="cnt-n cnt-mins">31</span><span class="cnt-u">min</span></div>
+        </div>
+        <p class="countdown-date">Jul 5 · 6:00 PM PST</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="home-body container">
+
+    <!-- LEFT COLUMN -->
+    <div class="home-left">
+
+      <!-- CURRENTLY READING -->
+      <p class="section-label mt-16">Currently reading</p>
+      <div class="reading-card card">
+        <div class="book-spine" style="background:#9E7BC9;">
+          <span class="spine-text">Everything I Never Told You</span>
+        </div>
+        <div class="reading-meta">
+          <h3 class="reading-title">Everything I Never Told You</h3>
+          <p class="text-sm text-muted mt-4">Celeste Ng</p>
+          <span class="badge badge-reading mt-8" style="display:inline-block;">
+            <span class="dot" style="background:#9E7BC9;"></span>
+            Picked by Heenal
+          </span>
+          <div class="flex gap-4 mt-8">
+            <div class="avatar avatar-sm" style="background:#7B9EC9;">M</div>
+            <div class="avatar avatar-sm" style="background:#C97B9E;">Mi</div>
+            <div class="avatar avatar-sm" style="background:#9E7BC9;">H</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <p class="section-label mt-16">Announcements</p>
+      <div class="announce-card" style="border-color:#C97B9E; background:#fdf5f8;">
+        <p>Meeting rescheduled to July 5 — same time, new location. Check the group chat.</p>
+        <p class="meta">Maya · 2 days ago</p>
+      </div>
+      <div class="announce-card" style="border-color:#7B9EC9; background:#f5f8fd;">
+        <p>Reminder: rate Bandit Queens! It has been two weeks.</p>
+        <p class="meta">Heenal · 5 days ago</p>
+      </div>
+
+      <!-- PICKER ORDER -->
+      <p class="section-label mt-16">Picker order</p>
+      <div class="picker-row">
+        <span class="picker-num">1</span>
+        <div class="avatar avatar-sm" style="background:#7B9EC9;">M</div>
+        <span class="picker-name">Maya</span>
+        <span class="badge badge-next">Next</span>
+      </div>
+      <div class="picker-row">
+        <span class="picker-num">2</span>
+        <div class="avatar avatar-sm" style="background:#C97B9E;">Mi</div>
+        <span class="picker-name">Mina</span>
+      </div>
+      <div class="picker-row">
+        <span class="picker-num">3</span>
+        <div class="avatar avatar-sm" style="background:#9E7BC9;">H</div>
+        <span class="picker-name">Heenal</span>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN — SHELF PLACEHOLDER -->
+    <div class="home-right">
+      <p class="section-label mt-16">Group shelf</p>
+      <div class="shelf-placeholder">
+        <div class="shelf-placeholder-icon">📚</div>
+        <p class="shelf-placeholder-title">Bookshelf coming soon</p>
+        <p class="shelf-placeholder-sub">Top rated books · jail section · member icons</p>
+        <p class="shelf-placeholder-sub">Phase 2 feature</p>
+      </div>
+    </div>
+
+  </div><!-- end home-body -->
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>To Read or Not to Read — UI Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #f0ebe4; color: #2c3e50; }
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+  h1 { font-family: 'Lora', serif; font-size: 28px; font-style: italic; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 40px; }
+  .section-title { font-family: 'Lora', serif; font-size: 20px; font-style: italic; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
+  .mockup-card { background: #fff; border-radius: 12px; border: 1px solid #e0d8d0; overflow: hidden; margin-bottom: 40px; }
+  .mockup-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #aaa; padding: 10px 16px; background: #f8f5f0; border-bottom: 1px solid #e0d8d0; }
+
+  /* ── TOPBAR ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:0.5px solid #e0d8d0; background:#fff; }
+  .logo { font-family:'Lora',serif; font-style:italic; font-size:17px; color:#2c3e50; }
+  .nav { display:flex; gap:5px; }
+  .nav span { font-size:11px; padding:4px 11px; border-radius:20px; border:0.5px solid #ddd; color:#888; cursor:pointer; }
+  .nav span.on { background:#9E7BC9; color:#fff; border-color:#9E7BC9; }
+
+  /* ── HERO ── */
+  .hero { position:relative; min-height:130px; border-bottom:0.5px solid #e0d8d0; overflow:hidden; }
+  .hero-bg { position:absolute; inset:0; background:linear-gradient(135deg,#2c1f14 0%,#4a3020 40%,#3a2818 100%); display:flex; align-items:center; justify-content:center; }
+  .hero-bg-label { font-size:11px; color:rgba(255,255,255,0.2); font-style:italic; font-family:'Lora',serif; }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to right,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.2) 60%,rgba(0,0,0,0.45) 100%); }
+  .hero-content { position:relative; z-index:2; padding:20px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .hero-edit { position:absolute; top:10px; right:10px; z-index:3; font-size:10px; padding:4px 10px; border-radius:20px; background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.7); border:0.5px solid rgba(255,255,255,0.2); }
+  .club-title { font-family:'Lora',serif; font-size:21px; font-weight:400; margin:0 0 3px; color:#fff; }
+  .club-sub { font-size:11px; color:rgba(255,255,255,0.6); margin:0 0 10px; }
+  .members { display:flex; gap:7px; }
+  .av { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:500; color:#fff; border:2px solid rgba(255,255,255,0.3); }
+  .countdown { background:rgba(255,255,255,0.12); backdrop-filter:blur(4px); border:0.5px solid rgba(255,255,255,0.2); border-radius:12px; padding:14px 18px; text-align:center; min-width:190px; }
+  .cnt-label { font-size:10px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+  .cnt-nums { display:flex; gap:8px; justify-content:center; align-items:flex-end; margin-bottom:6px; }
+  .cnt-block { display:flex; flex-direction:column; align-items:center; }
+  .cnt-n { font-family:'Lora',serif; font-size:26px; color:#c4a0e0; line-height:1; }
+  .cnt-u { font-size:9px; color:rgba(255,255,255,0.45); margin-top:1px; }
+  .cnt-sep { font-size:20px; color:rgba(255,255,255,0.2); padding-bottom:4px; }
+  .cnt-date { font-size:11px; color:rgba(255,255,255,0.5); }
+
+  /* ── BODY ── */
+  .body { display:grid; grid-template-columns:1fr 240px; }
+  .body-left { padding:18px 20px; border-right:0.5px solid #e0d8d0; }
+  .body-right { padding:16px; background:#f8f5f0; }
+  .sec { font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#aaa; margin:0 0 10px; }
+  .reading-card { border:0.5px solid #e0d8d0; border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+  .spine-sm { width:32px; height:80px; border-radius:3px 5px 5px 3px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .spine-text { writing-mode:vertical-rl; transform:rotate(180deg); font-size:8px; color:#fff; font-weight:500; opacity:0.9; max-height:72px; overflow:hidden; }
+  .book-meta h4 { font-family:'Lora',serif; font-size:14px; font-weight:400; margin:0 0 2px; }
+  .book-meta p { font-size:11px; color:#888; margin:0 0 7px; }
+  .picker-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; padding:2px 8px; border-radius:20px; }
+  .avs { display:flex; gap:4px; margin-top:6px; }
+  .av-sm { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:500; color:#fff; }
+  .announce { border-left:2px solid #C97B9E; padding:8px 10px; background:#fdf6f9; border-radius:0 7px 7px 0; margin-bottom:8px; }
+  .announce p { font-size:12px; margin:0 0 3px; }
+  .announce span { font-size:10px; color:#aaa; }
+  .picker-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:0.5px solid #e0d8d0; }
+  .picker-row:last-child { border-bottom:none; }
+  .pnum { font-size:10px; color:#aaa; width:14px; }
+  .pname { font-size:12px; flex:1; }
+  .next-badge { font-size:9px; padding:2px 8px; border-radius:20px; background:#9E7BC9; color:#fff; }
+  .shelf-placeholder { background:#2d1f14; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; height:200px; gap:8px; }
+  .shelf-placeholder p { font-size:11px; color:rgba(255,255,255,0.25); font-style:italic; font-family:'Lora',serif; }
+
+  /* ── RATINGS TABLE ── */
+  .rt-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:0.5px solid #e0d8d0; }
+  .rt-title { font-family:'Lora',serif; font-size:16px; font-style:italic; }
+  .rt-legend { display:flex; gap:14px; }
+  .rt-li { display:flex; align-items:center; gap:5px; font-size:11px; color:#888; }
+  .rt-dot { width:8px; height:8px; border-radius:50%; }
+  .rt-note { font-size:10px; color:#aaa; font-style:italic; padding:4px 20px 8px; border-bottom:0.5px solid #e0d8d0; }
+  .rt-wrap { overflow-x:auto; }
+  table.rtt { border-collapse:collapse; width:100%; table-layout:fixed; }
+  table.rtt col.sc { width:70px; }
+  table.rtt col.mc { width:220px; }
+  table.rtt th { font-size:11px; font-weight:500; padding:10px 14px; text-align:left; color:#888; border-bottom:0.5px solid #e0d8d0; }
+  table.rtt th.mc { border-left:0.5px solid #e0d8d0; }
+  table.rtt td { padding:8px 12px; vertical-align:top; border-bottom:0.5px solid #e0d8d0; }
+  td.mc { border-left:0.5px solid #e0d8d0; }
+  .sc { text-align:right; padding-right:14px !important; }
+  .sl { font-family:'Lora',serif; font-size:15px; color:#aaa; font-style:italic; }
+  .chip { display:inline-flex; align-items:center; gap:3px; border-radius:20px; padding:3px 9px 3px 5px; font-size:11px; margin:2px; cursor:grab; }
+  .dh { font-size:10px; opacity:0.35; }
+  .cm { background:#deeaf5; color:#185FA5; }
+  .cmi { background:#f4c0d1; color:#72243E; }
+  .ch { background:#e8dcf5; color:#3C3489; }
+  .cu { background:#f5f3f0; color:#aaa; border:0.5px dashed #ccc; }
+
+  /* ── REVIEWS TABLE ── */
+  .rv-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:0.5px solid #e0d8d0; }
+  .rv-title { font-family:'Lora',serif; font-size:16px; font-style:italic; }
+  .rv-search { font-size:12px; padding:5px 12px; border:0.5px solid #e0d8d0; border-radius:20px; background:#f8f5f0; color:#aaa; width:160px; }
+  table.rvt { border-collapse:collapse; width:100%; }
+  table.rvt th { font-size:11px; font-weight:500; padding:10px 16px; text-align:left; color:#888; border-bottom:0.5px solid #e0d8d0; }
+  table.rvt td { padding:14px 16px; vertical-align:top; border-bottom:0.5px solid #e0d8d0; }
+  .rv-book-num { font-size:10px; color:#aaa; margin-bottom:2px; }
+  .rv-book-title { font-family:'Lora',serif; font-size:14px; margin:0 0 3px; }
+  .rv-book-picker { display:inline-flex; align-items:center; gap:4px; font-size:10px; padding:2px 7px; border-radius:20px; }
+  .rv-review { font-size:12px; line-height:1.6; color:#2c3e50; margin:0 0 6px; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+  .rv-rating { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:500; padding:3px 8px; border-radius:20px; }
+  .rv-add { font-size:12px; color:#aaa; font-style:italic; border:0.5px dashed #ccc; border-radius:8px; padding:8px 10px; }
+  .rv-year td { background:#f8f5f0; font-size:11px; font-weight:500; color:#aaa; padding:6px 16px; letter-spacing:0.06em; text-transform:uppercase; }
+
+  /* ── DESIGN SPEC NOTES ── */
+  .spec { background:#fff; border-radius:12px; border:1px solid #e0d8d0; padding:24px; margin-bottom:40px; }
+  .spec h3 { font-family:'Lora',serif; font-size:16px; margin-bottom:12px; }
+  .spec-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .spec-item { font-size:13px; line-height:1.7; }
+  .spec-item strong { color:#2c3e50; }
+  .spec-item span { color:#666; }
+  .color-swatch { display:inline-flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .swatch { width:20px; height:20px; border-radius:50%; display:inline-block; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>To Read or Not to Read</h1>
+  <p class="subtitle">UI Design Mockups & Spec — for use in new chat sessions</p>
+
+  <!-- ── COLOR & DESIGN SPEC ── -->
+  <h2 class="section-title">Design System</h2>
+  <div class="spec">
+    <div class="spec-grid">
+      <div class="spec-item">
+        <strong>Vibe:</strong><br>
+        <span>Cozy bookshop meets playful social app. Warm paper tones, personality, and movement.</span>
+      </div>
+      <div class="spec-item">
+        <strong>Fonts:</strong><br>
+        <span>Lora (serif, italic) — titles, numbers, headings<br>DM Sans — body, labels, UI</span>
+      </div>
+      <div class="spec-item">
+        <strong>Member Colors (muted, configurable):</strong><br>
+        <div class="color-swatch"><span class="swatch" style="background:#7B9EC9;"></span><span>Maya — #7B9EC9 (muted blue)</span></div>
+        <div class="color-swatch"><span class="swatch" style="background:#C97B9E;"></span><span>Mina — #C97B9E (muted pink)</span></div>
+        <div class="color-swatch"><span class="swatch" style="background:#9E7BC9;"></span><span>Heenal — #9E7BC9 (muted purple)</span></div>
+      </div>
+      <div class="spec-item">
+        <strong>Key Rules:</strong><br>
+        <span>
+          — Chip color = who picked the book (not which column)<br>
+          — Column separators: neutral 0.5px lines only, no color fills<br>
+          — -1000 row sits directly below 1, above unrated<br>
+          — Admin sets group background photo (preselected options)<br>
+          — Member profile objects on shelf (customizable per member)
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOME PAGE ── -->
+  <h2 class="section-title">Page 1 — Group Home</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Group Home Page — approved direction</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav">
+        <span class="on">Home</span><span>Books</span><span>Ratings</span><span>Reviews</span><span>Meetings</span>
+      </div>
+    </div>
+    <div class="hero">
+      <div class="hero-bg"><span class="hero-bg-label">[ group background photo — admin selectable from presets ]</span></div>
+      <div class="hero-overlay"></div>
+      <span class="hero-edit">✎ Edit background</span>
+      <div class="hero-content">
+        <div>
+          <p class="club-title">To Read or Not to Read</p>
+          <p class="club-sub">Founded June 2020 · 78 books · 76 meetings</p>
+          <div class="members">
+            <div class="av" style="background:#7B9EC9;">M</div>
+            <div class="av" style="background:#C97B9E;">Mi</div>
+            <div class="av" style="background:#9E7BC9;">H</div>
+          </div>
+        </div>
+        <div class="countdown">
+          <p class="cnt-label">Next meeting</p>
+          <div class="cnt-nums">
+            <div class="cnt-block"><span class="cnt-n">12</span><span class="cnt-u">days</span></div>
+            <span class="cnt-sep">:</span>
+            <div class="cnt-block"><span class="cnt-n">04</span><span class="cnt-u">hrs</span></div>
+            <span class="cnt-sep">:</span>
+            <div class="cnt-block"><span class="cnt-n">31</span><span class="cnt-u">min</span></div>
+          </div>
+          <p class="cnt-date">Jun 5 · 6:00 PM PST</p>
+        </div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="body-left">
+        <p class="sec">Currently reading</p>
+        <div class="reading-card">
+          <div class="spine-sm" style="background:#9E7BC9;"><span class="spine-text">Everything I Never Told You</span></div>
+          <div class="book-meta">
+            <h4>Everything I Never Told You</h4>
+            <p>Celeste Ng</p>
+            <span class="picker-chip" style="background:#e8dcf5;color:#3C3489;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#9E7BC9;display:inline-block;"></span>
+              Picked by Heenal
+            </span>
+            <div class="avs">
+              <div class="av-sm" style="background:#7B9EC9;">M</div>
+              <div class="av-sm" style="background:#C97B9E;">Mi</div>
+              <div class="av-sm" style="background:#9E7BC9;">H</div>
+            </div>
+          </div>
+        </div>
+        <p class="sec">Announcements</p>
+        <div class="announce">
+          <p>Meeting rescheduled to June 5 — same time, new location. Check the group chat.</p>
+          <span>Maya · 2 days ago</span>
+        </div>
+        <div class="announce" style="border-color:#7B9EC9;background:#f5f8fd;">
+          <p>Reminder: rate Bandit Queens! It has been two weeks.</p>
+          <span>Heenal · 5 days ago</span>
+        </div>
+        <p class="sec" style="margin-top:14px;">Picker order</p>
+        <div class="picker-row">
+          <span class="pnum">1</span>
+          <div class="av-sm" style="background:#7B9EC9;width:22px;height:22px;font-size:9px;">M</div>
+          <span class="pname">Maya</span>
+          <span class="next-badge">Next</span>
+        </div>
+        <div class="picker-row">
+          <span class="pnum">2</span>
+          <div class="av-sm" style="background:#C97B9E;width:22px;height:22px;font-size:9px;">Mi</div>
+          <span class="pname">Mina</span>
+        </div>
+        <div class="picker-row">
+          <span class="pnum">3</span>
+          <div class="av-sm" style="background:#9E7BC9;width:22px;height:22px;font-size:9px;">H</div>
+          <span class="pname">Heenal</span>
+        </div>
+      </div>
+      <div class="body-right">
+        <p class="sec">Group shelf</p>
+        <div class="shelf-placeholder">
+          <p>📚 Bookshelf visual</p>
+          <p style="font-size:10px;">Top 3 rated books · jail section · member icons</p>
+          <p style="font-size:10px;">Deferred to Phase 2</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RATINGS TABLE ── -->
+  <h2 class="section-title">Page 2 — Ratings Table</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Ratings Table — approved direction</div>
+    <div class="rt-header">
+      <span class="rt-title">Book ratings</span>
+      <div class="rt-legend">
+        <div class="rt-li"><span class="rt-dot" style="background:#7B9EC9;"></span>Maya picked</div>
+        <div class="rt-li"><span class="rt-dot" style="background:#C97B9E;"></span>Mina picked</div>
+        <div class="rt-li"><span class="rt-dot" style="background:#9E7BC9;"></span>Heenal picked</div>
+      </div>
+    </div>
+    <p class="rt-note">Chip color = who picked the book · Drag chips to rerank · Each member edits their own column only</p>
+    <div class="rt-wrap">
+      <table class="rtt">
+        <colgroup><col class="sc"/><col class="mc"/><col class="mc"/><col class="mc"/></colgroup>
+        <thead>
+          <tr>
+            <th class="sc"></th>
+            <th class="mc"><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:#7B9EC9;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">M</div>Maya</div></th>
+            <th class="mc"><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:#C97B9E;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">Mi</div>Mina</div></th>
+            <th class="mc"><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:#9E7BC9;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">H</div>Heenal</div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="sc"><span class="sl">10</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>A Darker Shade of Magic</span><span class="chip cmi"><span class="dh">⠿</span>Tomorrow and Tomorrow</span><span class="chip cm"><span class="dh">⠿</span>Mistborn</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>A Darker Shade of Magic</span><span class="chip ch"><span class="dh">⠿</span>Fourth Wing</span><span class="chip cmi"><span class="dh">⠿</span>Circe</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>A Darker Shade of Magic</span><span class="chip ch"><span class="dh">⠿</span>A Man Called Ove</span><span class="chip ch"><span class="dh">⠿</span>Atmosphere</span></td></tr>
+          <tr><td class="sc"><span class="sl">9.5</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>Murder of Roger Ackroyd</span><span class="chip cmi"><span class="dh">⠿</span>Evelyn Hugo</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>Remarkably Bright Creatures</span><span class="chip ch"><span class="dh">⠿</span>A Man Called Ove</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>Remarkably Bright Creatures</span><span class="chip cmi"><span class="dh">⠿</span>Verity</span></td></tr>
+          <tr><td class="sc"><span class="sl">9</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>All the Light We Cannot See</span><span class="chip ch"><span class="dh">⠿</span>Fourth Wing</span></td><td class="mc"><span class="chip ch"><span class="dh">⠿</span>The Tainted Cup</span><span class="chip cmi"><span class="dh">⠿</span>Seven Year Slip</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>Piranesi</span><span class="chip ch"><span class="dh">⠿</span>Look Closer</span><span class="chip cm"><span class="dh">⠿</span>Vicious</span></td></tr>
+          <tr><td class="sc"><span class="sl">8</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Spinning Silver</span><span class="chip ch"><span class="dh">⠿</span>The Love Hypothesis</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Spinning Silver</span><span class="chip ch"><span class="dh">⠿</span>The Midnight Library</span></td><td class="mc"><span class="chip ch"><span class="dh">⠿</span>The Love Hypothesis</span><span class="chip cm"><span class="dh">⠿</span>The Night Circus</span></td></tr>
+          <tr><td class="sc"><span class="sl">7</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>The Night Circus</span><span class="chip cmi"><span class="dh">⠿</span>Fable</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Fable</span><span class="chip ch"><span class="dh">⠿</span>Illuminae</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Legend-Born</span><span class="chip ch"><span class="dh">⠿</span>Interview with a Vampire</span></td></tr>
+          <tr><td class="sc"><span class="sl">5</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>The Inheritance Games</span></td><td class="mc"><span class="chip ch"><span class="dh">⠿</span>We Were Liars</span><span class="chip ch"><span class="dh">⠿</span>Heartless</span></td><td class="mc"><span class="chip ch"><span class="dh">⠿</span>Heartless</span><span class="chip cmi"><span class="dh">⠿</span>The Last Namsara</span></td></tr>
+          <tr><td class="sc"><span class="sl">2</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>The Last Namsara</span><span class="chip cm"><span class="dh">⠿</span>Nevernight</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>The Last Namsara</span><span class="chip ch"><span class="dh">⠿</span>Blood and Honey</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>And I Darken</span></td></tr>
+          <tr><td class="sc"><span class="sl">1</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>And I Darken</span></td><td class="mc"><span class="chip cm"><span class="dh">⠿</span>And I Darken</span><span class="chip ch"><span class="dh">⠿</span>Alchemized</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Alchemized</span><span class="chip ch"><span class="dh">⠿</span>Ice Breaker</span></td></tr>
+          <tr><td class="sc"><span class="sl" style="font-size:11px;">-1000</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Flames of Chaos</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Flames of Chaos</span></td><td class="mc"><span class="chip cmi"><span class="dh">⠿</span>Flames of Chaos</span></td></tr>
+          <tr><td class="sc"><span class="sl" style="font-size:11px;">unrated</span></td><td class="mc"><span class="chip cu"><span class="dh">⠿</span>Everything I Never Told You</span></td><td class="mc"><span class="chip cu"><span class="dh">⠿</span>Everything I Never Told You</span></td><td class="mc"><span class="chip cu"><span class="dh">⠿</span>Everything I Never Told You</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── REVIEWS TABLE ── -->
+  <h2 class="section-title">Page 3 — Reviews Table</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Reviews Table — approved direction</div>
+    <div class="rv-header">
+      <span class="rv-title">Reviews</span>
+      <input class="rv-search" type="text" placeholder="Search books..." readonly/>
+    </div>
+    <table class="rvt">
+      <thead>
+        <tr>
+          <th style="min-width:160px;">Book</th>
+          <th><div style="display:flex;align-items:center;gap:6px;"><div style="width:18px;height:18px;border-radius:50%;background:#7B9EC9;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;">M</div>Maya</div></th>
+          <th><div style="display:flex;align-items:center;gap:6px;"><div style="width:18px;height:18px;border-radius:50%;background:#C97B9E;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;">Mi</div>Mina</div></th>
+          <th><div style="display:flex;align-items:center;gap:6px;"><div style="width:18px;height:18px;border-radius:50%;background:#9E7BC9;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;">H</div>Heenal</div></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="rv-year"><td colspan="4">2026</td></tr>
+        <tr>
+          <td><p class="rv-book-num">#78</p><p class="rv-book-title">Everything I Never Told You</p><span class="rv-book-picker" style="background:#e8dcf5;color:#3C3489;">Heenal</span></td>
+          <td><div class="rv-add">+ Add review</div></td>
+          <td><div class="rv-add">+ Add review</div></td>
+          <td><div class="rv-add">+ Add review</div></td>
+        </tr>
+        <tr>
+          <td><p class="rv-book-num">#77</p><p class="rv-book-title">Bandit Queens</p><span class="rv-book-picker" style="background:#e8dcf5;color:#3C3489;">Heenal</span></td>
+          <td><p class="rv-review">Really interesting concept — loved how the women banded together. The humor was sharp and unexpected.</p><span class="rv-rating" style="background:#deeaf5;color:#185FA5;">8.5 ★</span></td>
+          <td><p class="rv-review">Loved the dynamic between all the women. Funny and sharp with real emotional weight underneath.</p><span class="rv-rating" style="background:#f4c0d1;color:#72243E;">9 ★</span></td>
+          <td><div class="rv-add">+ Add review</div></td>
+        </tr>
+        <tr class="rv-year"><td colspan="4">2025</td></tr>
+        <tr>
+          <td><p class="rv-book-num">#72</p><p class="rv-book-title">How the Grinch Stole Christmas!</p><span class="rv-book-picker" style="background:#e8dcf5;color:#3C3489;">Heenal</span></td>
+          <td><p class="rv-review">A classic. Short. Festive. No notes.</p><span class="rv-rating" style="background:#deeaf5;color:#185FA5;">10 ★</span></td>
+          <td><p class="rv-review">Wonderful. Perfect meeting book.</p><span class="rv-rating" style="background:#f4c0d1;color:#72243E;">10 ★</span></td>
+          <td><p class="rv-review">Iconic. A delight.</p><span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">10 ★</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:11px;color:#aaa;text-align:center;padding:20px 0;">To Read or Not to Read — Design Mockups v1 — May 2026</p>
+</div>
+</body>
+</html>
