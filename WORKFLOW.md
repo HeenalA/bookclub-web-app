@@ -11,13 +11,13 @@ Keep this open every time you work on the project.
 
 **Tab 1 (main work terminal):**
 ```
-cd ~/Desktop/bookclub-web-app
+cd ~/Desktop/git/bookclub-web-app
 claude
 ```
 
 **Tab 2 (autosave — keeps your work safe):**
 ```
-cd ~/Desktop/bookclub-web-app
+cd ~/Desktop/git/bookclub-web-app
 bash scripts/autosave.sh
 ```
 
@@ -35,7 +35,7 @@ Read CLAUDE.md and docs/SESSION_STATE.md then tell me where we left off and what
 
 **Tab 3 (or a new terminal):**
 ```
-cd ~/Desktop/bookclub-web-app/frontend
+cd ~/Desktop/git/bookclub-web-app/frontend
 python3 -m http.server 3000
 ```
 
@@ -100,7 +100,7 @@ Here is my current session state — please read it and tell me where we left of
 
 To get the contents of SESSION_STATE.md quickly:
 ```
-cat ~/Desktop/bookclub-web-app/docs/SESSION_STATE.md | pbcopy
+cat ~/Desktop/git/bookclub-web-app/docs/SESSION_STATE.md | pbcopy
 ```
 That copies it to your clipboard. Then just paste into the chat.
 
@@ -110,8 +110,8 @@ That copies it to your clipboard. Then just paste into the chat.
 
 | What | Command |
 |---|---|
-| Open Claude Code | `cd ~/Desktop/bookclub-web-app && claude` |
-| Start local server | `cd ~/Desktop/bookclub-web-app/frontend && python3 -m http.server 3000` |
+| Open Claude Code | `cd ~/Desktop/git/bookclub-web-app && claude` |
+| Start local server | `cd ~/Desktop/git/bookclub-web-app/frontend && python3 -m http.server 3000` |
 | View app in browser | `http://localhost:3000/pages/home.html` |
 | Start autosave | `bash scripts/autosave.sh` |
 | End session + save state | `bash scripts/update_session.sh "what you did"` |
