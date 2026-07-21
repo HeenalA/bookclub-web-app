@@ -324,6 +324,7 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
 /* --- COUNTDOWN --- */
 .countdown-card {
   background: rgba(255,255,255,0.11);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: var(--radius);
@@ -430,6 +431,11 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
 table.ratings-tbl { border-collapse: collapse; width: 100%; table-layout: fixed; }
 table.ratings-tbl col.col-star { width: 72px; }
 table.ratings-tbl col.col-member { width: 230px; }
+/* LEARNING: position:sticky on <th> inside a border-collapse:collapse
+   table is unreliable across browsers (WebKit especially) — the cell
+   can detach and render inside the table body instead of pinning at
+   the top. Don't re-add sticky headers to these tables without also
+   switching to border-collapse:separate first. */
 table.ratings-tbl th {
   font-size: 11px;
   font-weight: 500;
@@ -438,8 +444,6 @@ table.ratings-tbl th {
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border);
   background: var(--bg-card);
-  position: sticky;
-  top: var(--sticky-offset, 85px);
 }
 table.ratings-tbl th.col-member { border-left: 1px solid var(--border); }
 table.ratings-tbl td { padding: 8px 12px; vertical-align: top; border-bottom: 1px solid var(--border); }
@@ -448,6 +452,7 @@ table.ratings-tbl td.col-member { border-left: 1px solid var(--border); }
 
 /* --- REVIEWS PAGE --- */
 table.reviews-tbl { border-collapse: collapse; width: 100%; }
+/* See LEARNING note on table.ratings-tbl th above — same reasoning applies here. */
 table.reviews-tbl th {
   font-size: 11px;
   font-weight: 500;
@@ -456,8 +461,6 @@ table.reviews-tbl th {
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border);
   background: var(--bg-card);
-  position: sticky;
-  top: var(--sticky-offset, 85px);
 }
 table.reviews-tbl td { padding: 14px 16px; vertical-align: top; border-bottom: 1px solid var(--border); }
 .review-text {
@@ -467,6 +470,7 @@ table.reviews-tbl td { padding: 14px 16px; vertical-align: top; border-bottom: 1
   margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

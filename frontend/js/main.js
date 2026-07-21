@@ -69,21 +69,6 @@ function renderProfileBar() {
   };
 }
 
-// --- STICKY HEADER OFFSET ---
-// LEARNING: the ratings/reviews table headers use position:sticky
-// so they stay visible while scrolling. That needs a "top" offset
-// equal to the height of whatever nav bars sit above the table.
-// Hardcoding that as a pixel value breaks the moment the nav
-// height changes (which is exactly what happened here) — so we
-// measure the real nav height and store it in a CSS variable instead.
-
-function setStickyOffset() {
-  const topnav = document.querySelector(".topnav");
-  const clubNav = document.querySelector(".club-nav");
-  const offset = (topnav?.offsetHeight || 0) + (clubNav?.offsetHeight || 0);
-  document.documentElement.style.setProperty("--sticky-offset", `${offset}px`);
-}
-
 function highlightOwnColumn() {
   const currentId = getCurrentUserId();
   DATA.members.forEach(member => {
@@ -261,7 +246,4 @@ loadData().then(() => {
   renderRatingsTable();
   renderReviewsTable();
   highlightActiveNav();
-  setStickyOffset();
-  window.addEventListener("load", setStickyOffset); // re-measure after fonts finish loading
-  window.addEventListener("resize", setStickyOffset);
 });
