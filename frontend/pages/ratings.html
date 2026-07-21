@@ -10,6 +10,13 @@
 
   <nav class="topnav">
     <span class="logo">To Read or Not to Read</span>
+    <div class="profile-area">
+      <button class="profile-tab" id="profile-tab" title="Click to switch user — demo only, not real login yet">Profile</button>
+      <span class="welcome-msg" id="welcome-msg">Welcome…</span>
+    </div>
+  </nav>
+
+  <nav class="club-nav">
     <div class="nav-links">
       <a href="home.html">Home</a>
       <a href="ratings.html" class="active">Ratings</a>
@@ -39,253 +46,24 @@
         <thead>
           <tr>
             <th></th>
-            <th class="col-member">
+            <th class="col-member" id="col-head-maya">
               <div class="flex-center gap-6">
                 <div class="avatar avatar-md" style="background:#7B9EC9;">M</div>Maya
               </div>
             </th>
-            <th class="col-member">
+            <th class="col-member" id="col-head-mina">
               <div class="flex-center gap-6">
                 <div class="avatar avatar-md" style="background:#C97B9E;">Mi</div>Mina
               </div>
             </th>
-            <th class="col-member">
+            <th class="col-member" id="col-head-heenal">
               <div class="flex-center gap-6">
                 <div class="avatar avatar-md" style="background:#9E7BC9;">H</div>Heenal
               </div>
             </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="star-label">10</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>A Darker Shade of Magic</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Tomorrow and Tomorrow</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Mistborn</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>A Darker Shade of Magic</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Fourth Wing</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Circe</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>A Darker Shade of Magic</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>A Man Called Ove</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Atmosphere</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">9.5</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Murder of Roger Ackroyd</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Evelyn Hugo</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Remarkably Bright Creatures</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>A Man Called Ove</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Remarkably Bright Creatures</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Verity</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">9</td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>All the Light We Cannot See</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Fourth Wing</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>The Tainted Cup</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Seven Year Slip</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>City of Brass</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Piranesi</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Look Closer</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Vicious</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">8.5</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Picture of Dorian Gray</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Verity</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Kaikeyi</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>The Measure</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Look Closer</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Kaikeyi</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>All the Light We Cannot See</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">8</td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Spinning Silver</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>The Love Hypothesis</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>A Visit from the Goon Squad</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Spinning Silver</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>The Midnight Library</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Mistborn</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>The Love Hypothesis</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Night Circus</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Days at Morasaki Bookstore</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">7.5</td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Ace of Spades</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Circe</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Stalking Jack the Ripper</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Somewhere Beyond the Sea</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Serpent and Dove</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>A Gathering of Shadows</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">7</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Night Circus</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Poppy War</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Fable</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Fable</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Illuminae</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Poppy War</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Night Circus</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Legend-Born</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Interview with a Vampire</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">6</td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Serpent and Dove</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Wall of Winnipeg</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>These Violent Delights</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Wall of Winnipeg</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Gideon the Ninth</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Gideon the Ninth</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Foxhole Court</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Namesake</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">5</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>The Inheritance Games</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Legend-Born</span>
-            </td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>We Were Liars</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Heartless</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Wicked Saints</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Heartless</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Last Namsara</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Ace of Shades</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">4</td>
-            <td class="col-member">
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Illuminae</span>
-              <span class="chip mina"><span class="chip-drag">⠿</span>Heartless</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Air Awakens</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Ace of Shades</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Iron Flame</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Nevernight</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Dictionary of Lost Words</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Iron Flame</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">3</td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Namesake</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Air Awakens</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>Nevernight</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>We Were Liars</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Gods and Monsters</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>And I Darken</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Gods and Monsters</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Blood and Honey</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">2</td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Last Namsara</span>
-              <span class="chip maya"><span class="chip-drag">⠿</span>Nevernight</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Blood and Honey</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>The Last Namsara</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Blood and Honey</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Ice Breaker</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>And I Darken</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Gods and Monsters</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label">1</td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>And I Darken</span>
-            </td>
-            <td class="col-member">
-              <span class="chip maya"><span class="chip-drag">⠿</span>And I Darken</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Alchemized</span>
-            </td>
-            <td class="col-member">
-              <span class="chip mina"><span class="chip-drag">⠿</span>Alchemized</span>
-              <span class="chip heenal"><span class="chip-drag">⠿</span>Ice Breaker</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="star-label" style="font-size:12px;">-1000</td>
-            <td class="col-member"><span class="chip mina"><span class="chip-drag">⠿</span>Flames of Chaos</span></td>
-            <td class="col-member"><span class="chip mina"><span class="chip-drag">⠿</span>Flames of Chaos</span></td>
-            <td class="col-member"><span class="chip mina"><span class="chip-drag">⠿</span>Flames of Chaos</span></td>
-          </tr>
-          <tr>
-            <td class="star-label" style="font-size:11px;">unrated</td>
-            <td class="col-member"><span class="chip unrated"><span class="chip-drag">⠿</span>Everything I Never Told You</span></td>
-            <td class="col-member"><span class="chip unrated"><span class="chip-drag">⠿</span>Everything I Never Told You</span></td>
-            <td class="col-member"><span class="chip unrated"><span class="chip-drag">⠿</span>Everything I Never Told You</span></td>
-          </tr>
-        </tbody>
+        <tbody id="ratings-body"></tbody>
       </table>
     </div>
   </div>
