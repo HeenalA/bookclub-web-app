@@ -1,0 +1,29 @@
+#!/bin/bash
+# .githooks/pre-commit — blocks commits that look like they'd leak secrets.
+# LEARNING: git hooks run automatically at points in the git workflow
+# (pre-commit, pre-push, etc). This repo isn't set up to use them by
+# default — hooksPath has to be set once per clone:
+#   git config core.hooksPath .githooks
+# See WORKFLOW.md "ONE-TIME SETUP" for the full explanation.
+
+# 1. Block committing real .env files (but allow .env.example)
+staged_env_files=$(git diff --cached --name-only | grep -E '(^|/)\.env(\.[a-z]+)?$' | grep -v '\.env\.example$')
+if [ -n "$staged_env_files" ]; then
+  echo "Commit blocked: staged .env file(s) detected:"
+  echo "$staged_env_files"
+  echo ".env files must never be committed — see CLAUDE.md absolute rules."
+  exit 1
+fi
+
+# 2. Scan staged additions for secret-looking key=value / key:"value" pairs,
+#    skipping obvious placeholders (your_, .example files, etc).
+secret_pattern='(api[_-]?key|secret[_-]?key|password|access[_-]?token|SUPABASE_KEY|sk-[a-zA-Z0-9]{20,})[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_.-]{8,}'
+matches=$(git diff --cached -U0 -- . ':(exclude)*.example' | grep -E '^\+' | grep -viE 'your_|placeholder|example|xxx' | grep -iE "$secret_pattern")
+if [ -n "$matches" ]; then
+  echo "Commit blocked: staged changes look like they contain a real secret:"
+  echo "$matches"
+  echo "If this is a false positive, review .githooks/pre-commit."
+  exit 1
+fi
+
+exit 0

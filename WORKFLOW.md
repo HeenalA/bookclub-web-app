@@ -5,6 +5,16 @@ Keep this open every time you work on the project.
 
 ---
 
+## ONE-TIME SETUP (per clone)
+
+**Enable the pre-commit secret check:**
+```
+git config core.hooksPath .githooks
+```
+This makes git run `.githooks/pre-commit` automatically before every commit. It blocks the commit if a staged file is a real `.env` file, or if staged changes look like they contain a real secret (API key, password, token, etc). It's a local git setting, not something that comes from cloning the repo, so run this once after every fresh clone.
+
+---
+
 ## STARTING A SESSION
 
 ### Step 1 — Open two terminal tabs
