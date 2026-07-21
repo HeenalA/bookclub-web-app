@@ -2,16 +2,16 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: June 23, 2026
+Last updated: July 20, 2026
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Phase 1 — Static HTML pages on localhost
-**Status:** Sprint 1 is COMPLETE. All files built and committed.
-**Next task:** View the pages in the browser (`localhost:3000`) and review the UI — then decide what to improve or move to Phase 2.
-**Branch:** `feature/sprint1-project-scaffold` (not yet merged to main)
+**Current phase:** Phase 1 — Static HTML pages on localhost, now data-driven
+**Status:** Sprint 2 is built on branch `feature/sprint2-seed-data`, about to be committed/pushed/merged via PR.
+**Next task:** Merge Sprint 2, then set up Vercel hosting (connected to `main`) so club members can view and give feedback.
+**Branch:** `feature/sprint2-seed-data` (not yet merged — `main` currently only has Sprint 1's static version)
 
 ### How to run locally
 ```bash
@@ -41,20 +41,27 @@ Then open: http://localhost:3000/pages/home.html
 - [x] `scripts/autosave.sh` — auto-commit every 30 min
 - [x] `scripts/update_session.sh` — updates this file at end of session
 - [x] All Sprint 1 files committed on branch `feature/sprint1-project-scaffold`
+- [x] Visual review done in browser against `docs/mockups.html` — some design issues found, deferred (not blocking)
+- [x] `feature/sprint1-project-scaffold` merged to `main` via PR #1
+- [x] `frontend/data/seed_data.json` — normalized seed data (members, books, ratings, reviews) mirroring future SQL table shape
+- [x] `main.js` rewritten to fetch seed data and render ratings/reviews tables dynamically instead of hardcoded HTML
+- [x] Phase 1 identity system: "Welcome, {Name}" + a Profile tab that cycles the current user (stored in `localStorage`) — client-side only, not real auth/security (that's Phase 2 via Supabase Auth)
+- [x] Ratings/reviews tables gate editing visually by current user (own column = editable, others = read-only)
+- [x] Nav redesigned: single header row (logo + Welcome + Profile), club nav (Home/Ratings/Reviews) in its own row below
+- [x] Fixed sticky-header bug on ratings/reviews tables — offset is now computed from real nav height via a CSS variable instead of a hardcoded pixel value
 
 ---
 
 ## 🔲 What Is Next
 
-**Immediate (next session):**
-1. Open pages in browser and do a visual review — does it match the mockups?
-2. Fix any visual bugs or missing styles
-3. Merge `feature/sprint1-project-scaffold` → `main` via PR once happy
+**Sprint 2 wrap-up:**
+- Commit, push, PR, and merge `feature/sprint2-seed-data` → `main`
+- Set up Vercel hosting connected to `main` so club members can view progress and give feedback
 
-**After that (Sprint 2 options — pick one):**
-- Add drag-and-drop reranking to the ratings table (pure JS, no backend)
-- Create `data/seed_data.json` with all 78 books — useful for Phase 2 backend prep
-- Start Phase 2 planning: React + FastAPI + Supabase
+**After that:**
+- Wire up actual click-to-edit-and-save for ratings/reviews (currently just visual gating, no persistence yet)
+- Backfill `seed_data.json` with the full 78 books (currently a representative subset of ~11)
+- Start Phase 2 planning: React + FastAPI + Supabase (real backend, SQL database, real auth, multi-device sync)
 
 ---
 

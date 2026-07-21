@@ -10,6 +10,13 @@
 
   <nav class="topnav">
     <span class="logo">To Read or Not to Read</span>
+    <div class="profile-area">
+      <button class="profile-tab" id="profile-tab" title="Click to switch user — demo only, not real login yet">Profile</button>
+      <span class="welcome-msg" id="welcome-msg">Welcome…</span>
+    </div>
+  </nav>
+
+  <nav class="club-nav">
     <div class="nav-links">
       <a href="home.html">Home</a>
       <a href="ratings.html">Ratings</a>
@@ -29,130 +36,24 @@
       <thead>
         <tr>
           <th style="min-width:170px;">Book</th>
-          <th style="min-width:210px;">
+          <th style="min-width:210px;" id="col-head-maya">
             <div class="flex-center gap-6">
               <div class="avatar avatar-sm" style="background:#7B9EC9;">M</div>Maya
             </div>
           </th>
-          <th style="min-width:210px;">
+          <th style="min-width:210px;" id="col-head-mina">
             <div class="flex-center gap-6">
               <div class="avatar avatar-sm" style="background:#C97B9E;">Mi</div>Mina
             </div>
           </th>
-          <th style="min-width:210px;">
+          <th style="min-width:210px;" id="col-head-heenal">
             <div class="flex-center gap-6">
               <div class="avatar avatar-sm" style="background:#9E7BC9;">H</div>Heenal
             </div>
           </th>
         </tr>
       </thead>
-      <tbody>
-
-        <tr class="year-divider"><td colspan="4">2026</td></tr>
-
-        <tr>
-          <td>
-            <p class="book-num">#78</p>
-            <p class="book-title-cell">Everything I Never Told You</p>
-            <span class="picker-chip-sm" style="background:#e8dcf5;color:#3C3489;">
-              <span class="dot" style="background:#9E7BC9;"></span>Heenal
-            </span>
-          </td>
-          <td><div class="add-review">+ Add review</div></td>
-          <td><div class="add-review">+ Add review</div></td>
-          <td><div class="add-review">+ Add review</div></td>
-        </tr>
-
-        <tr>
-          <td>
-            <p class="book-num">#77</p>
-            <p class="book-title-cell">Bandit Queens</p>
-            <span class="picker-chip-sm" style="background:#e8dcf5;color:#3C3489;">
-              <span class="dot" style="background:#9E7BC9;"></span>Heenal
-            </span>
-          </td>
-          <td>
-            <p class="review-text">Really interesting concept — loved how the women banded together. The humor was sharp and unexpected for the subject matter.</p>
-            <span class="rating-badge" style="background:#deeaf5;color:#185FA5;">8.5 ★</span>
-          </td>
-          <td>
-            <p class="review-text">Loved the dynamic between all the women. Funny and sharp with real emotional weight underneath it all.</p>
-            <span class="rating-badge" style="background:#f4c0d1;color:#72243E;">9 ★</span>
-          </td>
-          <td><div class="add-review">+ Add review</div></td>
-        </tr>
-
-        <tr class="year-divider"><td colspan="4">2025</td></tr>
-
-        <tr>
-          <td>
-            <p class="book-num">#72</p>
-            <p class="book-title-cell">How the Grinch Stole Christmas!</p>
-            <span class="picker-chip-sm" style="background:#e8dcf5;color:#3C3489;">
-              <span class="dot" style="background:#9E7BC9;"></span>Heenal
-            </span>
-          </td>
-          <td>
-            <p class="review-text">A classic. Short. Festive. No notes.</p>
-            <span class="rating-badge" style="background:#deeaf5;color:#185FA5;">10 ★</span>
-          </td>
-          <td>
-            <p class="review-text">Wonderful. Perfect meeting book. Heenal's best pick arguably.</p>
-            <span class="rating-badge" style="background:#f4c0d1;color:#72243E;">10 ★</span>
-          </td>
-          <td>
-            <p class="review-text">Iconic. A delight. The Grinch understood the assignment completely.</p>
-            <span class="rating-badge" style="background:#e8dcf5;color:#3C3489;">10 ★</span>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <p class="book-num">#66</p>
-            <p class="book-title-cell">The Tainted Cup</p>
-            <span class="picker-chip-sm" style="background:#e8dcf5;color:#3C3489;">
-              <span class="dot" style="background:#9E7BC9;"></span>Heenal
-            </span>
-          </td>
-          <td>
-            <p class="review-text">Really good. The world was very confusing and the plot could have been refined a bit. But the characters were great and the plot was very interesting. Very unique.</p>
-            <span class="rating-badge" style="background:#deeaf5;color:#185FA5;">9 ★</span>
-          </td>
-          <td>
-            <p class="review-text">Such an interesting world. Felt in some ways like Attack on Titan despite the fact I've only seen one episode of it. Very unique and complicated magic system.</p>
-            <span class="rating-badge" style="background:#f4c0d1;color:#72243E;">9 ★</span>
-          </td>
-          <td>
-            <p class="review-text">A good fantasy.</p>
-            <span class="rating-badge" style="background:#e8dcf5;color:#3C3489;">9 ★</span>
-          </td>
-        </tr>
-
-        <tr class="year-divider"><td colspan="4">2024</td></tr>
-
-        <tr>
-          <td>
-            <p class="book-num">#58</p>
-            <p class="book-title-cell">Dictionary of Lost Words</p>
-            <span class="picker-chip-sm" style="background:#e8dcf5;color:#3C3489;">
-              <span class="dot" style="background:#9E7BC9;"></span>Heenal
-            </span>
-          </td>
-          <td>
-            <p class="review-text">Disliked how nothing seemed to matter. The time jumping made it so there was never any character growth and there were lots of loose ends. No climax.</p>
-            <span class="rating-badge" style="background:#deeaf5;color:#185FA5;">4 ★</span>
-          </td>
-          <td>
-            <p class="review-text">Kinda slow. Esme was a very passive main character and did not change a lot. Favorite character was her short-lived husband. Plot was fairly non-existent.</p>
-            <span class="rating-badge" style="background:#f4c0d1;color:#72243E;">4 ★</span>
-          </td>
-          <td>
-            <p class="review-text">From the premise I was hoping for more character development and an actual story. The main character lacked development so there was nothing super likable or compelling there.</p>
-            <span class="rating-badge" style="background:#e8dcf5;color:#3C3489;">4 ★</span>
-          </td>
-        </tr>
-
-      </tbody>
+      <tbody id="reviews-body"></tbody>
     </table>
   </div>
 

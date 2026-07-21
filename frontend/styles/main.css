@@ -74,7 +74,7 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
   box-shadow: var(--shadow-sm);
 }
 
-/* --- NAV --- */
+/* --- SITE HEADER (brand + user identity) --- */
 .topnav {
   display: flex;
   align-items: center;
@@ -84,7 +84,7 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 101;
   box-shadow: var(--shadow-sm);
 }
 .topnav .logo {
@@ -93,17 +93,45 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
   font-size: 17px;
   color: var(--text-primary);
 }
-.topnav .nav-links { display: flex; gap: 5px; }
-.topnav .nav-links a {
+.topnav .profile-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topnav .welcome-msg {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* --- CLUB NAV (Home / Ratings / Reviews — scoped to this one book club) --- */
+.club-nav {
+  display: flex;
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 45px;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- NAV PILLS (shared by club-nav links and the profile tab) --- */
+.nav-links { display: flex; gap: 5px; }
+.nav-links a,
+.profile-tab {
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   padding: 5px 13px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
+  background: transparent;
   color: var(--text-secondary);
+  cursor: pointer;
   transition: all 0.15s;
 }
-.topnav .nav-links a:hover { border-color: var(--color-heenal); color: var(--color-heenal); }
-.topnav .nav-links a.active { background: var(--color-heenal); color: #fff; border-color: var(--color-heenal); }
+.nav-links a:hover,
+.profile-tab:hover { border-color: var(--color-heenal); color: var(--color-heenal); }
+.nav-links a.active { background: var(--color-heenal); color: #fff; border-color: var(--color-heenal); }
 
 /* --- AVATAR --- */
 .avatar {
@@ -144,6 +172,10 @@ h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
   color: var(--text-muted);
   border: 1px dashed var(--border-dark);
 }
+.chip-readonly { cursor: default; opacity: 0.75; }
+
+/* --- OWN COLUMN (whichever member is "logged in") --- */
+.col-member.own-col { background: var(--bg-secondary); }
 
 /* --- BADGES --- */
 .badge {
@@ -407,7 +439,7 @@ table.ratings-tbl th {
   border-bottom: 1px solid var(--border);
   background: var(--bg-card);
   position: sticky;
-  top: 47px;
+  top: var(--sticky-offset, 85px);
 }
 table.ratings-tbl th.col-member { border-left: 1px solid var(--border); }
 table.ratings-tbl td { padding: 8px 12px; vertical-align: top; border-bottom: 1px solid var(--border); }
@@ -425,7 +457,7 @@ table.reviews-tbl th {
   border-bottom: 1px solid var(--border);
   background: var(--bg-card);
   position: sticky;
-  top: 47px;
+  top: var(--sticky-offset, 85px);
 }
 table.reviews-tbl td { padding: 14px 16px; vertical-align: top; border-bottom: 1px solid var(--border); }
 .review-text {
