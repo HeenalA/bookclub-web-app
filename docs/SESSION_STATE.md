@@ -2,22 +2,30 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: July 20, 2026 (session paused mid-Sprint-3)
+Last updated: July 21, 2026 (session paused mid-Sprint-3, data seeding)
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Transitioning from Phase 1 (static/data-driven) into early Phase 2 (Supabase backend), driven by wanting a live demo for recruiters/resume + wanting real SQL practice.
-**Status:** Sprint 2 (data-driven frontend) is merged to `main`. A pre-commit secret-scanning hook is merged to `main`. Sprint 3 (Supabase) is in progress on branch `feature/sprint3-supabase-setup` — **pushed but not yet merged**.
-**Next task (pick up here):**
-1. Confirm whether the Supabase schema SQL (see below) was actually run successfully in the Supabase SQL editor — this was left mid-action, ask Heenal to check the Table Editor for `members`/`books`/`ratings`/`reviews` tables.
-2. If schema exists: seed it with real data from `data/source/bookclub_raw.md` (local-only reference file, not in git).
-3. Merge `feature/sprint3-supabase-setup` → `main` via PR (same manual flow as before).
-4. Then: Vercel hosting setup (discussed, not started) + decide on making GitHub repo public for resume (discussed, safety-audited as OK, but Heenal had not yet flipped the visibility toggle as of last check).
-**Branch:** `feature/sprint3-supabase-setup` (checked out locally, pushed to origin)
+**Current phase:** Early Phase 2 — Supabase is live with real schema + real ratings data. Reviews (prose text) are the next thing to seed.
+**Status:** Everything through the sticky-header fix is merged to `main` (PRs #1–#5, all clean). The Supabase schema (4 tables, RLS enabled, public-read policies) is created and confirmed live in the actual Supabase project. **Batch 1 of real data (3 members, all 81 books, all star ratings) has been successfully run against the live database** — the Ratings page's real data now exists in Supabase, just not wired up to the frontend yet (frontend still fetches `seed_data.json` locally).
+**Branch:** `main` (clean, nothing uncommitted)
 
-**Context on why this session moved fast:** Heenal has a software engineering interview this week and wanted to get hands-on practice with PRs, git workflow, and SQL/Supabase quickly, while deferring deeper "learning mode" explanations to a later session.
+**Next task (pick up here):**
+1. **Decide how Claude runs the remaining SQL directly** (Heenal asked for this to speed things up, since RLS correctly blocks the anon key from writing anything — no INSERT policies exist, by design). Two options were being weighed when we paused:
+   - Install `psql` locally + share the DB connection string (Project Settings → Database), or
+   - Share the `service_role` key (Project Settings → API) and Claude uses `curl` against the REST API instead (no install needed)
+   
+   Whichever Heenal picks, that credential is more powerful than the anon key (bypasses RLS) — treat it as sensitive, never let it land in a committed file.
+2. Seed **reviews** (the ~200 prose reviews across ~69 books) using whichever method was picked — this was scoped to be done in a few sequential batches by year (2020–2021, 2022–2023, 2024–2026) since it's too much content for one shot.
+3. Wire `frontend/js/main.js` to actually query Supabase (via `supabase-js` from a CDN script tag, since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`.
+4. Then: Vercel hosting (discussed, not started) + decide/action making the GitHub repo public (discussed, audited safe, Heenal's call on timing).
+5. Longer term: real Supabase Auth + club-membership-scoped RLS (see privacy discussion below) before this goes any more public than it already will be.
+
+**Context on why this project has moved fast:** Heenal has a software engineering interview this week and wanted hands-on practice with PRs, git workflow, and SQL/Supabase quickly — deeper "learning mode" explanations were deferred to reduce time spent per topic, while still getting real practice in.
+
+**Important privacy note carried forward:** the `reviews`/`ratings` tables currently have **public read** RLS policies (`using (true)`) — anyone with the anon key (which is necessarily public in `frontend/js/supabase-config.js`) can query full review text directly via the REST API right now, not just see it rendered on the page. Heenal explicitly chose to seed real data now and tighten access later (real Auth + club-membership RLS), accepting that tradeoff knowingly — this is not an oversight, but it should stay near the top of the priority list once the demo is otherwise working, especially before/if the GitHub repo and live site both go public.
 
 ### How to run locally
 ```bash
@@ -63,22 +71,26 @@ Starts the server on port 3000 and auto-opens your browser to the home page. (Ma
 - [x] `frontend/data/seed_data.json` is still just the ~11-book representative subset, not the real 78 — real data is now available in `data/source/bookclub_raw.md` to backfill from
 - [x] Supabase project created: `https://rzaqlstmcmmzjdqwzgmz.supabase.co`. Data API enabled, "automatically expose new tables" disabled, "automatic RLS on new tables" enabled — all deliberate least-privilege choices.
 - [x] `frontend/js/supabase-config.js` created with the project URL + anon key (safe to commit — anon key is meant to be public; real security is RLS policies, not key secrecy). Committed on `feature/sprint3-supabase-setup`.
-- [x] Schema SQL designed for 4 tables (`members`, `books`, `ratings`, `reviews`) with RLS enabled and public **read-only** policies on each (no write policies yet — those need real Supabase Auth sessions, which don't exist yet; current identity system is still the Phase 1 client-side fake one). Full SQL is in this conversation's history — **re-derive or ask Heenal to paste it back if not carried into next session's context.**
+- [x] Schema SQL designed and **successfully run** for 4 tables (`members`, `books`, `ratings`, `reviews`) with RLS enabled and public **read-only** policies on each (no write policies yet — those need real Supabase Auth sessions, which don't exist yet; current identity system is still the Phase 1 client-side fake one). Confirmed live via Table Editor.
+- [x] `feature/sprint3-supabase-setup` merged to `main` via PR #4
+- [x] Found and fixed a deeper sticky-header bug: `position: sticky` on `<th>` inside a `border-collapse: collapse` table is unreliable in WebKit — the header cell was detaching and rendering inside the table body. Removed sticky from both ratings/reviews table headers (and the now-dead JS that computed the offset) instead of continuing to patch a pixel value. Also fixed two related cross-browser gaps found while auditing: missing `-webkit-backdrop-filter` prefix on the countdown card blur, missing standard `line-clamp` alongside the WebKit-only prefix. Merged to `main` via PR #5.
+- [x] Privacy discussion: confirmed that RLS changes are fully controllable going forward but don't retroactively un-expose anything already read during a more-open policy window (same principle as the earlier public-repo git-history discussion). Heenal wants a future layer: real Supabase Auth + a `club_members` table so users only see/edit data for clubs they belong to, and only edit their own rows — this is the eventual replacement for the current public-read policies and the fake client-side identity switcher.
+- [x] Real data seeding, batch 1 (**done**): all 3 members, all 81 books (in the club's own #1–81 order, so auto-generated `book_id` matches the doc's own numbering), and all ~270 individual star ratings — transcribed by hand from `data/source/bookclub_raw.md` and successfully run against the live Supabase database. Saved as `data/source/seed_batch1_books_ratings.sql` (gitignored). A few title variants in the source doc were normalized to one canonical spelling (documented in that file's SQL comments); `author` is `null` for all books (not reliably available in the source doc); ~19 books have no noted picker so `picked_by` is `null` for those.
+- [x] Real data seeding, batch 2 (reviews) — **not started**. Scoped as a few sequential batches by year given ~200 individual prose reviews across ~69 books. Heenal asked Claude to run this SQL directly (via `psql` + DB connection string, or `service_role` key + REST API) instead of copy-pasting each batch manually — **which method wasn't decided before pausing for the day.**
 
 ---
 
 ## 🔲 What Is Next
 
 **Immediate (resume here):**
-1. Confirm the Supabase schema SQL actually ran (check Table Editor for the 4 tables + RLS indicators)
-2. Seed real data into Supabase from `data/source/bookclub_raw.md`
-3. Merge `feature/sprint3-supabase-setup` → `main`
-4. Wire `frontend/js/main.js` to query Supabase (via `supabase-js`, loaded from CDN since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`
+1. Decide: `psql` + DB connection string, or `service_role` key + `curl`/REST API, for Claude to run SQL directly going forward
+2. Seed reviews in a few batches by year (2020–2021, 2022–2023, 2024–2026) using real prose text from the original doc
+3. Wire `frontend/js/main.js` to query Supabase (via `supabase-js`, loaded from CDN since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`
 
 **After that:**
 - Set up Vercel hosting connected to `main` (discussed, not started) — needed for the recruiter-shareable live URL
 - Decide/action making the GitHub repo public (discussed, audited safe, not yet done)
-- Add real Supabase Auth so write policies (only-your-own-row editing) can actually be enforced server-side, replacing the current fake client-side identity switcher
+- Real Supabase Auth + `club_members` table + RLS rewritten to scope by club membership and restrict writes to a user's own rows — replaces both the current public-read policies and the fake client-side identity switcher. This is the real fix for the "reviews are publicly queryable via the anon key" tradeoff Heenal knowingly accepted this session.
 - Wire up actual click-to-edit-and-save for ratings/reviews (currently just visual gating, no persistence)
 - Eventually: React + FastAPI migration (Phase 2 proper), once Supabase-direct-from-frontend outgrows itself
 
@@ -162,7 +174,9 @@ bookclub-web-app/
 │   └── data/seed_data.json    ← LIVE data the frontend actually fetches (representative ~11-book subset, not real 78 yet)
 ├── data/
 │   ├── .gitkeep
-│   └── source/                ← GITIGNORED — local-only real book club data (bookclub_raw.md), used as reference to seed Supabase
+│   └── source/                ← GITIGNORED — local-only real data
+│       ├── bookclub_raw.md               ← structural reference (meeting list, master book list, ratings by star, rankings)
+│       └── seed_batch1_books_ratings.sql  ← members+books+ratings SQL, already run against live Supabase
 ├── backend/                   ← scaffolded, still empty (Phase 2 proper, not started)
 ├── docs/
 │   ├── SESSION_STATE.md       ← this file
