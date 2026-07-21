@@ -2,22 +2,28 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: July 20, 2026
+Last updated: July 20, 2026 (session paused mid-Sprint-3)
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Phase 1 — Static HTML pages on localhost, now data-driven
-**Status:** Sprint 2 is built on branch `feature/sprint2-seed-data`, about to be committed/pushed/merged via PR.
-**Next task:** Merge Sprint 2, then set up Vercel hosting (connected to `main`) so club members can view and give feedback.
-**Branch:** `feature/sprint2-seed-data` (not yet merged — `main` currently only has Sprint 1's static version)
+**Current phase:** Transitioning from Phase 1 (static/data-driven) into early Phase 2 (Supabase backend), driven by wanting a live demo for recruiters/resume + wanting real SQL practice.
+**Status:** Sprint 2 (data-driven frontend) is merged to `main`. A pre-commit secret-scanning hook is merged to `main`. Sprint 3 (Supabase) is in progress on branch `feature/sprint3-supabase-setup` — **pushed but not yet merged**.
+**Next task (pick up here):**
+1. Confirm whether the Supabase schema SQL (see below) was actually run successfully in the Supabase SQL editor — this was left mid-action, ask Heenal to check the Table Editor for `members`/`books`/`ratings`/`reviews` tables.
+2. If schema exists: seed it with real data from `data/source/bookclub_raw.md` (local-only reference file, not in git).
+3. Merge `feature/sprint3-supabase-setup` → `main` via PR (same manual flow as before).
+4. Then: Vercel hosting setup (discussed, not started) + decide on making GitHub repo public for resume (discussed, safety-audited as OK, but Heenal had not yet flipped the visibility toggle as of last check).
+**Branch:** `feature/sprint3-supabase-setup` (checked out locally, pushed to origin)
+
+**Context on why this session moved fast:** Heenal has a software engineering interview this week and wanted to get hands-on practice with PRs, git workflow, and SQL/Supabase quickly, while deferring deeper "learning mode" explanations to a later session.
 
 ### How to run locally
 ```bash
-cd ~/Desktop/git/bookclub-web-app/frontend && python3 -m http.server 3000
+bash ~/Desktop/git/bookclub-web-app/scripts/start.sh
 ```
-Then open: http://localhost:3000/pages/home.html
+Starts the server on port 3000 and auto-opens your browser to the home page. (Manual alternative: `cd frontend && python3 -m http.server 3000`, then open `http://localhost:3000/pages/home.html`)
 
 ---
 
@@ -47,21 +53,34 @@ Then open: http://localhost:3000/pages/home.html
 - [x] `main.js` rewritten to fetch seed data and render ratings/reviews tables dynamically instead of hardcoded HTML
 - [x] Phase 1 identity system: "Welcome, {Name}" + a Profile tab that cycles the current user (stored in `localStorage`) — client-side only, not real auth/security (that's Phase 2 via Supabase Auth)
 - [x] Ratings/reviews tables gate editing visually by current user (own column = editable, others = read-only)
-- [x] Nav redesigned: single header row (logo + Welcome + Profile), club nav (Home/Ratings/Reviews) in its own row below
+- [x] Nav redesigned: single header row (logo + Welcome + Profile tab), club nav (Home/Ratings/Reviews) in its own row below — went through a few iterations with Heenal reviewing each change individually
 - [x] Fixed sticky-header bug on ratings/reviews tables — offset is now computed from real nav height via a CSS variable instead of a hardcoded pixel value
+- [x] `feature/sprint2-seed-data` merged to `main` via PR #2
+- [x] Security audit run on repo (gitignore coverage, tracked `.env` check, full git history scanned for secret-like strings, tracked files scanned for emails) — came back clean, no real secrets ever committed
+- [x] `.githooks/pre-commit` added — blocks commits that stage a real `.env` file or add lines matching secret-like patterns (api key/password/token/etc, skipping placeholders). Enabled locally via `git config core.hooksPath .githooks` (one-time per clone, documented in `WORKFLOW.md`). Merged to `main` via PR #3.
+- [x] Discussed making the GitHub repo public for Heenal's resume/portfolio — audit supports it being safe, GitHub Pages ruled out (needs paid plan for private repos, and repo would need to go public anyway), decided the live site (Vercel) + public repo are the two links to use. **Not yet actioned** — Heenal was going to flip repo visibility via GitHub Settings → Danger Zone herself.
+- [x] Real book club data received from Heenal (the actual Google Doc/PDF — 78 books, full meeting history, star ratings, prose reviews, to-read list, etc). Cleaned/structural subset saved to `data/source/bookclub_raw.md` (meeting list, master book list, ratings by star, overall rankings, to-read list). **This file is gitignored** — contains personal content and should never be committed. Full prose reviews and the Zoom link/password were deliberately left out even from that local file; original attachments have the full text if needed again.
+- [x] `frontend/data/seed_data.json` is still just the ~11-book representative subset, not the real 78 — real data is now available in `data/source/bookclub_raw.md` to backfill from
+- [x] Supabase project created: `https://rzaqlstmcmmzjdqwzgmz.supabase.co`. Data API enabled, "automatically expose new tables" disabled, "automatic RLS on new tables" enabled — all deliberate least-privilege choices.
+- [x] `frontend/js/supabase-config.js` created with the project URL + anon key (safe to commit — anon key is meant to be public; real security is RLS policies, not key secrecy). Committed on `feature/sprint3-supabase-setup`.
+- [x] Schema SQL designed for 4 tables (`members`, `books`, `ratings`, `reviews`) with RLS enabled and public **read-only** policies on each (no write policies yet — those need real Supabase Auth sessions, which don't exist yet; current identity system is still the Phase 1 client-side fake one). Full SQL is in this conversation's history — **re-derive or ask Heenal to paste it back if not carried into next session's context.**
 
 ---
 
 ## 🔲 What Is Next
 
-**Sprint 2 wrap-up:**
-- Commit, push, PR, and merge `feature/sprint2-seed-data` → `main`
-- Set up Vercel hosting connected to `main` so club members can view progress and give feedback
+**Immediate (resume here):**
+1. Confirm the Supabase schema SQL actually ran (check Table Editor for the 4 tables + RLS indicators)
+2. Seed real data into Supabase from `data/source/bookclub_raw.md`
+3. Merge `feature/sprint3-supabase-setup` → `main`
+4. Wire `frontend/js/main.js` to query Supabase (via `supabase-js`, loaded from CDN since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`
 
 **After that:**
-- Wire up actual click-to-edit-and-save for ratings/reviews (currently just visual gating, no persistence yet)
-- Backfill `seed_data.json` with the full 78 books (currently a representative subset of ~11)
-- Start Phase 2 planning: React + FastAPI + Supabase (real backend, SQL database, real auth, multi-device sync)
+- Set up Vercel hosting connected to `main` (discussed, not started) — needed for the recruiter-shareable live URL
+- Decide/action making the GitHub repo public (discussed, audited safe, not yet done)
+- Add real Supabase Auth so write policies (only-your-own-row editing) can actually be enforced server-side, replacing the current fake client-side identity switcher
+- Wire up actual click-to-edit-and-save for ratings/reviews (currently just visual gating, no persistence)
+- Eventually: React + FastAPI migration (Phase 2 proper), once Supabase-direct-from-frontend outgrows itself
 
 ---
 
@@ -129,16 +148,22 @@ Then open: http://localhost:3000/pages/home.html
 bookclub-web-app/
 ├── CLAUDE.md
 ├── README.md
-├── WORKFLOW.md
-├── .gitignore
+├── WORKFLOW.md                ← has ONE-TIME SETUP section for the pre-commit hook, read this on a fresh clone
+├── .gitignore                 ← excludes data/source/ (personal data) and all .env variants
+├── .githooks/
+│   └── pre-commit             ← secret-scanning hook, enable via `git config core.hooksPath .githooks`
 ├── frontend/
-│   ├── styles/main.css        ← all styles in one file (no components.css needed yet)
+│   ├── styles/main.css        ← all styles in one file
 │   ├── pages/home.html
 │   ├── pages/ratings.html
 │   ├── pages/reviews.html
-│   └── js/main.js
-├── data/                      ← empty (seed_data.json deferred to Phase 2)
-├── backend/                   ← scaffolded, empty (Phase 2)
+│   ├── js/main.js             ← fetches seed_data.json, renders tables, handles fake identity/profile switcher
+│   ├── js/supabase-config.js  ← Supabase URL + anon key (safe to commit)
+│   └── data/seed_data.json    ← LIVE data the frontend actually fetches (representative ~11-book subset, not real 78 yet)
+├── data/
+│   ├── .gitkeep
+│   └── source/                ← GITIGNORED — local-only real book club data (bookclub_raw.md), used as reference to seed Supabase
+├── backend/                   ← scaffolded, still empty (Phase 2 proper, not started)
 ├── docs/
 │   ├── SESSION_STATE.md       ← this file
 │   ├── PROJECT_PLAN.md
@@ -148,7 +173,8 @@ bookclub-web-app/
 │   └── mockups.html           ← reference UI mockups (open in browser)
 └── scripts/
     ├── autosave.sh
-    └── update_session.sh
+    ├── update_session.sh
+    └── start.sh                ← launches local server + opens browser, prefer this over raw python3 command
 ```
 
 ---
