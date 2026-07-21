@@ -6,6 +6,10 @@
 backend/.env
 frontend/.env
 
+# Raw personal source data (real reviews, meeting/Zoom info) — reference
+# material for building seed data, not for the public repo
+data/source/
+
 # Python
 __pycache__/
 *.py[cod]
