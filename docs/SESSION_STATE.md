@@ -157,7 +157,7 @@ pipeline {
 
 ## 🔲 What Is Next
 
-**Immediate (resume here, after the interview):**
+**Immediate (resume here):**
 1. Decide: `psql` + DB connection string, or `service_role` key + `curl`/REST API, for Claude to run SQL directly going forward
 2. Seed reviews in a few batches by year (2020–2021, 2022–2023, 2024–2026) using real prose text from the original doc
 3. Wire `frontend/js/main.js` to query Supabase (via `supabase-js`, loaded from CDN since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`
