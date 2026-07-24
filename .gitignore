@@ -25,6 +25,7 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+results.xml
 
 # Node / React
 node_modules/
