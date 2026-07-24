@@ -41,6 +41,7 @@ That single file contains everything needed to resume instantly.
 5. Always show a plan before writing code
 6. Never delete data without confirmation
 7. Always update `docs/SESSION_STATE.md` at end of session
+8. This repo is public — never mention personal circumstances (job interviews, job search, personal schedule/deadlines) in commit messages or in any committed doc. Keep git history and docs strictly project/technical. Referring to Heenal/Maya/Mina as book club members (the actual app data) is fine; narrating "why Heenal was doing X today" is not.
 
 ---
 
