@@ -41,7 +41,7 @@ That single file contains everything needed to resume instantly.
 5. Always show a plan before writing code
 6. Never delete data without confirmation
 7. Always update `docs/SESSION_STATE.md` at end of session
-8. This repo is public — never mention personal circumstances (job interviews, job search, personal schedule/deadlines) in commit messages or in any committed doc. Keep git history and docs strictly project/technical. Referring to Heenal/Maya/Mina as book club members (the actual app data) is fine; narrating "why Heenal was doing X today" is not.
+8. This repo is public. Never mention specific personal circumstances (job interviews, job search, personal schedule/deadlines) in commit messages or committed docs — that's off-limits regardless of framing. Separately, don't use Heenal's name in commit messages, and don't repeat it in files like `SESSION_STATE.md` when a neutral phrasing works just as well (referring to Heenal/Maya/Mina as book club members — the actual app data — is fine; narrating "Heenal did X" as the session author is not). It's fine, and encouraged, to note that this project is a learning exercise and name the skills being practiced (git workflow, SQL, Supabase, Jenkins CI/CD, etc.) — that's good context, not something to hide.
 
 ---
 

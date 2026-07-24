@@ -12,6 +12,8 @@ Last updated: July 24, 2026
 **Status:** Everything through today's Jenkins work is merged to `main` (PRs #1–#8, all clean). GitHub repo is now **public** (`github.com/HeenalA/bookclub-web-app`). The Supabase schema (4 tables, RLS enabled, public-read policies) is live, and batch 1 of real data (3 members, all 81 books, all star ratings) is seeded into the actual database.
 **Branch:** `main` (clean, nothing uncommitted)
 
+**Project context:** this app doubles as a hands-on learning project — recent sprints have been a deliberate opportunity to practice real git workflow (branches, PRs, merge conflicts), SQL/Postgres (schema design, RLS), Supabase, and Jenkins CI/CD against a real, non-trivial codebase rather than tutorials.
+
 **Next task (pick up here):**
 1. **Decide how Claude runs the remaining SQL directly** (this speeds up review seeding, since RLS correctly blocks the anon key from writing anything — no INSERT policies exist, by design). Two options being weighed:
    - Install `psql` locally + share the DB connection string (Project Settings → Database), or
