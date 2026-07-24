@@ -2,34 +2,32 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: July 24, 2026 (paused for Heenal's final-round interview)
+Last updated: July 24, 2026
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Early Phase 2 — Supabase is live with real schema + real ratings data. A working Jenkins CI pipeline now exists against this repo too. Reviews (prose text) are the next data-seeding step once interview prep wraps up.
-**Status:** Everything through today's Jenkins work is merged to `main` (PRs #1–#8, all clean). GitHub repo is now **public** (`github.com/HeenalA/bookclub-web-app`) — Heenal confirmed this while setting up Jenkins today. The Supabase schema (4 tables, RLS enabled, public-read policies) is live, and batch 1 of real data (3 members, all 81 books, all star ratings) is seeded into the actual database.
+**Current phase:** Early Phase 2 — Supabase is live with real schema + real ratings data. A working Jenkins CI pipeline now exists against this repo too. Reviews (prose text) are the next data-seeding step.
+**Status:** Everything through today's Jenkins work is merged to `main` (PRs #1–#8, all clean). GitHub repo is now **public** (`github.com/HeenalA/bookclub-web-app`). The Supabase schema (4 tables, RLS enabled, public-read policies) is live, and batch 1 of real data (3 members, all 81 books, all star ratings) is seeded into the actual database.
 **Branch:** `main` (clean, nothing uncommitted)
 
-**Immediate context:** Heenal has a final-round SWE interview tomorrow (July 25) and spent today specifically on hands-on Jenkins CI/CD practice against this real repo, to have a genuine story to tell rather than just theory. That succeeded — see the Jenkins section below. Supabase review-seeding is paused until after the interview.
+**Project context:** this app doubles as a hands-on learning project — recent sprints have been a deliberate opportunity to practice real git workflow (branches, PRs, merge conflicts), SQL/Postgres (schema design, RLS), Supabase, and Jenkins CI/CD against a real, non-trivial codebase rather than tutorials.
 
-**Next task (pick up here, after the interview):**
-1. **Decide how Claude runs the remaining SQL directly** (Heenal asked for this to speed things up, since RLS correctly blocks the anon key from writing anything — no INSERT policies exist, by design). Two options were being weighed:
+**Next task (pick up here):**
+1. **Decide how Claude runs the remaining SQL directly** (this speeds up review seeding, since RLS correctly blocks the anon key from writing anything — no INSERT policies exist, by design). Two options being weighed:
    - Install `psql` locally + share the DB connection string (Project Settings → Database), or
    - Share the `service_role` key (Project Settings → API) and Claude uses `curl` against the REST API instead (no install needed)
    
-   Whichever Heenal picks, that credential is more powerful than the anon key (bypasses RLS) — treat it as sensitive, never let it land in a committed file. **Not decided yet** — got sidetracked into Jenkins practice before this was resolved.
+   Whichever option is picked, that credential is more powerful than the anon key (bypasses RLS) — treat it as sensitive, never let it land in a committed file. **Not decided yet.**
 2. Seed **reviews** (the ~200 prose reviews across ~69 books) using whichever method was picked — scoped as a few sequential batches by year (2020–2021, 2022–2023, 2024–2026) since it's too much content for one shot.
 3. Wire `frontend/js/main.js` to actually query Supabase (via `supabase-js` from a CDN script tag, since there's still no bundler) instead of `fetch()`-ing the local `seed_data.json`.
-4. Set up Vercel hosting connected to `main` for the recruiter-shareable live URL (discussed, not started).
-5. Longer term: real Supabase Auth + club-membership-scoped RLS (see privacy note below) — now more urgent since the repo is confirmed public.
-6. Possibly: practice resolving an actual merge conflict together (walkthrough already given, see below — practice deferred to "later," not done yet).
-7. Possibly: containerize the FastAPI backend once it's actually built out (currently just scaffolding + one validator function) — discussed as a good future exercise, not started.
+4. Set up Vercel hosting connected to `main` for a shareable live URL (discussed, not started).
+5. Longer term: real Supabase Auth + club-membership-scoped RLS (see privacy note below) — more urgent now that the repo is public.
+6. Practice resolving an actual merge conflict (walkthrough already given, see below — hands-on practice still pending).
+7. Possibly: containerize the FastAPI backend once it's actually built out (currently just scaffolding + one validator function).
 
-**Context on why this project has moved fast:** Heenal has been using this real project as hands-on practice for an active job search / interview loop — git workflow, PRs, SQL/Supabase, and now Jenkins CI/CD — prioritizing genuine hands-on experience over theory, often choosing to move fast and defer deeper explanations to catch up later (today's Jenkins section below is the "catch up" — Heenal explicitly asked for a fuller conceptual explanation after getting the pipeline green).
-
-**Important privacy note carried forward:** the `reviews`/`ratings` tables currently have **public read** RLS policies (`using (true)`) — anyone with the anon key (which is necessarily public in `frontend/js/supabase-config.js`) can query full review text directly via the REST API right now, not just see it rendered on the page. Heenal explicitly chose to seed real data now and tighten access later (real Auth + club-membership RLS), accepting that tradeoff knowingly — this is not an oversight, but it should stay near the top of the priority list once the demo is otherwise working, especially before/if the GitHub repo and live site both go public.
+**Important privacy note carried forward:** the `reviews`/`ratings` tables currently have **public read** RLS policies (`using (true)`) — anyone with the anon key (which is necessarily public in `frontend/js/supabase-config.js`) can query full review text directly via the REST API right now, not just see it rendered on the page. This was a deliberate, informed tradeoff (seed real data now, tighten access later via real Auth + club-membership RLS) — not an oversight — but it should stay near the top of the priority list given the repo and site are both public.
 
 ### How to run locally
 ```bash
@@ -65,26 +63,26 @@ Starts the server on port 3000 and auto-opens your browser to the home page. (Ma
 - [x] `main.js` rewritten to fetch seed data and render ratings/reviews tables dynamically instead of hardcoded HTML
 - [x] Phase 1 identity system: "Welcome, {Name}" + a Profile tab that cycles the current user (stored in `localStorage`) — client-side only, not real auth/security (that's Phase 2 via Supabase Auth)
 - [x] Ratings/reviews tables gate editing visually by current user (own column = editable, others = read-only)
-- [x] Nav redesigned: single header row (logo + Welcome + Profile tab), club nav (Home/Ratings/Reviews) in its own row below — went through a few iterations with Heenal reviewing each change individually
+- [x] Nav redesigned: single header row (logo + Welcome + Profile tab), club nav (Home/Ratings/Reviews) in its own row below — went through a few design iterations before settling
 - [x] Fixed sticky-header bug on ratings/reviews tables — offset is now computed from real nav height via a CSS variable instead of a hardcoded pixel value
 - [x] `feature/sprint2-seed-data` merged to `main` via PR #2
 - [x] Security audit run on repo (gitignore coverage, tracked `.env` check, full git history scanned for secret-like strings, tracked files scanned for emails) — came back clean, no real secrets ever committed
 - [x] `.githooks/pre-commit` added — blocks commits that stage a real `.env` file or add lines matching secret-like patterns (api key/password/token/etc, skipping placeholders). Enabled locally via `git config core.hooksPath .githooks` (one-time per clone, documented in `WORKFLOW.md`). Merged to `main` via PR #3.
-- [x] Discussed making the GitHub repo public for Heenal's resume/portfolio — audit supports it being safe, GitHub Pages ruled out (needs paid plan for private repos, and repo would need to go public anyway), decided the live site (Vercel) + public repo are the two links to use. **Not yet actioned** — Heenal was going to flip repo visibility via GitHub Settings → Danger Zone herself.
-- [x] Real book club data received from Heenal (the actual Google Doc/PDF — 78 books, full meeting history, star ratings, prose reviews, to-read list, etc). Cleaned/structural subset saved to `data/source/bookclub_raw.md` (meeting list, master book list, ratings by star, overall rankings, to-read list). **This file is gitignored** — contains personal content and should never be committed. Full prose reviews and the Zoom link/password were deliberately left out even from that local file; original attachments have the full text if needed again.
+- [x] Discussed making the GitHub repo public for portfolio purposes — audit supports it being safe, GitHub Pages ruled out (needs paid plan for private repos, and repo would need to go public anyway), decided the live site (Vercel) + public repo are the two links to use. Repo visibility flipped to public via GitHub Settings → Danger Zone.
+- [x] Real book club data received (the actual Google Doc/PDF — 78 books, full meeting history, star ratings, prose reviews, to-read list, etc). Cleaned/structural subset saved to `data/source/bookclub_raw.md` (meeting list, master book list, ratings by star, overall rankings, to-read list). **This file is gitignored** — contains personal content and should never be committed. Full prose reviews and the Zoom link/password were deliberately left out even from that local file; original attachments have the full text if needed again.
 - [x] `frontend/data/seed_data.json` is still just the ~11-book representative subset, not the real 78 — real data is now available in `data/source/bookclub_raw.md` to backfill from
 - [x] Supabase project created: `https://rzaqlstmcmmzjdqwzgmz.supabase.co`. Data API enabled, "automatically expose new tables" disabled, "automatic RLS on new tables" enabled — all deliberate least-privilege choices.
 - [x] `frontend/js/supabase-config.js` created with the project URL + anon key (safe to commit — anon key is meant to be public; real security is RLS policies, not key secrecy). Committed on `feature/sprint3-supabase-setup`.
 - [x] Schema SQL designed and **successfully run** for 4 tables (`members`, `books`, `ratings`, `reviews`) with RLS enabled and public **read-only** policies on each (no write policies yet — those need real Supabase Auth sessions, which don't exist yet; current identity system is still the Phase 1 client-side fake one). Confirmed live via Table Editor.
 - [x] `feature/sprint3-supabase-setup` merged to `main` via PR #4
 - [x] Found and fixed a deeper sticky-header bug: `position: sticky` on `<th>` inside a `border-collapse: collapse` table is unreliable in WebKit — the header cell was detaching and rendering inside the table body. Removed sticky from both ratings/reviews table headers (and the now-dead JS that computed the offset) instead of continuing to patch a pixel value. Also fixed two related cross-browser gaps found while auditing: missing `-webkit-backdrop-filter` prefix on the countdown card blur, missing standard `line-clamp` alongside the WebKit-only prefix. Merged to `main` via PR #5.
-- [x] Privacy discussion: confirmed that RLS changes are fully controllable going forward but don't retroactively un-expose anything already read during a more-open policy window (same principle as the earlier public-repo git-history discussion). Heenal wants a future layer: real Supabase Auth + a `club_members` table so users only see/edit data for clubs they belong to, and only edit their own rows — this is the eventual replacement for the current public-read policies and the fake client-side identity switcher.
+- [x] Privacy discussion: confirmed that RLS changes are fully controllable going forward but don't retroactively un-expose anything already read during a more-open policy window (same principle as the earlier public-repo git-history discussion). Planned future layer: real Supabase Auth + a `club_members` table so users only see/edit data for clubs they belong to, and only edit their own rows — this is the eventual replacement for the current public-read policies and the fake client-side identity switcher.
 - [x] Real data seeding, batch 1 (**done**): all 3 members, all 81 books (in the club's own #1–81 order, so auto-generated `book_id` matches the doc's own numbering), and all ~270 individual star ratings — transcribed by hand from `data/source/bookclub_raw.md` and successfully run against the live Supabase database. Saved as `data/source/seed_batch1_books_ratings.sql` (gitignored). A few title variants in the source doc were normalized to one canonical spelling (documented in that file's SQL comments); `author` is `null` for all books (not reliably available in the source doc); ~19 books have no noted picker so `picked_by` is `null` for those.
-- [x] Real data seeding, batch 2 (reviews) — **not started, paused for interview prep**. Scoped as a few sequential batches by year given ~200 individual prose reviews across ~69 books. Heenal asked Claude to run this SQL directly (via `psql` + DB connection string, or `service_role` key + REST API) instead of copy-pasting each batch manually — **method still not decided.**
-- [x] GitHub repo confirmed **public** (`github.com/HeenalA/bookclub-web-app`) — Heenal referenced it as public while setting up the Jenkins pipeline today, so the earlier "audited safe, not yet done" item is now done.
-- [x] **Jenkins CI/CD set up and working, end to end** — full walkthrough below, this was today's main focus for interview prep.
-- [x] Ran a full-page smoke check (curl on home/ratings/reviews + `node --check` on `main.js`) before pausing — all three pages return HTTP 200, no JS syntax errors. Safe to demo the static pages as-is tomorrow if needed.
-- [x] Gave Heenal a plain-language walkthrough of resolving a git merge conflict (conflict markers, `git add` to mark resolved, `git commit`/`git rebase --continue` to finish, verify before pushing) — **conceptual only, practice deferred to a later session.**
+- [x] Real data seeding, batch 2 (reviews) — **not started yet**. Scoped as a few sequential batches by year given ~200 individual prose reviews across ~69 books. This SQL should be run directly (via `psql` + DB connection string, or `service_role` key + REST API) rather than copy-pasted manually — **method still not decided.**
+- [x] GitHub repo confirmed **public** (`github.com/HeenalA/bookclub-web-app`).
+- [x] **Jenkins CI/CD set up and working, end to end** — full walkthrough below.
+- [x] Ran a full-page smoke check (curl on home/ratings/reviews + `node --check` on `main.js`) — all three pages return HTTP 200, no JS syntax errors.
+- [x] Walked through resolving a git merge conflict conceptually (conflict markers, `git add` to mark resolved, `git commit`/`git rebase --continue` to finish, verify before pushing) — **conceptual only, hands-on practice still pending.**
 
 ---
 
@@ -145,13 +143,13 @@ pipeline {
 }
 ```
 
-**Two real bugs hit and fixed (good interview debugging story — read the exact error, fix that specific thing):**
+**Two real bugs hit and fixed (a good debugging story — read the exact error, fix that specific thing, not guess-and-check):**
 1. `pip3 install -r requirements.txt` failed — `No such file or directory`. Root cause: `sh` steps run from the workspace root by default, but all Python code lives under `backend/`. Fixed with `dir('backend') { ... }`, which is the pipeline equivalent of `cd backend` for everything inside that block, auto-restoring the working directory after.
 2. After that fix, pip found the file but `psycopg2-binary` failed to build from source — `pg_config executable not found`. Root cause: no prebuilt wheel existed for this container's exact platform, so pip fell back to compiling from source, which needs Postgres's own `pg_config` tool that isn't installed in the Jenkins container. Since the current test suite is pure Python and touches no database at all, the real fix was splitting `requirements-dev.txt` (test-only: just `pytest`) from the full runtime `requirements.txt`, so CI never attempts to install/compile packages the tests don't actually need.
 
 **Result:** pipeline goes green end-to-end — checkout → install Python → install test deps → run 4 tests (all pass) → publish JUnit report → deploy placeholder. `Finished: SUCCESS`.
 
-**Conceptual explanation given (Heenal asked for this after getting it working, to be able to narrate it, not just have it work):** what Jenkins/a job/a pipeline/a stage/a step/an agent/a workspace/Console Output/an exit code/JUnit XML each actually are, in plain language, plus a re-walk of both bugs using that vocabulary. Also clarified: **only Jenkins itself runs in Docker** — the frontend static site isn't containerized (nothing to containerize, no build step), and the one thing actually being tested (`is_valid_rating`) is tested *inside the Jenkins container's own filesystem*, not on the Mac host — that's why the pipeline has to `apt-get install python3` as its own stage (the base Jenkins image only has Java).
+**Conceptual explanation added, so the pipeline is understood, not just working:** what Jenkins/a job/a pipeline/a stage/a step/an agent/a workspace/Console Output/an exit code/JUnit XML each actually are, in plain language, plus a re-walk of both bugs using that vocabulary. Also clarified: **only Jenkins itself runs in Docker** — the frontend static site isn't containerized (nothing to containerize, no build step), and the one thing actually being tested (`is_valid_rating`) is tested *inside the Jenkins container's own filesystem*, not on the Mac host — that's why the pipeline has to `apt-get install python3` as its own stage (the base Jenkins image only has Java).
 
 **Restart commands if the Jenkins container ever stops:** `docker start modest_curie` (do **not** re-run the original long `docker run` command — that would create a second, separate Jenkins instance with none of today's job/config history).
 
