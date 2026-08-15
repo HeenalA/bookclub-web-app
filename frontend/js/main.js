@@ -1,16 +1,54 @@
 /* ============================================================
-   main.js — Loads data from seed_data.json and renders pages.
-   LEARNING: fetch() reads seed_data.json, our stand-in database
-   for Phase 1. In Phase 2 this becomes a real API call to
-   FastAPI/Supabase instead — the HTML and render functions
-   below won't need to change, only loadData() will.
+   main.js — Loads live data from Supabase and renders pages.
+   LEARNING: this used to fetch() seed_data.json as a stand-in
+   database. Now it queries the real Supabase tables directly via
+   supabase-js (loaded from a CDN script tag in each page, before
+   this file). The render functions below didn't need to change —
+   only loadData() did — because we map the DB's snake_case columns
+   (member_id, book_id, picked_by) to the same camelCase shape
+   (memberId, bookId, pickedBy) the rest of this file already expects.
    ============================================================ */
 
 let DATA = null;
 
+// No `clubs`/`meetings` table exists in Supabase yet (that's a future
+// multi-club schema change) — this stays a local placeholder until then.
+// NOTE: this date is already in the past; update it to the real next
+// meeting date whenever that's scheduled.
+const NEXT_MEETING = "2026-07-05T18:00:00-07:00";
+
 async function loadData() {
-  const res = await fetch("../data/seed_data.json");
-  DATA = await res.json();
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const [membersRes, booksRes, ratingsRes, reviewsRes] = await Promise.all([
+    sb.from("members").select("*"),
+    sb.from("books").select("*"),
+    sb.from("ratings").select("*"),
+    sb.from("reviews").select("*"),
+  ]);
+
+  for (const [label, res] of [
+    ["members", membersRes], ["books", booksRes],
+    ["ratings", ratingsRes], ["reviews", reviewsRes],
+  ]) {
+    if (res.error) throw new Error(`Failed to load ${label} from Supabase: ${res.error.message}`);
+  }
+
+  DATA = {
+    members: membersRes.data.map(m => ({
+      id: m.id, name: m.name, color: m.color, initials: m.initials,
+    })),
+    books: booksRes.data.map(b => ({
+      id: b.id, title: b.title, author: b.author,
+      pickedBy: b.picked_by, status: b.status, year: b.year,
+    })),
+    ratings: ratingsRes.data.map(r => ({
+      memberId: r.member_id, bookId: r.book_id, value: r.value,
+    })),
+    reviews: reviewsRes.data.map(r => ({
+      memberId: r.member_id, bookId: r.book_id, text: r.text,
+    })),
+  };
   return DATA;
 }
 
@@ -85,7 +123,7 @@ function initCountdown() {
   const el = document.getElementById("countdown");
   if (!el) return;
 
-  const nextMeeting = new Date(DATA.club.nextMeeting);
+  const nextMeeting = new Date(NEXT_MEETING);
 
   function tick() {
     const diff = nextMeeting - new Date();
@@ -197,16 +235,19 @@ function renderReviewsTable() {
       lastYear = book.year;
     }
 
+    // book.pickedBy is null for ~10 real books with no recorded picker —
+    // memberById() correctly returns undefined for those, so the chip
+    // below is only rendered when there's an actual picker to show.
     const picker = memberById(book.pickedBy);
-    const pickerColors = CHIP_COLORS[picker.id];
+    const pickerColors = picker ? CHIP_COLORS[picker.id] : null;
 
     html += `<tr>
       <td>
         <p class="book-num">#${book.id}</p>
         <p class="book-title-cell">${escapeHtml(book.title)}</p>
-        <span class="picker-chip-sm" style="background:${pickerColors.bg};color:${pickerColors.text};">
+        ${picker ? `<span class="picker-chip-sm" style="background:${pickerColors.bg};color:${pickerColors.text};">
           <span class="dot" style="background:${picker.color};"></span>${picker.name}
-        </span>
+        </span>` : ""}
       </td>`;
 
     DATA.members.forEach(member => {
@@ -246,4 +287,6 @@ loadData().then(() => {
   renderRatingsTable();
   renderReviewsTable();
   highlightActiveNav();
+}).catch(err => {
+  console.error("Failed to load data from Supabase:", err);
 });

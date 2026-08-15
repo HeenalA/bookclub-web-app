@@ -42,6 +42,23 @@ That single file contains everything needed to resume instantly.
 6. Never delete data without confirmation
 7. Always update `docs/SESSION_STATE.md` at end of session
 8. This repo is public. Never mention specific personal circumstances (job interviews, job search, personal schedule/deadlines) in commit messages or committed docs — that's off-limits regardless of framing. Separately, don't use Heenal's name in commit messages, and don't repeat it in files like `SESSION_STATE.md` when a neutral phrasing works just as well (referring to Heenal/Maya/Mina as book club members — the actual app data — is fine; narrating "Heenal did X" as the session author is not). It's fine, and encouraged, to note that this project is a learning exercise and name the skills being practiced (git workflow, SQL, Supabase, Jenkins CI/CD, etc.) — that's good context, not something to hide.
+9. Never interpolate raw external/human-sourced text (doc exports, seed data, future user-submitted content) into SQL or HTML without sanitizing it first — see 🔒 Input Sanitization below for the specific rules and why.
+
+---
+
+## 🔒 Input Sanitization
+
+Applies to anything that isn't a literal written directly in code: doc/PDF exports used for seeding, and — once real click-to-edit-and-save exists — actual member-submitted review/rating text.
+
+**Generating raw SQL (seeding scripts, one-off data migrations):**
+- Escape single quotes (`'` → `''`) before interpolating any text into a SQL string literal. A real bug during reviews seeding: doc-exported review text with apostrophes would have broken SQL syntax if inserted unescaped.
+- When importing from a Google Docs `.md` export specifically: strip markdown escape-backslashes (`\-`, `\!`, `\<`, `\_`, `\+`, `\=`, `\#`, etc.) before the data lands anywhere real. Google Docs' export backslash-escapes punctuation that was never actually typed that way — left in, it corrupts the data itself (not a security bug, but a correctness one caught the same way).
+- Prefer parameterized queries / prepared statements over string concatenation wherever the tool supports it (e.g. if the FastAPI backend ever runs raw SQL directly, use placeholders like `%s`/`$1`, not f-strings) — this closes off SQL injection categorically instead of relying on manually getting escaping right each time.
+
+**Rendering to the DOM (frontend):**
+- Always run dynamic text through `escapeHtml()` (`frontend/js/main.js`) before interpolating it into an `innerHTML` string. Already done consistently today for book titles and review text — keep doing it for any new field that gets rendered.
+- Never assign unescaped external/user text directly via `innerHTML`; use `textContent` when no HTML formatting is actually needed.
+- This is precautionary today (all current content is Heenal-curated seed data) but becomes load-bearing — a real XSS vector — the moment click-to-edit-and-save ships and review/rating text becomes genuinely user-controlled.
 
 ---
 
