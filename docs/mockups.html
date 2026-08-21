@@ -113,6 +113,97 @@
   .spec-item span { color:#666; }
   .color-swatch { display:inline-flex; align-items:center; gap:8px; margin-bottom:6px; }
   .swatch { width:20px; height:20px; border-radius:50%; display:inline-block; }
+
+  /* ── AUTH / FORMS (new) ── */
+  .auth-wrap { display:flex; justify-content:center; padding:44px 20px; }
+  .auth-card { background:#fff; border:0.5px solid #e0d8d0; border-radius:14px; padding:34px 32px; width:100%; max-width:340px; text-align:center; }
+  .auth-logo { font-family:'Lora',serif; font-style:italic; font-size:19px; margin-bottom:4px; }
+  .auth-sub { font-size:11px; color:#aaa; margin-bottom:26px; }
+  .field { text-align:left; margin-bottom:13px; }
+  .field label { display:block; font-size:10px; color:#999; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.06em; }
+  .field input, .field textarea { width:100%; padding:9px 12px; border:0.5px solid #d8d0c6; border-radius:8px; font-size:13px; font-family:'DM Sans',sans-serif; background:#faf8f5; color:#2c3e50; }
+  .field textarea { resize:none; height:60px; font-family:'DM Sans',sans-serif; }
+  .btn { display:block; width:100%; padding:10px; border-radius:20px; border:none; font-size:13px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; text-align:center; box-sizing:border-box; }
+  .btn-primary { background:#9E7BC9; color:#fff; margin-top:4px; }
+  .btn-secondary { background:transparent; border:0.5px solid #d8d0c6; color:#666; }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:20px 0; font-size:10px; color:#bbb; }
+  .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:#e8e2da; }
+  .auth-note { font-size:11px; color:#999; line-height:1.6; margin-top:16px; }
+  .auth-note strong { color:#777; }
+  .pending-icon { width:40px; height:40px; border-radius:50%; background:#fdf3d8; color:#c9a13b; display:flex; align-items:center; justify-content:center; font-size:18px; margin:0 auto 14px; }
+
+  /* ── USER HOME (new) ── */
+  .uh-wrap { max-width:640px; margin:0 auto; padding:36px 20px; }
+  .uh-user-card { display:flex; align-items:center; gap:14px; background:#fff; border:0.5px solid #e0d8d0; border-radius:14px; padding:18px 22px; margin-bottom:30px; }
+  .uh-avatar { width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff; font-family:'Lora',serif; flex-shrink:0; background:#9E7BC9; }
+  .uh-user-name { font-family:'Lora',serif; font-size:16px; }
+  .uh-user-email { font-size:11px; color:#999; margin-top:2px; }
+  .uh-user-actions { margin-left:auto; }
+  .club-list { display:flex; flex-direction:column; gap:10px; margin-bottom:8px; }
+  .club-card { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:0.5px solid #e0d8d0; border-radius:12px; padding:14px 18px; }
+  .club-card-left { display:flex; align-items:center; gap:12px; }
+  .club-avatar-group { display:flex; }
+  .club-avatar-group .av-sm { margin-left:-6px; border:2px solid #fff; width:22px; height:22px; font-size:8px; }
+  .club-avatar-group .av-sm:first-child { margin-left:0; }
+  .club-name { font-family:'Lora',serif; font-size:14px; margin-bottom:2px; }
+  .club-meta { font-size:10px; color:#999; }
+  .status-badge { font-size:9px; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.04em; font-weight:500; }
+  .status-active { background:#e6f2ea; color:#2e7d4f; }
+  .status-pending { background:#fdf3d8; color:#93731c; }
+  .status-inactive { background:#f0ede8; color:#999; }
+  .btn-small { font-size:11px; padding:6px 15px; border-radius:20px; border:0.5px solid #d8d0c6; background:#fff; color:#666; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; }
+  .btn-small-primary { background:#9E7BC9; color:#fff; border:none; }
+  .admin-panel { background:#faf8f5; border:0.5px dashed #d8d0c6; border-radius:12px; padding:16px 18px; margin-top:6px; }
+  .admin-panel .sec { color:#b89a3f; }
+  .admin-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:0.5px solid #e8e2da; }
+  .admin-row:last-child { border-bottom:none; }
+  .admin-row-name { font-size:12px; }
+  .admin-row-meta { font-size:10px; color:#aaa; }
+  .admin-actions { display:flex; gap:6px; }
+  .badge-visibility { font-size:9px; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:0.03em; font-weight:500; margin-left:6px; }
+  .badge-public { background:#eef2fb; color:#3a5aa8; }
+  .badge-private { background:#f5eefb; color:#7a3aa8; }
+  .search-bar { margin-bottom:12px; }
+  .search-bar input { width:100%; padding:9px 14px; border:0.5px solid #d8d0c6; border-radius:20px; font-size:12px; background:#faf8f5; font-family:'DM Sans',sans-serif; box-sizing:border-box; color:#2c3e50; }
+  .browse-table { border:0.5px solid #e0d8d0; border-radius:12px; overflow:hidden; background:#fff; }
+  .browse-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 16px; border-bottom:0.5px solid #e8e2da; }
+  .browse-row:last-child { border-bottom:none; }
+  .browse-row-name { font-size:13px; }
+  .browse-row-meta { font-size:10px; color:#999; margin-top:2px; }
+  .browse-pagination { display:flex; align-items:center; justify-content:center; gap:16px; padding:10px; font-size:11px; color:#999; background:#faf8f5; border-top:0.5px solid #e8e2da; }
+  .page-arrow { cursor:pointer; color:#bbb; }
+  .page-arrow.on { color:#9E7BC9; }
+  .code-inline { display:flex; align-items:center; gap:6px; }
+  .code-inline input { width:90px; padding:6px 9px; border:0.5px solid #d8d0c6; border-radius:8px; font-size:11px; font-family:monospace; background:#faf8f5; letter-spacing:0.04em; }
+  .code-pill { font-family:monospace; font-size:13px; background:#f0ede8; padding:6px 12px; border-radius:8px; color:#666; letter-spacing:0.08em; }
+  .placeholder-note { font-size:12px; color:#b89a3f; background:#fdf9ec; border:0.5px dashed #e0cf8a; border-radius:10px; padding:14px 18px; line-height:1.6; }
+  .uh-tabs { display:flex; gap:6px; margin-bottom:26px; }
+  .uh-tab { font-size:12px; padding:6px 16px; border-radius:20px; border:0.5px solid #ddd; color:#888; cursor:pointer; }
+  .uh-tab.on { background:#9E7BC9; color:#fff; border-color:#9E7BC9; }
+  .search-row { display:flex; gap:10px; margin-bottom:12px; }
+  .search-row .search-bar { flex:1; margin-bottom:0; }
+  .btn-create { white-space:nowrap; padding:0 20px; border-radius:20px; background:#9E7BC9; color:#fff; border:none; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+  /* ── MEETINGS (new) ── */
+  .mtg-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; }
+  .mtg-title { font-family:'Lora',serif; font-size:16px; font-style:italic; }
+  .mtg-body { padding:0 20px 20px; }
+  .meeting-next-card { border:0.5px solid #e0d8d0; border-radius:12px; padding:18px 20px; background:#faf8f5; margin-bottom:22px; display:flex; align-items:center; gap:16px; justify-content:space-between; }
+  .meeting-date-block { text-align:center; background:#fff; border:0.5px solid #e0d8d0; border-radius:10px; padding:8px 16px; min-width:52px; flex-shrink:0; }
+  .meeting-date-month { font-size:9px; text-transform:uppercase; color:#999; letter-spacing:0.05em; }
+  .meeting-date-day { font-family:'Lora',serif; font-size:22px; color:#9E7BC9; line-height:1.1; }
+  .meeting-info { flex:1; }
+  .meeting-info h4 { font-family:'Lora',serif; font-size:14px; font-weight:400; margin:0 0 3px; }
+  .meeting-info p { font-size:11px; color:#888; margin:0 0 6px; }
+  .countdown-flag { font-size:9px; background:#e8dcf5; color:#3C3489; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+  .mtg-past-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 16px; border-bottom:0.5px solid #e8e2da; }
+  .mtg-past-row:last-child { border-bottom:none; }
+  .mtg-past-date { font-size:11px; color:#999; width:64px; flex-shrink:0; }
+  .mtg-past-book { font-size:12px; flex:1; }
+  .mtg-past-loc { font-size:10px; color:#aaa; }
+  .mtg-num { font-size:10px; color:#aaa; width:26px; flex-shrink:0; }
+  .mtg-edit-col { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .btn-danger { background:transparent; border:0.5px solid #e0a8a0; color:#c0392b; }
 </style>
 </head>
 <body>
@@ -151,14 +242,313 @@
     </div>
   </div>
 
+  <!-- ── LOGIN PAGE ── -->
+  <h2 class="section-title">Page 1 — Login</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Login — sign in</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <p class="auth-logo">To Read or Not to Read</p>
+        <p class="auth-sub">Sign in to your book clubs</p>
+        <div class="field"><label>Email</label><input type="text" placeholder="you@email.com" readonly/></div>
+        <div class="field"><label>Password</label><input type="text" placeholder="••••••••" readonly/></div>
+        <span class="btn btn-primary">Log in</span>
+        <div class="auth-divider">or</div>
+        <span class="btn btn-secondary">Request access</span>
+        <p class="auth-note">New accounts are <strong>approved manually</strong> — request access below and an admin will confirm you.</p>
+      </div>
+    </div>
+  </div>
+  <div class="mockup-card">
+    <div class="mockup-label">Login — "Request access" form (no self-serve signup)</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <p class="auth-logo">Request access</p>
+        <p class="auth-sub">One request per email — an admin reviews before you can sign in</p>
+        <div class="field"><label>Name</label><input type="text" placeholder="Your name" readonly/></div>
+        <div class="field"><label>Email</label><input type="text" placeholder="you@email.com" readonly/></div>
+        <div class="field"><label>Password</label><input type="text" placeholder="Choose a password" readonly/></div>
+        <div class="field"><label>Note to admin (optional)</label><textarea placeholder="e.g. which club you'd like to join" readonly></textarea></div>
+        <span class="btn btn-primary">Submit request</span>
+        <span class="btn btn-secondary" style="margin-top:8px;">Back to log in</span>
+      </div>
+    </div>
+  </div>
+  <div class="mockup-card">
+    <div class="mockup-label">Login — pending-approval state (shown after submitting, or on login attempt while pending)</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="pending-icon">⏳</div>
+        <p class="auth-logo" style="font-size:16px;">Request submitted</p>
+        <p class="auth-sub" style="margin-bottom:6px;">Thanks! Your account is awaiting admin approval.</p>
+        <p class="auth-note">You'll be able to log in once approved. This usually only takes a day or two.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── USER HOME PAGE ── -->
+  <h2 class="section-title">Page 2 — User Home (lands here after login)</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">User Home — Clubs tab (default) — approved direction</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav"><span>Log out</span></div>
+    </div>
+    <div class="uh-wrap">
+      <div class="uh-user-card">
+        <div class="uh-avatar">H</div>
+        <div>
+          <p class="uh-user-name">Heenal</p>
+          <p class="uh-user-email">heenal@email.com</p>
+        </div>
+        <div class="uh-user-actions"><span class="btn-small">Edit profile</span></div>
+      </div>
+
+      <div class="uh-tabs">
+        <span class="uh-tab on">Clubs</span>
+        <span class="uh-tab">Books</span>
+        <span class="uh-tab">Ratings</span>
+        <span class="uh-tab">Reviews</span>
+      </div>
+
+      <p class="sec">Your book clubs</p>
+      <div class="club-list">
+        <div class="club-card">
+          <div class="club-card-left">
+            <div class="club-avatar-group">
+              <div class="av-sm" style="background:#7B9EC9;">M</div>
+              <div class="av-sm" style="background:#C97B9E;">Mi</div>
+              <div class="av-sm" style="background:#9E7BC9;">H</div>
+            </div>
+            <div>
+              <p class="club-name">To Read or Not to Read<span class="badge-visibility badge-private">Private</span></p>
+              <p class="club-meta">3 active members · 81 books</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="status-badge status-active">Active</span>
+            <span class="btn-small btn-small-primary">Enter club →</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="sec" style="margin-top:22px;">Was Your Bookclub</p>
+      <div class="club-list">
+        <div class="club-card">
+          <div class="club-card-left">
+            <div class="club-avatar-group">
+              <div class="av-sm" style="background:#aaa;">J</div>
+              <div class="av-sm" style="background:#aaa;">K</div>
+            </div>
+            <div>
+              <p class="club-name">Nonfiction Nook<span class="badge-visibility badge-public">Public</span></p>
+              <p class="club-meta">Left May 2025 · your reviews & ratings are kept</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="status-badge status-inactive">Inactive</span>
+            <span class="btn-small">Rejoin</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="sec" style="margin-top:22px;">Could Be Your Bookclub</p>
+      <div class="search-row">
+        <div class="search-bar"><input type="text" placeholder="Search book clubs..." readonly/></div>
+        <span class="btn-create">+ Create book club</span>
+      </div>
+      <div class="browse-table">
+        <div class="browse-row">
+          <div>
+            <p class="browse-row-name">Sci-Fi Sunday<span class="badge-visibility badge-public">Public</span></p>
+            <p class="browse-row-meta">4 active members</p>
+          </div>
+          <span class="btn-small">Request to join</span>
+        </div>
+        <div class="browse-row">
+          <div>
+            <p class="browse-row-name">Mystery Mavens<span class="badge-visibility badge-private">Private</span></p>
+            <p class="browse-row-meta">6 active members · admin-shared code required</p>
+          </div>
+          <div class="code-inline">
+            <input type="text" placeholder="Code" readonly/>
+            <span class="btn-small btn-small-primary">Join</span>
+          </div>
+        </div>
+        <div class="browse-row">
+          <div>
+            <p class="browse-row-name">Poetry & Prose<span class="badge-visibility badge-public">Public</span></p>
+            <p class="browse-row-meta">2 active members</p>
+          </div>
+          <span class="btn-small">Request to join</span>
+        </div>
+        <div class="browse-row">
+          <div>
+            <p class="browse-row-name">The Thriller Table<span class="badge-visibility badge-private">Private</span></p>
+            <p class="browse-row-meta">8 active members · admin-shared code required</p>
+          </div>
+          <div class="code-inline">
+            <input type="text" placeholder="Code" readonly/>
+            <span class="btn-small btn-small-primary">Join</span>
+          </div>
+        </div>
+        <div class="browse-row">
+          <div>
+            <p class="browse-row-name">Cookbook Club<span class="badge-visibility badge-public">Public</span></p>
+            <p class="browse-row-meta">3 active members</p>
+          </div>
+          <span class="btn-small">Request to join</span>
+        </div>
+        <div class="browse-pagination">
+          <span class="page-arrow">‹ Prev</span>
+          <span>Page 1 of 3</span>
+          <span class="page-arrow on">Next ›</span>
+        </div>
+      </div>
+
+      <p class="sec" style="margin-top:26px;">Pending requests (admin only)</p>
+      <div class="admin-panel">
+        <div class="admin-row">
+          <div>
+            <p class="admin-row-name">Maya Patel</p>
+            <p class="admin-row-meta">maya@email.com · requested "To Read or Not to Read" · 2 days ago</p>
+          </div>
+          <div class="admin-actions">
+            <span class="btn-small btn-small-primary">Approve</span>
+            <span class="btn-small">Deny</span>
+          </div>
+        </div>
+        <div class="admin-row">
+          <div>
+            <p class="admin-row-name">test_dev_03</p>
+            <p class="admin-row-meta">testdev03@email.com · requested "To Read or Not to Read" · 5 hours ago</p>
+          </div>
+          <div class="admin-actions">
+            <span class="btn-small btn-small-primary">Approve</span>
+            <span class="btn-small">Deny</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">User Home — Books tab (your books across all clubs, no other member data)</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav"><span>Log out</span></div>
+    </div>
+    <div class="uh-wrap">
+      <div class="uh-tabs">
+        <span class="uh-tab">Clubs</span>
+        <span class="uh-tab on">Books</span>
+        <span class="uh-tab">Ratings</span>
+        <span class="uh-tab">Reviews</span>
+      </div>
+      <div class="browse-table">
+        <div class="browse-row">
+          <div><p class="browse-row-name">Everything I Never Told You</p><p class="browse-row-meta">To Read or Not to Read</p></div>
+          <span class="status-badge status-pending">Reading</span>
+        </div>
+        <div class="browse-row">
+          <div><p class="browse-row-name">Bandit Queens</p><p class="browse-row-meta">To Read or Not to Read</p></div>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">8.5 ★</span>
+        </div>
+        <div class="browse-row">
+          <div><p class="browse-row-name">The Housemaid</p><p class="browse-row-meta">Mystery Mavens</p></div>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">7 ★</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">User Home — Ratings tab (your rating value only, per book)</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav"><span>Log out</span></div>
+    </div>
+    <div class="uh-wrap">
+      <div class="uh-tabs">
+        <span class="uh-tab">Clubs</span>
+        <span class="uh-tab">Books</span>
+        <span class="uh-tab on">Ratings</span>
+        <span class="uh-tab">Reviews</span>
+      </div>
+      <div class="browse-table">
+        <div class="browse-row">
+          <div><p class="browse-row-name">A Darker Shade of Magic</p><p class="browse-row-meta">To Read or Not to Read</p></div>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">10 ★</span>
+        </div>
+        <div class="browse-row">
+          <div><p class="browse-row-name">Fourth Wing</p><p class="browse-row-meta">To Read or Not to Read</p></div>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">9 ★</span>
+        </div>
+        <div class="browse-row">
+          <div><p class="browse-row-name">The Housemaid</p><p class="browse-row-meta">Mystery Mavens</p></div>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">7 ★</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">User Home — Reviews tab (your review text only, no other member columns)</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav"><span>Log out</span></div>
+    </div>
+    <div class="uh-wrap">
+      <div class="uh-tabs">
+        <span class="uh-tab">Clubs</span>
+        <span class="uh-tab">Books</span>
+        <span class="uh-tab">Ratings</span>
+        <span class="uh-tab on">Reviews</span>
+      </div>
+      <div class="browse-table">
+        <div style="padding:14px 16px;border-bottom:0.5px solid #e8e2da;">
+          <p class="rv-book-title">Bandit Queens</p>
+          <p class="browse-row-meta" style="margin-bottom:6px;">To Read or Not to Read</p>
+          <p class="rv-review" style="-webkit-line-clamp:unset;">Really interesting concept — loved how the women banded together. The humor was sharp and unexpected.</p>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">8.5 ★</span>
+        </div>
+        <div style="padding:14px 16px;">
+          <p class="rv-book-title">The Housemaid</p>
+          <p class="browse-row-meta" style="margin-bottom:6px;">Mystery Mavens</p>
+          <p class="rv-review" style="-webkit-line-clamp:unset;">Fast, twisty, exactly what I wanted from a thriller pick.</p>
+          <span class="rv-rating" style="background:#e8dcf5;color:#3C3489;">7 ★</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">User Home — "Create book club" form (creator becomes the club's admin)</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <p class="auth-logo" style="font-size:16px;">Create a book club</p>
+        <p class="auth-sub">You'll be the admin of this club</p>
+        <div class="field"><label>Club name (must be unique)</label><input type="text" placeholder="e.g. Sci-Fi Sunday" readonly/></div>
+        <div class="field">
+          <label>Visibility</label>
+          <div style="display:flex;gap:8px;">
+            <span class="btn-small btn-small-primary" style="flex:1;text-align:center;">Public</span>
+            <span class="btn-small" style="flex:1;text-align:center;">Private</span>
+          </div>
+        </div>
+        <span class="btn btn-primary" style="margin-top:10px;">Create club</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ── HOME PAGE ── -->
-  <h2 class="section-title">Page 1 — Group Home</h2>
+  <h2 class="section-title">Page 3 — Group Home (after clicking into a club)</h2>
   <div class="mockup-card">
     <div class="mockup-label">Group Home Page — approved direction</div>
     <div class="topbar">
       <span class="logo">To Read or Not to Read</span>
       <div class="nav">
-        <span class="on">Home</span><span>Books</span><span>Ratings</span><span>Reviews</span><span>Meetings</span>
+        <span class="on">Home</span><span>Books</span><span>Ratings</span><span>Reviews</span><span>Meetings</span><span>Settings <span style="font-size:8px;opacity:0.6;">(admin)</span></span>
       </div>
     </div>
     <div class="hero">
@@ -246,7 +636,7 @@
   </div>
 
   <!-- ── RATINGS TABLE ── -->
-  <h2 class="section-title">Page 2 — Ratings Table</h2>
+  <h2 class="section-title">Page 4 — Ratings Table</h2>
   <div class="mockup-card">
     <div class="mockup-label">Ratings Table — approved direction</div>
     <div class="rt-header">
@@ -286,7 +676,7 @@
   </div>
 
   <!-- ── REVIEWS TABLE ── -->
-  <h2 class="section-title">Page 3 — Reviews Table</h2>
+  <h2 class="section-title">Page 5 — Reviews Table</h2>
   <div class="mockup-card">
     <div class="mockup-label">Reviews Table — approved direction</div>
     <div class="rv-header">
@@ -325,6 +715,221 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ── MEETINGS ── -->
+  <h2 class="section-title">Page 6 — Meetings</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Meetings — default view · meeting # is auto-generated from date order, not stored/re-numbered (see note below)</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav">
+        <span>Home</span><span>Books</span><span>Ratings</span><span>Reviews</span><span class="on">Meetings</span><span>Settings</span>
+      </div>
+    </div>
+    <div class="mtg-header">
+      <span class="mtg-title">Meetings</span>
+      <span class="btn-small btn-small-primary">+ Add meeting</span>
+    </div>
+    <div class="mtg-body">
+      <div class="meeting-next-card">
+        <div class="meeting-date-block">
+          <p class="meeting-date-month">Jul</p>
+          <p class="meeting-date-day">5</p>
+        </div>
+        <div class="meeting-info">
+          <p class="mtg-num">#4</p>
+          <h4>Discussing: Everything I Never Told You</h4>
+          <p>6:00 PM PST · Maya's place</p>
+          <div class="avs">
+            <div class="av-sm" style="background:#7B9EC9;">M</div>
+            <div class="av-sm" style="background:#C97B9E;">Mi</div>
+            <div class="av-sm" style="background:#9E7BC9;">H</div>
+          </div>
+        </div>
+        <div class="mtg-edit-col">
+          <span class="countdown-flag">Drives home countdown</span>
+          <span class="btn-small">Edit</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <p class="sec">Past meetings</p>
+        <span class="btn-small">Edit past meetings</span>
+      </div>
+      <div class="browse-table">
+        <div class="mtg-past-row">
+          <span class="mtg-num">#3</span>
+          <span class="mtg-past-date">Jun 12</span>
+          <span class="mtg-past-book">Bandit Queens</span>
+          <span class="mtg-past-loc">Mina's place</span>
+          <div class="avs"><div class="av-sm" style="background:#7B9EC9;">M</div><div class="av-sm" style="background:#C97B9E;">Mi</div><div class="av-sm" style="background:#9E7BC9;">H</div></div>
+        </div>
+        <div class="mtg-past-row">
+          <span class="mtg-num">#2</span>
+          <span class="mtg-past-date">May 15</span>
+          <span class="mtg-past-book">How the Grinch Stole Christmas!</span>
+          <span class="mtg-past-loc">Zoom</span>
+          <div class="avs"><div class="av-sm" style="background:#7B9EC9;">M</div><div class="av-sm" style="background:#9E7BC9;">H</div></div>
+        </div>
+        <div class="mtg-past-row">
+          <span class="mtg-num">#1</span>
+          <span class="mtg-past-date">Apr 3</span>
+          <span class="mtg-past-book">A Darker Shade of Magic</span>
+          <span class="mtg-past-loc">Heenal's place</span>
+          <div class="avs"><div class="av-sm" style="background:#7B9EC9;">M</div><div class="av-sm" style="background:#C97B9E;">Mi</div><div class="av-sm" style="background:#9E7BC9;">H</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">Meetings — "Edit past meetings" toggled on (each row gets its own Edit button)</div>
+    <div class="mtg-body" style="padding-top:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <p class="sec">Past meetings</p>
+        <span class="btn-small btn-small-primary">Done editing</span>
+      </div>
+      <div class="browse-table">
+        <div class="mtg-past-row">
+          <span class="mtg-num">#3</span>
+          <span class="mtg-past-date">Jun 12</span>
+          <span class="mtg-past-book">Bandit Queens</span>
+          <span class="mtg-past-loc">Mina's place</span>
+          <span class="btn-small">Edit</span>
+        </div>
+        <div class="mtg-past-row">
+          <span class="mtg-num">#2</span>
+          <span class="mtg-past-date">May 15</span>
+          <span class="mtg-past-book">How the Grinch Stole Christmas!</span>
+          <span class="mtg-past-loc">Zoom</span>
+          <span class="btn-small">Edit</span>
+        </div>
+        <div class="mtg-past-row">
+          <span class="mtg-num">#1</span>
+          <span class="mtg-past-date">Apr 3</span>
+          <span class="mtg-past-book">A Darker Shade of Magic</span>
+          <span class="mtg-past-loc">Heenal's place</span>
+          <span class="btn-small">Edit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">Meetings — "Add meeting" form (same form, empty, used for creating)</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <p class="auth-logo" style="font-size:16px;">Add a meeting</p>
+        <p class="auth-sub">Becomes "next meeting" if it's the soonest upcoming date</p>
+        <div class="field"><label>Date</label><input type="text" placeholder="Jul 5, 2026" readonly/></div>
+        <div class="field"><label>Time</label><input type="text" placeholder="6:00 PM PST" readonly/></div>
+        <div class="field"><label>Location</label><input type="text" placeholder="e.g. Maya's place, or Zoom" readonly/></div>
+        <div class="field"><label>Book being discussed (optional)</label><input type="text" placeholder="Currently reading, or pick one" readonly/></div>
+        <span class="btn btn-primary">Save meeting</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-card">
+    <div class="mockup-label">Meetings — "Edit meeting" form (pre-filled, same fields + Delete) — opened from either Edit button above</div>
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <p class="auth-logo" style="font-size:16px;">Edit meeting #3</p>
+        <p class="auth-sub">Deleting will renumber later meetings down by one</p>
+        <div class="field"><label>Date</label><input type="text" value="Jun 12, 2026" readonly/></div>
+        <div class="field"><label>Time</label><input type="text" value="6:00 PM PST" readonly/></div>
+        <div class="field"><label>Location</label><input type="text" value="Mina's place" readonly/></div>
+        <div class="field"><label>Book being discussed (optional)</label><input type="text" value="Bandit Queens" readonly/></div>
+        <span class="btn btn-primary">Save changes</span>
+        <span class="btn btn-danger" style="margin-top:8px;">Delete meeting</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOOK CLUB SETTINGS ── -->
+  <h2 class="section-title">Page 7 — Book Club Settings (all members; admin-only sections marked)</h2>
+  <div class="mockup-card">
+    <div class="mockup-label">Settings tab — Members section visible to everyone, Admin-only section below it</div>
+    <div class="topbar">
+      <span class="logo">To Read or Not to Read</span>
+      <div class="nav">
+        <span>Home</span><span>Books</span><span>Ratings</span><span>Reviews</span><span>Meetings</span><span class="on">Settings</span>
+      </div>
+    </div>
+    <div class="uh-wrap">
+      <p class="club-name" style="font-size:18px;">To Read or Not to Read<span class="badge-visibility badge-private">Private</span></p>
+      <p class="club-meta" style="margin-bottom:24px;">Founded June 2020 · 3 active members</p>
+
+      <p class="sec">Members</p>
+      <p style="font-size:10px;color:#bbb;margin:-4px 0 10px;">Visible to every member · colors shown here · you can change your own</p>
+      <div class="browse-table" style="margin-bottom:28px;">
+        <div class="browse-row">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="uh-avatar" style="width:32px;height:32px;font-size:12px;background:#7B9EC9;">M</div>
+            <div>
+              <p class="browse-row-name">Maya <span class="status-badge status-active">Admin</span></p>
+              <p class="browse-row-meta"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#7B9EC9;vertical-align:middle;margin-right:4px;"></span>#7B9EC9</p>
+            </div>
+          </div>
+          <span class="btn-small">Remove admin <span style="opacity:0.5;">(admin only)</span></span>
+        </div>
+        <div class="browse-row">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="uh-avatar" style="width:32px;height:32px;font-size:12px;background:#C97B9E;">Mi</div>
+            <div>
+              <p class="browse-row-name">Mina</p>
+              <p class="browse-row-meta"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#C97B9E;vertical-align:middle;margin-right:4px;"></span>#C97B9E</p>
+            </div>
+          </div>
+          <span class="btn-small">Make admin <span style="opacity:0.5;">(admin only)</span></span>
+        </div>
+        <div class="browse-row">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="uh-avatar" style="width:32px;height:32px;font-size:12px;background:#9E7BC9;">H</div>
+            <div>
+              <p class="browse-row-name">Heenal <span class="status-badge status-active">Admin</span></p>
+              <p class="browse-row-meta"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#9E7BC9;vertical-align:middle;margin-right:4px;"></span>#9E7BC9</p>
+            </div>
+          </div>
+          <span class="btn-small btn-small-primary">Change my color</span>
+        </div>
+      </div>
+
+      <p class="sec" style="color:#b89a3f;">Admin only</p>
+      <div class="admin-panel">
+        <p style="font-size:11px;color:#b89a3f;margin-bottom:8px;">Join code</p>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <span class="code-pill">FT82KX</span>
+          <span class="btn-small">Regenerate</span>
+        </div>
+        <p style="font-size:11px;color:#b89a3f;margin-bottom:8px;">Pending join requests</p>
+        <div class="admin-row">
+          <div>
+            <p class="admin-row-name">Maya Patel</p>
+            <p class="admin-row-meta">maya@email.com · requested 2 days ago</p>
+          </div>
+          <div class="admin-actions">
+            <span class="btn-small btn-small-primary">Approve</span>
+            <span class="btn-small">Deny</span>
+          </div>
+        </div>
+        <div class="admin-row">
+          <div>
+            <p class="admin-row-name">test_dev_03</p>
+            <p class="admin-row-meta">testdev03@email.com · requested 5 hours ago</p>
+          </div>
+          <div class="admin-actions">
+            <span class="btn-small btn-small-primary">Approve</span>
+            <span class="btn-small">Deny</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="placeholder-note" style="margin-top:22px;">
+        ⚠ Still to design: rename club, visibility toggle (public/private), deactivate/reactivate club flow (reactivating requires choosing a new club name, since the old name frees up once a club goes inactive).
+      </p>
+    </div>
   </div>
 
   <p style="font-size:11px;color:#aaa;text-align:center;padding:20px 0;">To Read or Not to Read — Design Mockups v1 — May 2026</p>
