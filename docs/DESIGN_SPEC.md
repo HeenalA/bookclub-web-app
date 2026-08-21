@@ -104,6 +104,73 @@ Each member can also choose their own color in their profile settings.
 
 ---
 
+## Page 0 — Login ✅ APPROVED
+
+**Flow:** Login page → User Home → click an active club → Group Home (existing club tabs).
+
+**States (all mocked in `mockups.html`):**
+- Sign in — email + password
+- Request access — no self-serve signup; new accounts require manual admin approval. Form: name, email, password, optional note to admin.
+- Pending approval — shown after submitting a request, or on a login attempt while still pending.
+
+---
+
+## Page 0.5 — User Home ✅ APPROVED
+
+Lands here immediately after login. Has its own sub-tabs: **Clubs** (default) · **Books** · **Ratings** · **Reviews**.
+
+**User card (top, all tabs):** avatar, name, email, "Edit profile."
+
+**Clubs tab:**
+- **Your book clubs** — active memberships, each with a Public/Private badge, member count, "Enter club →"
+- **Was Your Bookclub** — clubs the user left (soft-deleted membership, see Data Model note below), shows "Inactive" + "Rejoin"
+- **Could Be Your Bookclub** — search bar + "+ Create book club" button (to the right of search), then a paginated browse table (5 rows/page, Prev/Next):
+  - Public clubs → "Request to join" (still requires admin approval)
+  - Private clubs → inline join-code field + "Join" (the code itself is the gate; no separate approval on top of a valid code)
+- **Pending requests (admin only)** — inline approve/deny list. Deliberately left here for now even after the Settings page gained its own copy of this (see Settings, below) — not yet decided which is canonical.
+- **Create book club form** — club name (must be unique among *active* clubs) + visibility toggle. The creator becomes that club's admin.
+
+**Books / Ratings / Reviews tabs:** the user's own data rolled up across *all* their clubs, single-column, no other members' names/ratings/reviews visible — lets a user see their reading history without opening a club page.
+- Books tab: title, club badge, status (reading / rating badge if finished)
+- Ratings tab: title, club badge, own rating badge only
+- Reviews tab: title, club badge, own review text + own rating badge only
+
+---
+
+## Page 6 — Meetings ✅ APPROVED (partial — see open items)
+
+**"+ Add meeting"** button lives here (top of page, next to the "Meetings" title) — date, time, location, and an optional linked book. This is the one and only place a meeting gets created.
+
+**Next meeting card:** date block, discussion book, time + location, attendee avatars, and a small flag noting it drives the Home page hero countdown — the soonest future meeting date replaces the current hardcoded `NEXT_MEETING` placeholder in `main.js`.
+
+**Past meetings:** simple list below — date, book discussed, location, who attended. An "Edit past meetings" toggle next to the section header reveals a per-row **Edit** button (the next-meeting card always shows its own Edit button, no toggle needed since there's only one). Edit opens the same form as "Add meeting," pre-filled, with a **Delete meeting** option added.
+
+**Meeting numbers (`#1`, `#2`...):** always derived from date order, not a stored column — see `DECISIONS.md` ("Meeting numbers are computed, not stored"). This is what makes "delete #3, #4 becomes #3" happen automatically with no extra update logic.
+
+**Still open:** who can add/edit a meeting — currently mocked as open to any active member (consistent with announcements, which any member can already post), not admin-gated. Revisit if that turns out to be wrong once real usage starts.
+
+---
+
+## Page 7 — Book Club Settings ✅ APPROVED (partial — see open items)
+
+**Access:** every club member can open this page (tab visible to all, not admin-gated at the nav level).
+
+**Members section — visible to all members:**
+- List of members: avatar, name, Admin badge if applicable, member's color swatch + hex
+- Each member can change their own color from here
+- Admin-only controls layered into the *same* list: "Make admin" / "Remove admin" per row (visible only to admins)
+
+**Admin only section (clearly separated, labeled):**
+- Join code display + regenerate
+- Pending join requests for this club (approve/deny) — currently duplicated with the user-home panel, see note above
+
+**Still open / not designed yet:**
+- Rename club
+- Visibility toggle (public ⇄ private)
+- Deactivate whole club / reactivate — reactivating requires the admin to choose a **new** club name, since the original name is freed for reuse the moment a club goes inactive (uniqueness is enforced among active clubs only)
+
+---
+
 ## Bookshelf Visual (Phase 2/3) ⏳ DEFERRED
 
 **Design direction confirmed but implementation deferred:**
@@ -132,8 +199,9 @@ Each member can also choose their own color in their profile settings.
 
 ## What Is NOT Approved / Still Open
 
-- User profile page design (not yet designed)
-- Books list page design (not yet designed)
-- Meetings list page design (not yet designed)
+- Book Club Settings: rename club, visibility toggle, deactivate/reactivate flow
+- Whether admin-only pending-requests belongs on User Home, Settings, or both (currently mocked in both places)
+- Club-level Books list page (not yet designed — distinct from the new personal Books/Ratings/Reviews tabs on User Home, which *are* designed)
+- Whether "add meeting" should be admin-only rather than open to any member (see Page 6)
 - Mobile layouts (desktop first, mobile later)
 - Navigation final structure (current mockup is placeholder)

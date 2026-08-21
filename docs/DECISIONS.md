@@ -152,3 +152,50 @@ This is a learning resource — reading this file teaches you how engineers thin
 - Good software engineering practice: single source of truth for configuration values.
 
 **Reversibility:** Already maximally reversible by design.
+
+---
+
+## Aug 2026 — Multi-club membership model: soft-delete + per-club admin roles
+
+**Decision:** Membership is modeled as its own table (`club_members`: member_id, club_id, status, role, join fields) rather than a single club_id on `members`. Leaving a club sets `status = inactive` instead of deleting the row. Admin is a per-club role on that join row, not a global flag on the member. Club names are unique only among *active* clubs — deactivating a club frees its name for reuse, and reactivating requires the admin to pick a new name.
+
+**Alternatives considered:**
+- Single `club_id` column on `members` (one club per user) — ruled out once "browse and join other clubs" became a requirement; a user needs to belong to more than one club.
+- Hard-delete the membership row on leave — ruled out because it would silently delete that member's ratings/reviews history (or orphan them), and rejoining should restore prior data.
+- Globally unique club names forever, even once inactive — ruled out because it would permanently squat a name for a club nobody can reactivate under it again.
+
+**Reason:**
+- Soft-delete on leave is the only way to satisfy "if they rejoin, nothing is lost."
+- Per-club admin role (not global) is required now that any user can create a club and become its admin — admin-of-one-club shouldn't imply admin-of-all-clubs.
+- Scoping name uniqueness to active clubs only is what makes "deactivate, then let someone else use that name" and "reactivate under a new name" both possible without a manual cleanup step.
+
+**Reversibility:** Medium — this shapes the core schema; changing it later means migrating existing membership rows.
+
+---
+
+## Aug 2026 — Public/private clubs with different join gates
+
+**Decision:** Clubs have a `visibility` flag. Public clubs are discoverable in the browse/search list and joinable via a "Request to join" that still requires admin approval. Private clubs are joined via an admin-shared join code (regenerable per club) — the code itself is the gate, no separate approval step on top of a valid code.
+
+**Alternatives considered:**
+- Same approval flow for both (i.e., private clubs also queue a request) — ruled out as redundant; the code is already how the admin controls who gets in, so a second approval gate adds friction without added safety.
+- Private clubs invisible in search entirely (invite-only, no search match) — not decided either way yet; current mockup still lists private clubs in the browse table with a code-entry field rather than hiding them. Worth revisiting once real users exist.
+
+**Reason:** Two different real-world groups this app serves — an open community club (public, moderated by approval) versus a closed friend-group club (private, gated by a shared code) — need genuinely different join mechanics, not one flow trying to cover both.
+
+**Reversibility:** Easy — `visibility` and `join_code` are additive columns; the join-request approval path already exists for public clubs regardless.
+
+---
+
+## Aug 2026 — Meeting numbers are computed, not stored
+
+**Decision:** A meeting's display number (`#1`, `#2`, `#3`...) is calculated at query time from date order (`ROW_NUMBER() OVER (ORDER BY meeting_date)` per club), not stored as a column on the `meetings` table.
+
+**Alternatives considered:** Store `meeting_number` directly on each row, and re-run an `UPDATE` to shift every later row down by one whenever a meeting is deleted (or up by one on insert-in-the-middle).
+
+**Reason:**
+- The requirement is "delete meeting #3 and #4 becomes #3, #5 becomes #4, etc." — that's exactly what a *derived* value gives you for free. Query it fresh and the renumbering has already happened; there's nothing to update.
+- A stored, manually-renumbered column is a classic source of drift bugs — miss one `UPDATE` (a failed request, a bug, a manual DB edit) and the numbers silently disagree with the real order. This is the general "derived data" principle: if a value can be computed from other columns you already have (here, the date), storing it separately just creates a second copy that can go stale.
+- Same pattern already used for the book numbers in reviews/ratings (`#78`, `#77`...) — this keeps meetings consistent with that.
+
+**Reversibility:** Easy — purely a query-time decision; switching to a stored column later is possible but would reintroduce the drift risk above.
