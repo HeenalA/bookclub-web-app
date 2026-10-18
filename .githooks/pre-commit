@@ -1,13 +1,24 @@
 #!/bin/bash
-# .githooks/pre-commit — blocks commits that look like they'd leak secrets.
-# LEARNING: git hooks run automatically at points in the git workflow
-# (pre-commit, pre-push, etc). This repo isn't set up to use them by
-# default — hooksPath has to be set once per clone:
+# ============================================================================
+# .githooks/pre-commit — block commits that would leak a secret.
+# ============================================================================
+# LEARNING: git hooks run automatically at points in the git workflow. They are
+# not committed-and-active by default — hooksPath has to be set once per clone:
 #   git config core.hooksPath .githooks
-# See WORKFLOW.md "ONE-TIME SETUP" for the full explanation.
+# See WORKFLOW.md "ONE-TIME SETUP".
+#
+# A hook that cries wolf gets bypassed with --no-verify, and a hook that is
+# routinely bypassed protects nothing. So each rule below is written to be
+# precise rather than broad.
+# ============================================================================
 
-# 1. Block committing real .env files (but allow .env.example)
-staged_env_files=$(git diff --cached --name-only | grep -E '(^|/)\.env(\.[a-z]+)?$' | grep -v '\.env\.example$')
+# ----------------------------------------------------------------------------
+# 1. Never commit a real .env file (.env.example is fine)
+# ----------------------------------------------------------------------------
+staged_env_files=$(git diff --cached --name-only \
+  | grep -E '(^|/)\.env(\.[a-z]+)?$' \
+  | grep -v '\.env\.example$')
+
 if [ -n "$staged_env_files" ]; then
   echo "Commit blocked: staged .env file(s) detected:"
   echo "$staged_env_files"
@@ -15,15 +26,65 @@ if [ -n "$staged_env_files" ]; then
   exit 1
 fi
 
-# 2. Scan staged additions for secret-looking key=value / key:"value" pairs,
-#    skipping obvious placeholders (your_, .example files, etc).
-secret_pattern='(api[_-]?key|secret[_-]?key|password|access[_-]?token|SUPABASE_KEY|sk-[a-zA-Z0-9]{20,})[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_.-]{8,}'
-matches=$(git diff --cached -U0 -- . ':(exclude)*.example' | grep -E '^\+' | grep -viE 'your_|placeholder|example|xxx' | grep -iE "$secret_pattern")
+# ----------------------------------------------------------------------------
+# 2. Hardcoded secrets — but only QUOTED STRING LITERALS
+# ----------------------------------------------------------------------------
+# The previous version of this rule matched any 8+ word characters after an
+# `=`, which flagged ordinary code: `const updatePassword = useCallback(...)`
+# contains "password", an "=", and a long word.
+#
+# Two changes make it precise. The value must be a quoted string literal,
+# because that is what a hardcoded secret actually looks like — code assigns
+# identifiers and calls, not quoted blobs. And the key must END with the
+# sensitive word, so `updatePassword` and `setPassword` no longer match while
+# `db_password` and `apiKey` still do.
+added=$(git diff --cached -U0 -- . ':(exclude)*.example' ':(exclude).githooks/*' \
+        | grep -E '^\+' | grep -v '^+++')
+
+secret_pattern='[A-Za-z_]*(api[_-]?key|secret|passwd|password|access[_-]?token|auth[_-]?token|private[_-]?key)["'"'"']?[[:space:]]*[:=][[:space:]]*["'"'"'][A-Za-z0-9_./+=-]{8,}["'"'"']'
+
+matches=$(echo "$added" \
+  | grep -viE 'your[_-]|placeholder|example|changeme|xxxx|<[a-z-]+>|\.\.\.' \
+  | grep -iE "$secret_pattern")
+
 if [ -n "$matches" ]; then
-  echo "Commit blocked: staged changes look like they contain a real secret:"
+  echo "Commit blocked: a hardcoded secret appears to be staged:"
   echo "$matches"
-  echo "If this is a false positive, review .githooks/pre-commit."
+  echo
+  echo "Move it to .env.local (gitignored) and read it from the environment."
   exit 1
 fi
+
+# ----------------------------------------------------------------------------
+# 3. The service_role key, found by decoding rather than guessing
+# ----------------------------------------------------------------------------
+# Supabase issues two JWTs. The anon key is designed to be public and is safe
+# to commit; the service_role key bypasses every row-level security policy and
+# must never leave a server. They look identical to a regex.
+#
+# So rather than guess, this decodes each JWT's payload and reads the role it
+# claims. That blocks exactly the dangerous one and never the safe one.
+jwts=$(echo "$added" | grep -oE 'eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}' | sort -u)
+
+for jwt in $jwts; do
+  payload=$(echo "$jwt" | cut -d. -f2)
+  # base64url -> base64, then pad to a multiple of 4 so the decoder accepts it
+  b64=$(echo "$payload" | tr '_-' '/+')
+  case $(( ${#b64} % 4 )) in
+    2) b64="${b64}==" ;;
+    3) b64="${b64}=" ;;
+  esac
+
+  decoded=$(echo "$b64" | base64 -d 2>/dev/null)
+
+  if echo "$decoded" | grep -q 'service_role'; then
+    echo "Commit blocked: a Supabase service_role key is staged."
+    echo
+    echo "That key bypasses every row-level security policy — it is the one"
+    echo "credential that must never reach this repo or a browser. If it has"
+    echo "already been exposed, rotate it in the Supabase dashboard now."
+    exit 1
+  fi
+done
 
 exit 0
