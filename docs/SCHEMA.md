@@ -1,14 +1,15 @@
 # SCHEMA.md — Database Reference
-## Table-by-table reference for the Supabase Postgres database
 
-This is the plain-language companion to the actual DDL in `db/migrations/`.
-When they disagree, `db/migrations/` is the source of truth — this file is
-for understanding the shape and *why*, not for copy-pasting into the SQL
-Editor.
+Plain-language companion to the DDL in `db/migrations/`. **When they disagree,
+`db/migrations/` is the source of truth** — this file is for understanding the
+shape and the *why*.
 
-**Status legend:**
-- ✅ **Live** — exists in the real Supabase database today
-- 🆕 **Drafted** — defined in `db/migrations/0001_multi_club_auth.sql`, not yet run against the live database
+**Status legend**
+- ✅ **Live** — exists in the Supabase database today
+- 📝 **Written** — defined in `db/migrations/`, not yet run
+
+> As of 18 Oct 2026, migrations 0001–0005 are **written but not yet applied**.
+> Everything marked 📝 becomes ✅ the moment `docs/RUNBOOK.md` step 2 is done.
 
 ---
 
@@ -18,129 +19,204 @@ Editor.
 erDiagram
     MEMBERS ||--o{ CLUB_MEMBERS : "belongs to clubs via"
     CLUBS ||--o{ CLUB_MEMBERS : "has members via"
+    CLUBS ||--|| CLUB_JOIN_CODES : "private clubs have"
     CLUBS ||--o{ BOOKS : "owns"
     CLUBS ||--o{ MEETINGS : "schedules"
+    CLUBS ||--o{ ANNOUNCEMENTS : "carries"
     MEMBERS ||--o{ RATINGS : "gives"
     BOOKS ||--o{ RATINGS : "receives"
     MEMBERS ||--o{ REVIEWS : "writes"
     BOOKS ||--o{ REVIEWS : "receives"
     BOOKS ||--o{ MEETINGS : "discussed at"
     MEMBERS ||--o{ BOOKS : "picked"
-    MEMBERS ||--o{ CLUBS : "created"
+    MEMBERS ||--o{ ANNOUNCEMENTS : "posts"
 ```
 
-Note what's *not* here: `ratings` and `reviews` have no direct link to `club_members`. A book already belongs to exactly one club (`books.club_id`), so a rating/review is implicitly scoped through the book it's attached to — no need to duplicate `club_id` onto every rating/review row.
+**What is deliberately absent.** `ratings` and `reviews` have no link to
+`club_members` and no `club_id` of their own. A book already belongs to exactly
+one club, so a rating is scoped *through* its book. Duplicating `club_id` onto
+hundreds of rating rows would create a second place for the truth to live, and
+therefore a way for the two to disagree.
 
 ---
 
-## `members` ✅ live, 🆕 gaining columns
+## `members` ✅ live, 📝 gaining columns
 
-One row per person, across all clubs — a member's identity is club-independent; which clubs they belong to and whether they're an admin lives in `club_members`, not here.
+One row per person, across all clubs. Identity is club-independent — which
+clubs they belong to and whether they are an admin lives in `club_members`.
 
 | Column | Type | Status | Notes |
 |---|---|---|---|
-| `id` | `text` | ✅ live | Human-chosen slug PK (`'maya'`, `'mina'`, `'heenal'`), not an auto ID — predates this migration, kept as-is rather than changed mid-flight |
-| `name` | `text` | ✅ live | Display name |
-| `color` | `text` | ✅ live | Hex color, member's UI color |
-| `initials` | `text` | ✅ live | Used for avatar circles |
-| `email` | `text` | 🆕 drafted | Unique (case-insensitive, partial index — allows existing null rows) |
-| `auth_user_id` | `uuid` | 🆕 drafted | FK → `auth.users(id)`, nullable until the member has a real Supabase Auth account, unique once set — this is the "user key" for finding/cleaning up test accounts |
+| `id` | `text` | ✅ | Human-chosen slug PK (`'maya'`, `'heenal'`). Predates these migrations; kept rather than changed mid-flight. Constrained to `^[a-z0-9_]{2,40}$`. |
+| `name` | `text` | ✅ | 1–60 characters |
+| `color` | `text` | ✅ | **Must be `#RRGGBB`.** A real injection guard, not tidiness — this value is interpolated into inline `style` props. |
+| `initials` | `text` | ✅ | ≤ 3 characters, for avatars |
+| `email` | `text` | 📝 | Unique case-insensitively, partial index so existing nulls do not collide. **This is what links a person to their login.** |
+| `auth_user_id` | `uuid` | 📝 | FK → `auth.users(id)`, `on delete set null` — deleting a login never deletes years of reading history |
 
-**Superseded:** the CLAUDE.md "Data Models" table currently lists a global `role (admin, max 3 per group)` field on Member. That model is replaced by `club_members.role` — admin is per-club now, not global. CLAUDE.md should be updated to match once this migration runs.
-
----
-
-## `books` ✅ live, 🆕 gaining a column
-
-| Column | Type | Status | Notes |
-|---|---|---|---|
-| `id` | `integer` (identity) | ✅ live | Auto-generated; deliberately seeded in the source doc's own #1–81 order so it matches the doc's numbering |
-| `title` | `text` | ✅ live | |
-| `picked_by` | `text` | ✅ live | FK → `members(id)`, nullable (~19 books have no recorded picker) |
-| `status` | `text` | ✅ live | e.g. `finished` |
-| `year` | `integer` | ✅ live | |
-| `club_id` | `uuid` | 🆕 drafted | FK → `clubs(id)` — every book now belongs to exactly one club |
-
-`author`, `genre`, `cover_url` mentioned in CLAUDE.md's original Data Model were never actually populated (author isn't reliably known from the source doc) — not live columns today.
+**Column-level grant:** `authenticated` may update only `name`, `color` and
+`initials`. `email` and `auth_user_id` are not updatable by anyone through the
+API; the auth trigger sets them.
 
 ---
 
-## `ratings` ✅ live — unchanged by this migration
-
-| Column | Type | Status | Notes |
-|---|---|---|---|
-| `member_id` | `text` | ✅ live | FK → `members(id)`, part of composite key |
-| `book_id` | `integer` | ✅ live | FK → `books(id)`, part of composite key |
-| `value` | `decimal(4,1)` | ✅ live | `-1000` (jail, counts as 1 in averages) or `1`–`10` in 0.5 steps — mirrored by `backend/app/validators.py::is_valid_rating()` |
-
----
-
-## `reviews` ✅ live — unchanged by this migration
-
-| Column | Type | Status | Notes |
-|---|---|---|---|
-| `member_id` | `text` | ✅ live | FK → `members(id)` |
-| `book_id` | `integer` | ✅ live | FK → `books(id)` |
-| `text` | `text` | ✅ live | Unique on `(member_id, book_id)` — seeding scripts use `on conflict (member_id, book_id) do nothing` |
-
----
-
-## `clubs` 🆕 drafted
+## `clubs` 📝
 
 | Column | Type | Notes |
 |---|---|---|
 | `id` | `uuid` PK | |
-| `name` | `text` | Unique among **active** clubs only (partial unique index on `lower(name)`) — see DECISIONS.md, "reactivating requires a new name" |
-| `visibility` | `text` | `'public'` or `'private'` |
-| `join_code` | `text` | Only meaningful when `visibility = 'private'`; the code is the join gate, no separate approval step on top of it |
+| `name` | `text` | 2–60 chars. Unique among **active** clubs only, via a partial unique index on `lower(btrim(name))`. Deactivating frees the name. |
+| `visibility` | `text` | `'public'` (discoverable, join by request+approval) or `'private'` (join by code) |
 | `status` | `text` | `'active'` or `'inactive'` |
 | `founded_date` | `date` | |
-| `created_by` | `text` | FK → `members(id)` — the creator, who becomes the club's first admin via `club_members` |
+| `created_by` | `text` | FK → `members(id)` — becomes the club's first admin |
 | `created_at` | `timestamptz` | |
 
+**No member list column, and no next-meeting column.** Members are a
+many-to-many relationship (`club_members`); the next meeting is derived from
+the soonest future row in `meetings`. Both are facts that already live
+elsewhere, and a copy is a thing that can drift.
+
 ---
 
-## `club_members` 🆕 drafted
+## `club_join_codes` 📝 — sealed
 
-The join table that makes multi-club membership, soft-delete-on-leave, and per-club admin roles all work. See DECISIONS.md, "Multi-club membership model."
+| Column | Type | Notes |
+|---|---|---|
+| `club_id` | `uuid` PK | FK → `clubs(id)`, cascade |
+| `code` | `text` | 6–20 chars. Generated from `gen_random_uuid()` over a 32-character alphabet with no ambiguous glyphs. |
+| `updated_at` | `timestamptz` | |
+
+**RLS on, zero policies, no grants to any role.** Unreachable through the API.
+The only access is `public.club_join_code()` and
+`public.regenerate_join_code()`, both admin-checked. See DECISIONS.md for why
+this is not a column on `clubs`.
+
+---
+
+## `club_members` 📝
+
+The join table that makes multi-club membership, leave-and-rejoin, and per-club
+admin all work.
 
 | Column | Type | Notes |
 |---|---|---|
 | `id` | `uuid` PK | |
-| `club_id` | `uuid` | FK → `clubs(id)` |
-| `member_id` | `text` | FK → `members(id)` |
-| `status` | `text` | `'pending'` (requested, awaiting admin approval) → `'active'` (approved / code-joined) → `'inactive'` (left) |
-| `role` | `text` | `'member'` or `'admin'`, scoped to this one club |
-| `requested_at` | `timestamptz` | |
-| `joined_at` | `timestamptz` | Nullable, set when approved |
-| `left_at` | `timestamptz` | Nullable, set when the member leaves |
+| `club_id` | `uuid` | FK → `clubs(id)`, cascade |
+| `member_id` | `text` | FK → `members(id)`, cascade |
+| `status` | `text` | `'pending'` → `'active'` → `'inactive'` |
+| `role` | `text` | `'member'` or `'admin'`, **scoped to this one club** |
+| `requested_at` / `joined_at` / `left_at` | `timestamptz` | |
 
-**Unique constraint:** `(club_id, member_id)` — one row per member per club, *ever*. Leaving/rejoining flips `status` on the same row rather than inserting a new one; that's what preserves the relationship's history. (It does not protect ratings/reviews — those were never at risk, see the table note above.)
+**Unique `(club_id, member_id)`** — one row per member per club, *ever*.
+Leaving flips `status`; rejoining flips it back on the same row. That is what
+preserves the relationship's history. It does not protect ratings or reviews,
+which were never at risk.
+
+**No write policies at all.** Every change goes through an admin-checked
+function in `0004_rpc.sql`.
 
 ---
 
-## `meetings` 🆕 drafted
+## `books` ✅ live, 📝 gaining columns
+
+| Column | Type | Status | Notes |
+|---|---|---|---|
+| `id` | `integer` identity | ✅ | Seeded in the club's own #1–81 order. **Global, not per club** — display numbers are computed per club at render. |
+| `title` | `text` | ✅ | 1–300 chars |
+| `author` | `text` | ✅ | Null for all 81 books; the source doc did not reliably have them |
+| `picked_by` | `text` | ✅ | FK → `members(id)`, nullable — 10 books genuinely have no recorded picker |
+| `status` | `text` | ✅ | `'to_read'`, `'reading'` or `'finished'` |
+| `year` | `integer` | ✅ | |
+| `club_id` | `uuid` | 📝 | FK → `clubs(id)`, cascade |
+
+**Trigger `books_check_picker`:** a book's picker must be a member of the
+book's club. RLS decides *who* may insert; it cannot express a fact about
+another table, so a trigger does.
+
+---
+
+## `ratings` ✅ live, 📝 gaining a constraint
+
+| Column | Type | Status | Notes |
+|---|---|---|---|
+| `member_id` | `text` | ✅ | FK → `members(id)` |
+| `book_id` | `integer` | ✅ | FK → `books(id)` |
+| `value` | `numeric` | ✅ | `-1000` (jail), or 1–10 in half-point steps |
+| `created_at` / `updated_at` | `timestamptz` | 📝 | `updated_at` maintained by trigger |
+
+⚠️ **`ratings_member_book_unique` is load-bearing.** The live table was created
+with a surrogate `id` and no uniqueness rule on `(member_id, book_id)`. The app
+saves ratings with an upsert, which *requires* a unique index on exactly those
+columns — without it Postgres rejects the statement and **every rating edit
+fails**. Migration 0001 adds the index explicitly, because on an existing table
+the `create table` that declares the primary key is skipped entirely.
+
+The value rule is mirrored by `backend/app/validators.py::is_valid_rating()`.
+The database is the authority; the Python version exists to fail fast with a
+readable message.
+
+---
+
+## `reviews` ✅ live, 📝 gaining a constraint
+
+| Column | Type | Status | Notes |
+|---|---|---|---|
+| `member_id` | `text` | ✅ | |
+| `book_id` | `integer` | ✅ | |
+| `text` | `text` | ✅ | **1–5000 characters.** An abuse and cost control: without a cap one client could write megabytes into a free-tier database. Longest real review is 1,278 characters. |
+| `created_at` / `updated_at` | `timestamptz` | 📝 | |
+
+---
+
+## `meetings` 📝
 
 | Column | Type | Notes |
 |---|---|---|
 | `id` | `uuid` PK | |
-| `club_id` | `uuid` | FK → `clubs(id)` |
+| `club_id` | `uuid` | FK → `clubs(id)`, cascade |
 | `meeting_date` | `date` | |
-| `meeting_time` | `text` | Free text for now (e.g. `"6:00 PM PST"`) |
-| `location` | `text` | |
-| `book_id` | `integer` | FK → `books(id)`, nullable — optional linked book |
+| `meeting_time` | `text` | Free text (`"6:00 PM PST"`), ≤ 40 chars |
+| `location` | `text` | ≤ 120 chars |
+| `book_id` | `integer` | FK → `books(id)`, nullable |
 | `created_by` | `text` | FK → `members(id)` |
-| `created_at` | `timestamptz` | |
 
-**No `meeting_number` column.** Display numbers (`#1`, `#2`...) are computed at query time via `row_number() over (partition by club_id order by meeting_date)` — see DECISIONS.md, "Meeting numbers are computed, not stored." Deleting a meeting automatically renumbers the rest; there's nothing to update.
+**No `meeting_number` column.** Display numbers come from date order at query
+time, so deleting a meeting renumbers the rest with nothing to update. The home
+page countdown reads the soonest row from today onward.
 
 ---
 
-## Row Level Security status
+## `announcements` 📝
 
-| Table | RLS | Policy |
+| Column | Type | Notes |
 |---|---|---|
-| `members`, `books`, `ratings`, `reviews` | ✅ enabled | Public read (`using (true)`) — the known, flagged-as-temporary tradeoff from initial seeding, still open |
-| `clubs`, `club_members`, `meetings` | 🆕 enabled (drafted) | **No policies yet** — default-deny, inaccessible via the API until step 3 of the auth plan designs real policies scoped by `club_members` |
+| `id` | `uuid` PK | |
+| `club_id` | `uuid` | FK → `clubs(id)`, cascade |
+| `member_id` | `text` | FK → `members(id)`, cascade |
+| `text` | `text` | 1–1000 chars |
+| `created_at` | `timestamptz` | |
 
-Full auth rollout plan (schema → Supabase Auth → RLS rewrite → real pages) is tracked in `docs/SESSION_STATE.md`.
+Replaces the two announcements that were hardcoded in the old `home.html`.
+Border colour follows the poster's own member colour.
+
+---
+
+## Row Level Security
+
+| Table | Read | Write |
+|---|---|---|
+| `members` | Yourself, plus anyone you share an active club with | Your own row, `name`/`color`/`initials` only |
+| `clubs` | Any club you are attached to — active, pending or left | **Functions only** |
+| `club_members` | Your own rows, plus everyone's in clubs you are active in | **Functions only** |
+| `club_join_codes` | **Nobody** | **Functions only** |
+| `books` | Active members of the club | Insert/update: any active member. Delete: **admin only** (cascades to reviews) |
+| `ratings` / `reviews` | Active members of the book's club | Your own rows only |
+| `meetings` | Active members | Any active member |
+| `announcements` | Active members | Your own; delete also by admin |
+
+**`anon` has zero privileges on every table**, and every function in `public`
+is revoked from it. Two independent reasons the published key reads nothing.
+
+Verify with `db/verify_security.sql` (6 checks) and
+`scripts/verify_anon_lockdown.sh` (external proof).

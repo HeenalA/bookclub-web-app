@@ -199,3 +199,166 @@ This is a learning resource — reading this file teaches you how engineers thin
 - Same pattern already used for the book numbers in reviews/ratings (`#78`, `#77`...) — this keeps meetings consistent with that.
 
 **Reversibility:** Easy — purely a query-time decision; switching to a stored column later is possible but would reintroduce the drift risk above.
+
+---
+
+## Oct 2026 — React + Vite over vanilla JavaScript
+
+**Decision:** rewrite the frontend in React 19 with Vite, rather than continuing
+with plain HTML pages and a shared `main.js`.
+
+**Context:** the app was three static pages that only *displayed* data. It is
+now twelve routes that also edit it.
+
+**Why:**
+- The deciding factor was editing, not page count. `renderRatingsTable()` built
+  one HTML string and assigned it to `tbody.innerHTML`. That is fine for
+  display and actively broken once cells are editable: every save would destroy
+  focus, cursor position and any half-typed text. Fixing it by hand means
+  tracking which DOM node maps to which record — which is what React is.
+- Component reuse: the member avatar appears on six of the seven designed
+  pages, the rating chip and status badge on most.
+- Drag-to-rerank is in the approved design. The native HTML5 drag API is
+  inconsistent across browsers and effectively non-functional on touch;
+  `@dnd-kit` handles pointer, touch and keyboard.
+- A side benefit that removes a whole bug class: React escapes interpolated
+  text by default, retiring the `escapeHtml()` discipline.
+
+**Accepted cost:** a build step, a dependency tree, and rewriting pages that
+worked. The CSS carried over nearly unchanged and the database work was
+untouched.
+
+**Rejected:** a hybrid, keeping the three existing pages vanilla and building
+new ones in React. That means two auth implementations, two render paradigms
+and duplicated components — worse than either choice alone.
+
+---
+
+## Oct 2026 — No application server
+
+**Decision:** the browser talks to Supabase directly. No FastAPI service, now
+or planned. This supersedes the May 2026 "FastAPI over Django or Flask" entry,
+which chose a framework for a service that is no longer being built.
+
+**Why:**
+- *Security.* With a server, authorisation becomes "is there a correct check in
+  every route handler?" and one miss exposes everything. In the database, a Row
+  Level Security policy applies to every query path — including ones written
+  later, and including a query typed by hand. Structural rather than
+  procedural.
+- *User experience.* Free-tier hosting for such a service sleeps after ~15
+  minutes idle and takes 50+ seconds to wake. A club checking in weekly would
+  hit a cold start every single visit. Avoiding that costs $7/month.
+- *Maintenance.* A second deployment to patch, monitor, rotate secrets for.
+
+**Accepted cost:** no rate limiting of our own, nowhere to keep a secret API
+key, and the schema shape is visible to clients. Knowing the shape grants no
+access, so this is acceptable.
+
+**The upgrade path, when server-side code is needed** (book-cover lookup,
+reminder emails, scheduled jobs): **Supabase Edge Functions** — serverless, no
+cold-start penalty, deployed next to the database, able to hold secrets. "No
+backend" means "no separate always-on backend".
+
+**Kept:** `backend/app/validators.py` and its tests. Not an application — it
+mirrors a database constraint exactly, which gives the CI pipeline one genuine
+piece of logic to test instead of a fake example.
+
+---
+
+## Oct 2026 — RLS for reads, SECURITY DEFINER functions for privileged writes
+
+**Decision:** `clubs`, `club_members` and `club_join_codes` get read policies
+only. They have no insert, update or delete policies at all, and every
+membership change goes through a `SECURITY DEFINER` function that checks
+permission first.
+
+**Why:** an RLS `with check` expression sees the NEW row, not the old one.
+Expressing "a member may set their own status to `inactive` (leaving), but only
+an admin may set someone's status to `active` (approving)" means reasoning
+about every combination of old and new values across `status`, `role` and
+`member_id`. Getting one case wrong lets someone approve their own pending
+membership or promote themselves to admin. A function states the rule once —
+check admin, then act — and the table being unwritable means there is no second
+path to get it wrong.
+
+**Where the line falls:** ordinary content — books, ratings, reviews, meetings,
+announcements — *is* written directly under RLS, because there the rule
+genuinely is "your own row, in a club you belong to", which a policy expresses
+cleanly.
+
+---
+
+## Oct 2026 — Join codes in their own sealed table
+
+**Decision:** the join code for a private club lives in `club_join_codes`, not
+as a `clubs.join_code` column. That table has RLS enabled, zero policies, and
+no privileges granted to any role. Access is only through two admin-checked
+functions.
+
+**Why:** the code is the entire gate on joining a private club. As a column on
+`clubs`, any future read policy on that table would carry it along — and a
+policy added later to let people browse public clubs is an obvious and
+plausible way to leak it without noticing. Separating it means the code can
+only be reached by code written deliberately to reach it.
+
+---
+
+## Oct 2026 — Invite-only accounts, no signup form
+
+**Decision:** public signup is disabled in Supabase. An admin creates each
+account in the dashboard with a temporary password; the person changes it in
+the app under Edit profile.
+
+**Why, primarily operational:** Supabase's built-in email service is
+rate-limited to a handful of messages an hour and is explicitly not for
+production use. Any flow depending on it — confirmations, invites, resets —
+fails quietly at the worst moment. Creating accounts directly removes email
+from the critical path entirely.
+
+**The security benefit is real but secondary:** with signup off there is no
+unauthenticated endpoint on the internet that writes to the database.
+
+**Reversible by design:** the schema already supports request-and-approve — it
+is how joining a *public club* works, with `club_members.status = 'pending'`
+and the `approve_member` / `deny_member` functions. Enabling self-serve signup
+later is a Supabase setting plus one page, not a redesign.
+
+---
+
+## Oct 2026 — Member colours come from data, not CSS
+
+**Decision:** `--color-maya` / `--color-mina` / `--color-heenal` are deleted.
+A member's colour lives on their database row, and the pale chip background and
+dark chip text are derived from it at runtime in `src/lib/util/color.js`.
+
+**Why:** three hardcoded CSS rules meant a fourth member was impossible without
+an engineer editing a stylesheet — an absurd limit for an app whose entire
+point is supporting more clubs with more people.
+
+**How:** convert the hex to HSL, hold the hue, rebuild lightness and
+saturation. Hue is what makes a colour read as "blue" or "pink"; lightness is
+what makes a shade usable as a background versus as text. Holding hue steady
+keeps the family resemblance while guaranteeing the pair stays readable — text
+is pinned to 36% lightness, which clears WCAG AA contrast against the 91%
+background at every hue.
+
+**Validated:** Maya's `#7B9EC9` derives to `hsl(213, 59%, 91%)` and
+`hsl(213, 73%, 36%)`, within a hair of the `#deeaf5` / `#185FA5` originally
+chosen by eye.
+
+---
+
+## Oct 2026 — CSS Modules over Tailwind
+
+**Decision:** component-scoped CSS Modules, with every aesthetic value as a
+token in `src/styles/tokens.css`.
+
+**Why:** the owner intends to do their own design passes. "Make all cards
+rounder" should be one line in `Card.module.css`, not a search across every JSX
+file for utility classes. Scoping also means adding a feature cannot
+accidentally restyle an existing page. And 495 lines of already-understood CSS
+carried forward rather than being replaced by a new vocabulary.
+
+**Supporting tool:** a `/style` route renders every component in every state on
+one page, reading no database — change a token, see everything that moved.

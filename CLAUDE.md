@@ -56,9 +56,17 @@ Applies to anything that isn't a literal written directly in code: doc/PDF expor
 - Prefer parameterized queries / prepared statements over string concatenation wherever the tool supports it (e.g. if the FastAPI backend ever runs raw SQL directly, use placeholders like `%s`/`$1`, not f-strings) — this closes off SQL injection categorically instead of relying on manually getting escaping right each time.
 
 **Rendering to the DOM (frontend):**
-- Always run dynamic text through `escapeHtml()` (`frontend/js/main.js`) before interpolating it into an `innerHTML` string. Already done consistently today for book titles and review text — keep doing it for any new field that gets rendered.
-- Never assign unescaped external/user text directly via `innerHTML`; use `textContent` when no HTML formatting is actually needed.
-- This is precautionary today (all current content is Heenal-curated seed data) but becomes load-bearing — a real XSS vector — the moment click-to-edit-and-save ships and review/rating text becomes genuinely user-controlled.
+- **React escapes interpolated text automatically**, so the old `escapeHtml()`
+  helper is gone and this is no longer a manual discipline. `{review.text}` is
+  safe by construction.
+- The rule that remains: **never use `dangerouslySetInnerHTML`.** That prop is
+  the one way back into this class of bug, and nothing in this app needs it.
+- Values interpolated into inline `style` props are a separate path that React
+  does not sanitise. That is why `members.color` has a
+  `^#[0-9A-Fa-f]{6}$` check constraint in the database — it makes a colour
+  that is secretly a style injection impossible to store.
+- Review and rating text became genuinely user-controlled the moment
+  click-to-edit shipped, so these are load-bearing now, not precautionary.
 
 ---
 
@@ -95,16 +103,24 @@ Heenal is learning full-stack development — never skip the explanation.
 
 ## 🏗️ Tech Stack
 
-| Layer | Phase 1 | Phase 2+ |
-|---|---|---|
-| Frontend | Plain HTML + CSS + vanilla JS | React 18 + Vite |
-| Backend | None yet | Python + FastAPI |
-| Database | None yet | PostgreSQL via Supabase |
-| Auth | None yet | Supabase Auth |
-| Hosting | localhost | Vercel (FE) + Render (BE) |
-| CI/CD | None yet | GitHub Actions |
+| Layer | Current |
+|---|---|
+| Frontend | React 19 + Vite, CSS Modules + design tokens |
+| Backend | **None, deliberately** — the browser talks to Supabase directly |
+| Database | PostgreSQL via Supabase |
+| Auth | Supabase Auth (email + password, invite-only) |
+| Authorization | Row Level Security + `SECURITY DEFINER` functions, in the database |
+| Hosting | Vercel (static) |
+| CI/CD | Jenkins (`Jenkinsfile` at repo root) |
 
-**Current phase: Phase 1 — Static HTML on localhost. No backend, no database.**
+**Current phase: Phase 2 — multi-club + real auth.** See `docs/SDD.md` for the
+full specification and `docs/RUNBOOK.md` for deployment.
+
+**There is no FastAPI backend and there is not meant to be one.** `backend/`
+holds a single validator plus its tests, which exist to give the CI pipeline
+real logic to test. Server-side code, when it is eventually needed, goes in
+Supabase Edge Functions — not a separate always-on service. Reasoning in
+`docs/DECISIONS.md`.
 
 ---
 
@@ -113,38 +129,47 @@ Heenal is learning full-stack development — never skip the explanation.
 ```
 bookclub-web-app/
 ├── CLAUDE.md
-├── README.md
-├── .gitignore
-├── .env.example
+├── Jenkinsfile                 ← CI pipeline as code
 │
-├── frontend/
-│   ├── index.html             ← redirect or landing
-│   ├── styles/
-│   │   ├── main.css           ← CSS variables + global styles
-│   │   └── components.css     ← reusable component styles
-│   ├── pages/
-│   │   ├── home.html          ← group home page
-│   │   ├── ratings.html       ← drag-and-drop ratings table
-│   │   └── reviews.html       ← reviews grid
-│   └── js/
-│       └── main.js            ← static data + basic interactivity
+├── db/
+│   ├── migrations/             ← run in order: 0001 → 0005
+│   │   ├── 0001_core_schema.sql
+│   │   ├── 0002_auth_link.sql
+│   │   ├── 0003_internal_helpers.sql
+│   │   ├── 0004_rpc.sql        ← the membership write API
+│   │   └── 0005_rls.sql        ← Row Level Security
+│   ├── seeds/0001_bootstrap_club.sql
+│   ├── preflight_check.sql     ← run BEFORE migrating
+│   └── verify_security.sql     ← run AFTER migrating, all 6 must PASS
 │
-├── data/
-│   └── seed_data.json         ← 78 books, 76 meetings, all ratings/reviews
+├── frontend/                   ← Vite root (Vercel "Root Directory")
+│   ├── src/
+│   │   ├── routes/             ← one file per page
+│   │   ├── components/ui/      ← presentational primitives, no data logic
+│   │   ├── components/club/
+│   │   ├── components/layout/
+│   │   ├── lib/api/            ← every database call
+│   │   ├── lib/hooks/          ← useAuth, useClub, useAsync
+│   │   ├── lib/util/           ← colour derivation, dates
+│   │   └── styles/tokens.css   ← ⭐ every aesthetic value lives here
+│   ├── scripts/smoke.mjs
+│   ├── vercel.json             ← CSP + security headers
+│   └── .env.local              ← gitignored, never committed
+│
+├── backend/                    ← NOT an app. One validator + its tests, for CI.
 │
 ├── docs/
-│   ├── SESSION_STATE.md       ← ⭐ living project state, updated every session
-│   ├── PROJECT_PLAN.md
-│   ├── DESIGN_SPEC.md
+│   ├── SDD.md                  ← ⭐ the full specification
+│   ├── RUNBOOK.md              ← ⭐ how to deploy, step by step
+│   ├── SESSION_STATE.md
+│   ├── SCHEMA.md
 │   ├── DECISIONS.md
-│   └── COST_TRACKER.md
+│   └── mockups.html
 │
 └── scripts/
-    ├── autosave.sh            ← auto-commit every 30 min
-    └── update_session.sh      ← update SESSION_STATE.md + stage it
+    ├── start.sh                ← run the app locally
+    └── verify_anon_lockdown.sh ← proves the anon key reads nothing
 ```
-
----
 
 ## 🎨 Design System
 
@@ -174,20 +199,22 @@ bookclub-web-app/
 
 ## 🗄️ Data Models
 
-```
-Member     name, email, color, role (admin max 3 per group)
-BookClub   name, rules, founded_date, picker_order
-Book       title, author, genre, cover_url
-ClubBook   book + club + status (to_read/reading/finished) + picked_by
-Meeting    date, location, club_id
-Review     member + book + text
-Rating     member + book + value (DECIMAL, -1000 to 10, supports 0.5)
-```
+**The schema is defined in `db/migrations/` and explained in `docs/SCHEMA.md`.**
+Do not restate column lists here — a third copy only drifts out of date.
 
-Rating rules:
-- `-1000` → jail row, counts as `1` in averages, syncs to shelf jail
-- `unrated` → bottom of ratings table
-- Half-stars supported (7.5, 8.5, 9.5), configurable per group
+Nine tables: `members`, `clubs`, `club_members`, `club_join_codes`, `books`,
+`ratings`, `reviews`, `meetings`, `announcements`.
+
+Rules that are easy to get wrong:
+- **Admin is per club** (`club_members.role`), never global. An earlier version
+  of this file described a global admin flag; that model is gone.
+- **Membership is a join table**, not a column on `clubs`. A member belongs to
+  many clubs and a club has many members.
+- **Rating `-1000`** is the jail value — real data with a check constraint, not
+  a null. Counts as `1` in averages. Half-points allowed (7.5), thirds are not.
+- **Meeting numbers and the next meeting date are computed, never stored.**
+  Same for a book's per-club display number. Deriving them means they cannot
+  drift from the rows they summarise.
 
 ---
 
@@ -212,14 +239,9 @@ Alert Heenal before introducing any paid service.
 
 ---
 
-## 📋 Current Sprint: Static HTML on localhost
+## 📋 Where Things Stand
 
-- [ ] frontend/styles/main.css — CSS variables and global styles
-- [ ] frontend/pages/home.html — group home page
-- [ ] frontend/pages/ratings.html — ratings table
-- [ ] frontend/pages/reviews.html — reviews table
-- [ ] frontend/js/main.js — static sample data
-- [ ] scripts/autosave.sh
-- [ ] scripts/update_session.sh
-- [ ] docs/SESSION_STATE.md — initial state
-- [ ] Commit all of the above
+Read `docs/SESSION_STATE.md` for the live status. In short: the app is built,
+the migrations are written and verified safe to apply, and **they have not
+been run yet** — until they are, the anon key can read every review.
+`docs/RUNBOOK.md` step 2 is the fix.

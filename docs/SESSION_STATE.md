@@ -2,36 +2,103 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: August 21, 2026
+Last updated: October 18, 2026
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Early Phase 2. Supabase is live with the full real dataset (81 books, all star ratings, 206 prose reviews across 70 books) and the frontend queries it directly. A working Jenkins CI pipeline exists against this repo. PR #11 (reviews seeding + Supabase wiring) is **merged to `main`** — the multi-session reviews-seeding arc from earlier is fully closed out.
+**Current phase:** Phase 2 — multi-club support with real authentication. The
+app has been **rebuilt in React 19 + Vite**, the full database schema and
+security model are written, and the data is verified compatible. The
+migrations have **not been run yet**.
 
-**Status:** Just finished an extensive design/planning session for the next big arc — multi-club support + real Auth — before writing any implementation code. Nothing here touches the live database or the live frontend yet; this is all design docs + a draft migration file, on a new branch (see below), not yet merged.
+**The one thing that matters most:** the live database still has
+permissive read policies, so the anon key published in this public repo can
+read every review over plain HTTP. This was confirmed live, not theorised.
+`db/migrations/0005_rls.sql` is the fix and `docs/RUNBOOK.md` step 2 is how to
+apply it.
 
-**Branch:** `docs/multi-club-auth-planning` (this session's work — not yet merged)
+**Branch:** `feat/multi-club-auth-build`
 
-**Project context:** this app doubles as a hands-on learning project — recent sprints have been a deliberate opportunity to practice real git workflow (branches, PRs, merge conflicts), SQL/Postgres (schema design, RLS, scoped roles), Supabase, and Jenkins CI/CD against a real, non-trivial codebase rather than tutorials.
+**The full specification now lives in `docs/SDD.md`** — architecture, security
+model, data model, app structure, testing, backlog and glossary. This file is
+the running status; that one is the reference.
 
-**Next task (pick up here):** this session drafted the full plan for turning the app from one implicit club into real multi-club support with proper auth. It's a 4-step rollout; **only step 1 (schema draft) is done, and even that hasn't been run against the live database yet:**
+### What changed this session
 
-1. ✅ **Schema drafted** — `db/migrations/0001_multi_club_auth.sql` (new `clubs`, `club_members`, `meetings` tables; `members` gains `email`/`auth_user_id`; `books` gains `club_id`). Documented in `docs/SCHEMA.md`. **Not yet run against Supabase** — needs review, then run in the SQL Editor.
-2. ⬜ Supabase Auth itself — real email/password sign-up+sign-in via `supabase-js`, replacing the current fake `localStorage` identity switcher. Includes the manual-approval gate (new `club_members` rows land `pending`) and duplicate-account prevention (`members.email` uniqueness).
-3. ⬜ RLS rewrite — scope `members`/`books`/`ratings`/`reviews` reads/writes by `club_members` active membership, replacing today's public-read-everything policies. Also write the real policies for the new `clubs`/`club_members`/`meetings` tables (currently RLS-enabled but zero policies = fully locked, on purpose, until this step).
-4. ⬜ Build the real pages against the above: Login → User Home (Clubs/Books/Ratings/Reviews tabs) → Meetings → Settings. All four are fully mocked in `docs/mockups.html` already, nothing built as a real page yet.
+- **Rewrote the frontend in React 19 + Vite.** The deciding factor was
+  editing, not page count: the old `renderRatingsTable()` rebuilt the whole
+  table's HTML on every change, which breaks focus and half-typed text the
+  moment cells become editable. 12 routes, 10 UI primitives, 19 CSS modules.
+- **Wrote the whole database layer** — 5 migrations plus a preflight checker,
+  a security verifier and a bootstrap seed.
+- **Settled four architecture decisions** (React, no backend, invite-only
+  auth, CSS Modules) — all written up in `docs/DECISIONS.md`.
+- **A design-token system** so aesthetic changes are one file, plus a `/style`
+  route rendering every component in every state.
+- **Member colours now come from the database**, with chip shades derived in
+  `src/lib/util/color.js`. `.chip.maya` and friends are gone — a fourth member
+  works now.
+- **Fixed a real bug in `is_valid_rating()`**: it accepted `7.3`, which the
+  database constraint correctly rejects. The whole point of that function is
+  to mirror the constraint. 8 tests now, up from 4.
+- **`Jenkinsfile` moved into the repo** with frontend lint, build, `npm audit`
+  and a grep that fails the build if a `service_role` key ever appears in
+  frontend code.
+- **Caught the Supabase project was paused, not deleted.** An earlier read of
+  `NXDOMAIN` as deletion was wrong — a paused free project stops resolving,
+  which looks identical. All data intact.
 
-**After the auth arc:** Vercel hosting for a shareable live URL (not started), hands-on merge-conflict practice (conceptual walkthrough already given), Jenkins Jenkinsfile-as-code follow-up, small housekeeping (books-table typo, `reviews_seeder` role cleanup, domain check) — all still pending from before, just deprioritized behind the auth arc.
+### Three fixes that came from the project being alive rather than fresh
 
-**Important privacy note carried forward:** `members`/`books`/`ratings`/`reviews` still have **public read** RLS policies (`using (true)`) — anyone with the anon key can query full review text directly via the REST API. This is exactly what step 3 above replaces. Still near the top of the priority list given the repo and site are both public.
+1. **The live `ratings` table has no unique constraint on
+   `(member_id, book_id)`.** The app saves with an upsert, which *requires*
+   one — without it every rating edit would fail. Migration 0001 adds the
+   index explicitly, because on an existing table the `create table` that
+   declares the primary key is skipped entirely.
+2. **Constraint-existence checks were keyed on `conname` alone**, which is
+   unique per table in Postgres, not globally. Now scoped by `conrelid`.
+3. **Both SQL check scripts were a series of separate `SELECT`s.** The
+   Supabase SQL Editor only displays the *last* statement's result, so 16 of
+   17 preflight checks and 5 of 6 security checks were silently hidden.
+   Rewritten as single statements returning one table.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `npm run build` | clean |
+| ESLint 10 + React Compiler rules | 0 errors, 0 warnings |
+| `npm audit` | 0 vulnerabilities |
+| Headless-browser smoke tests | 7/7 pass |
+| Preflight against live data | 16/16 pass |
+| Backend pytest | 8/8 pass |
+
+**Not verified:** anything involving auth, permissions or multi-club
+behaviour — no migration has been applied, so none of it has run in practice.
+The migration SQL has also never been executed anywhere; it is reviewed, not
+tested.
+
+### Next steps, in order
+
+1. **Run `docs/RUNBOOK.md` steps 1–5** — preflight, migrations 0001–0005,
+   `verify_security.sql`, the bootstrap seed, then create accounts and disable
+   public signup. This closes the data exposure.
+2. Sign in and click through everything (runbook step 7 has the list).
+3. Fix whatever that review turns up.
+4. Design and aesthetic pass — `src/styles/tokens.css` and `/style`.
+5. Final security check, then deploy to Vercel.
+6. Then: more design polish, then features from the `docs/SDD.md` backlog.
 
 ### How to run locally
+
 ```bash
 bash ~/Desktop/git/bookclub-web-app/scripts/start.sh
 ```
-Starts the server on port 3000 and auto-opens your browser to the home page. (Manual alternative: `cd frontend && python3 -m http.server 3000`, then open `http://localhost:3000/pages/home.html`)
+
+Opens `http://localhost:3000`. `frontend/.env.local` is already configured.
+The style guide at `/style` works without a database connection.
 
 ---
 
