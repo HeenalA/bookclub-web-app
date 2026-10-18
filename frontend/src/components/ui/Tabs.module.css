@@ -1,0 +1,27 @@
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+  /* Hide the scrollbar on touch devices where the tabs overflow. */
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease);
+}
+.tab:hover { color: var(--text-primary); }
+
+.on {
+  color: var(--accent-strong);
+  border-bottom-color: var(--accent);
+}

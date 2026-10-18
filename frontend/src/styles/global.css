@@ -1,0 +1,101 @@
+/* ============================================================================
+   global.css — reset and base element styles.
+   ============================================================================
+   Deliberately small. Anything that styles a *component* belongs in that
+   component's own .module.css file, not here — that is what keeps adding a
+   feature from accidentally restyling an existing page.
+
+   What belongs in this file: the reset, base typography for real HTML
+   elements, and the focus-visible treatment.
+   ============================================================================ */
+
+@import "./tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  /* Stops iOS Safari from inflating text in landscape. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-normal);
+  line-height: var(--leading-tight);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* Form controls do not inherit font by default — one of the few genuinely
+   surprising CSS defaults. */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* ============================================================
+   Focus visibility
+   ============================================================
+   LEARNING: `:focus-visible` rather than `:focus`. The browser only matches
+   it when focus arrived in a way that suggests the person needs to see it —
+   keyboard navigation, not a mouse click. That gives keyboard users a clear
+   ring without putting an outline around every button a mouse user clicks.
+   Removing focus outlines entirely is a genuine accessibility failure: it
+   makes the app impossible to navigate without a pointer. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   Screen-reader-only text
+   ============================================================
+   Visually hidden but still read aloud. Used for things like giving an
+   icon-only button a real name. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,53 @@
+.nextCard {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  background: var(--surface-card);
+  border: 1px solid var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.dateBlock {
+  text-align: center;
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  flex: 0 0 auto;
+}
+.month {
+  font-size: var(--text-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-strong);
+}
+.day {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: 1.1;
+  color: var(--accent-strong);
+}
+
+.info { flex: 1; min-width: 180px; }
+.num { font-size: var(--text-micro); color: var(--text-muted); }
+.discussing { font-family: var(--font-display); font-size: var(--text-subtitle); margin: 2px 0 var(--space-2); }
+.where { font-size: var(--text-small); color: var(--text-secondary); }
+
+.flag {
+  font-size: var(--text-micro);
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+}
+
+.pastNum {
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+  color: var(--text-muted);
+  width: 34px;
+  flex: 0 0 auto;
+}
