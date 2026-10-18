@@ -1,0 +1,69 @@
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-6);
+}
+.userName { font-family: var(--font-display); font-size: var(--text-subtitle); }
+.userEmail { font-size: var(--text-caption); color: var(--text-muted); }
+.userGrow { flex: 1; min-width: 0; }
+
+.searchRow {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+.searchRow > input {
+  flex: 1 1 200px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-small);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-3);
+  font-size: var(--text-micro);
+  color: var(--text-muted);
+}
+
+.section { margin-bottom: var(--space-8); }
+
+.codeRow { display: flex; gap: var(--space-2); align-items: center; }
+.codeRow > input {
+  width: 110px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-micro);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+
+.reviewBlock {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-hairline);
+}
+.reviewBlock:last-child { border-bottom: none; }
+.reviewTitle {
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  margin-bottom: 2px;
+}
+.reviewMeta { font-size: var(--text-micro); color: var(--text-muted); margin-bottom: var(--space-2); }
+.reviewText {
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+  margin-bottom: var(--space-2);
+  white-space: pre-wrap;
+}

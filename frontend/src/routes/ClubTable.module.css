@@ -1,0 +1,143 @@
+/* Shared layout for the two big grids: ratings and reviews. */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+.title { font-family: var(--font-display); font-size: var(--text-title); }
+
+.legend {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-micro);
+  color: var(--text-secondary);
+}
+.legendDot { width: 9px; height: 9px; border-radius: var(--radius-pill); }
+
+.note {
+  font-size: var(--text-micro);
+  color: var(--text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.wrap {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  /* `separate` rather than `collapse`, deliberately. With border-collapse the
+     per-cell borders below render unreliably in WebKit, and sticky headers
+     detach entirely — that was a real bug in the previous version of this
+     table. */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3);
+  vertical-align: top;
+  border-bottom: 1px solid var(--border-hairline);
+  border-right: 1px solid var(--border-hairline);
+}
+.table th:last-child,
+.table td:last-child { border-right: none; }
+.table tr:last-child td { border-bottom: none; }
+
+.table th {
+  text-align: left;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  background: var(--surface-sunken);
+  white-space: nowrap;
+}
+
+.colHead { display: flex; align-items: center; gap: var(--space-2); }
+
+.ownCol { background: var(--surface-sunken); }
+
+.scaleCol { width: 62px; }
+.scaleLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-subtitle);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.scaleLabelSmall { font-size: var(--text-micro); color: var(--text-secondary); }
+
+.cell { min-width: 180px; }
+.cellEmpty { color: var(--text-muted); font-size: var(--text-micro); }
+
+/* --- reviews table --- */
+.bookCell { min-width: 170px; }
+.bookNum { font-size: var(--text-micro); color: var(--text-muted); }
+.bookTitle {
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  margin: 2px 0 var(--space-2);
+}
+.yearRow td {
+  background: var(--surface-sunken);
+  font-family: var(--font-display);
+  font-size: var(--text-caption);
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+}
+.reviewText {
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+  white-space: pre-wrap;
+  margin-bottom: var(--space-2);
+}
+.addCell {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+  text-align: center;
+  transition: border-color var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease);
+}
+.addCell:hover { border-color: var(--accent); color: var(--accent-strong); }
+
+/* --- the rating picker grid inside the modal --- */
+.pickerGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.pickerCell {
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+  background: var(--surface-card);
+  transition: all var(--duration-fast) var(--ease);
+}
+.pickerCell:hover { border-color: var(--accent); color: var(--accent-strong); }
+.pickerCellOn {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}

@@ -1,0 +1,75 @@
+.clubName {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.clubMeta {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.adminPanel {
+  background: var(--admin-bg);
+  border: 1px solid #efe3c2;
+  border-radius: var(--radius);
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+.adminLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--admin-accent);
+  margin-bottom: var(--space-4);
+}
+.adminSub {
+  font-size: var(--text-micro);
+  color: var(--admin-accent);
+  margin-bottom: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.codePill {
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-subtitle);
+  letter-spacing: 0.18em;
+  background: var(--surface-card);
+  border: 1px solid #efe3c2;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+}
+.codeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  vertical-align: middle;
+  margin-right: var(--space-1);
+}
+
+.danger {
+  border: 1px solid var(--status-danger-bg);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+  margin-top: var(--space-8);
+}
+.dangerLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--status-danger-text);
+  margin-bottom: var(--space-3);
+}

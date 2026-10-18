@@ -1,0 +1,33 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  flex: 0 0 auto;
+  background: currentColor;
+}
+
+.neutral { background: var(--status-neutral-bg); color: var(--status-neutral-text); }
+.success { background: var(--status-success-bg); color: var(--status-success-text); }
+.warning { background: var(--status-warning-bg); color: var(--status-warning-text); }
+.danger  { background: var(--status-danger-bg);  color: var(--status-danger-text); }
+.info    { background: var(--status-info-bg);    color: var(--status-info-text); }
+.accent  { background: var(--accent-soft);       color: var(--accent-strong); }
+.admin   { background: var(--admin-bg);          color: var(--admin-accent); }
+
+/* Coloured by a member's own colour, set via the style prop. */
+.member {
+  background: var(--member-bg);
+  color: var(--member-text);
+}
