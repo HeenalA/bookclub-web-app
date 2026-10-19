@@ -116,14 +116,47 @@ with checks as (
   -- ---- 6. No anonymous RPC ----------------------------------------------
   -- Postgres grants EXECUTE to PUBLIC on new functions by default, and PUBLIC
   -- includes anon. Migration 0004 revokes that; this confirms it stuck.
+  --
+  -- Trigger and event-trigger functions are excluded, and that exclusion is
+  -- principled rather than a convenience. Postgres refuses to call them
+  -- directly at all ("trigger functions can only be called as triggers"), and
+  -- PostgREST cannot expose a function whose return type it has no way to
+  -- serialise. So they are not an RPC surface, however they are granted.
+  --
+  -- Without this, the check fails on `rls_auto_enable` — a function Supabase
+  -- itself installs to turn RLS on for new tables. Verified unreachable: an
+  -- anonymous POST to /rest/v1/rpc/rls_auto_enable returns HTTP 400.
+  --
+  -- `proacl` is null for a function nobody has touched, which means *default*
+  -- privileges rather than none — and the default is EXECUTE to PUBLIC. That
+  -- is why acldefault() is substituted rather than treating null as empty;
+  -- reading null as "no grants" would make this check pass on exactly the
+  -- functions it exists to catch.
   union all
   select 6, 'No public-schema function callable by anon',
-         (select count(*) = 0 from information_schema.role_routine_grants
-           where grantee in ('anon', 'PUBLIC') and specific_schema = 'public'),
-         coalesce((select string_agg(distinct routine_name, ', ')
-                     from information_schema.role_routine_grants
-                    where grantee in ('anon', 'PUBLIC')
-                      and specific_schema = 'public'), 'none')
+         (select count(*) = 0
+            from pg_proc p
+            join pg_namespace n  on n.oid = p.pronamespace
+            join pg_type      rt on rt.oid = p.prorettype
+            cross join lateral
+              aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+            left join pg_roles r on r.oid = a.grantee
+           where n.nspname = 'public'
+             and a.privilege_type = 'EXECUTE'
+             and (a.grantee = 0 or r.rolname = 'anon')   -- grantee 0 is PUBLIC
+             and rt.typname not in ('trigger', 'event_trigger')),
+         coalesce((select string_agg(distinct p.proname, ', ')
+                     from pg_proc p
+                     join pg_namespace n  on n.oid = p.pronamespace
+                     join pg_type      rt on rt.oid = p.prorettype
+                     cross join lateral
+                       aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+                     left join pg_roles r on r.oid = a.grantee
+                    where n.nspname = 'public'
+                      and a.privilege_type = 'EXECUTE'
+                      and (a.grantee = 0 or r.rolname = 'anon')
+                      and rt.typname not in ('trigger', 'event_trigger')),
+                  'none')
 )
 select
   check_name,

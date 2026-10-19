@@ -15,10 +15,11 @@
 # ============================================================================
 set -uo pipefail
 
-CONFIG="$(dirname "$0")/../frontend/js/config.js"
+CONFIG="$(dirname "$0")/../frontend/.env.local"
 
 if [[ ! -f "$CONFIG" ]]; then
   echo "Could not find $CONFIG" >&2
+  echo "Copy frontend/.env.example to frontend/.env.local and fill it in." >&2
   exit 1
 fi
 
@@ -58,7 +59,7 @@ done
 
 echo
 echo "Checking that the membership functions refuse anonymous callers..."
-for fn in discover_clubs create_club club_join_code; do
+for fn in discover_clubs create_club club_join_code rls_auto_enable; do
   code=$(curl -s -m 20 -o /dev/null -w '%{http_code}' -X POST \
     -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
     -H "Content-Type: application/json" -d '{}' \
