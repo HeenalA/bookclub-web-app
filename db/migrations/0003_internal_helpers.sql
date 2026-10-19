@@ -170,7 +170,24 @@ $$;
 -- exactly one club. This helper is what lets their policies ask "is the
 -- current user in the club that owns this book?" without duplicating club_id
 -- onto every rating and review row.
-create or replace function app.book_club_id(p_book integer)
+-- The parameter is `bigint`, not `integer`, and that distinction is the whole
+-- point. Supabase's table editor creates identity columns as `bigint` by
+-- default, so the live `books.id` and therefore `ratings.book_id` are int8.
+--
+-- Postgres will widen an `integer` argument to a `bigint` parameter for free,
+-- but it will NOT narrow a `bigint` argument to an `integer` parameter —
+-- that could silently lose data, so it refuses and reports the function as
+-- not existing. Taking the wider type means this works against either column
+-- type, which matters because these migrations have to run on an existing
+-- database as well as a fresh one.
+--
+-- The drops clear out a narrower version from an earlier run; changing a
+-- parameter's type creates a NEW function rather than replacing the old one,
+-- so without these you would end up with both.
+drop function if exists app.book_club_id(integer);
+drop function if exists app.book_club_id(bigint);
+
+create or replace function app.book_club_id(p_book bigint)
 returns uuid
 language sql
 stable

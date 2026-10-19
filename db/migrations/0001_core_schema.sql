@@ -347,7 +347,7 @@ create table if not exists meetings (
   meeting_date date not null,
   meeting_time text,
   location     text,
-  book_id      integer references books(id) on delete set null,
+  book_id      bigint references books(id) on delete set null,
   created_by   text references members(id) on delete set null,
   created_at   timestamptz not null default now()
 );
@@ -364,6 +364,21 @@ do $$ begin
   if not exists (select 1 from pg_constraint where conrelid = 'meetings'::regclass and conname = 'meetings_date_range') then
     alter table meetings add constraint meetings_date_range
       check (meeting_date between '2000-01-01' and '2100-01-01');
+  end if;
+end $$;
+
+-- Match books.id exactly. A foreign key from int4 to int8 is legal and works,
+-- but leaving the two different is how the book_club_id(integer) bug happened
+-- in the first place — so this widens the column if an earlier run created it
+-- as integer.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'meetings'
+       and column_name = 'book_id' and data_type = 'integer'
+  ) then
+    alter table meetings alter column book_id type bigint;
   end if;
 end $$;
 
