@@ -18,23 +18,34 @@
 -- ------------------------------------------------------------
 -- 1. Member email addresses
 -- ------------------------------------------------------------
--- EDIT BEFORE RUNNING.
+-- ⚠️  DO NOT PUT A REAL EMAIL ADDRESS IN THIS FILE.
 --
--- The email here must match the address used when creating that person's
--- login account exactly. That match is the whole mechanism by which an
--- existing member inherits their years of ratings and reviews: the trigger in
--- migration 0002 looks for a members row with this email and no account
--- attached, and links the two.
+-- This file is tracked in git and the repository is public. An address edited
+-- in here and committed is an address published on GitHub.
+--
+-- Instead, set emails with a one-off statement in the SQL Editor, which is
+-- never written to disk:
+--
+--     update members set email = 'you@example.com' where id = 'heenal';
+--
+-- Then run this file unchanged. The line below is written as
+-- `... and email is null`, so once an address is set it quietly does nothing
+-- and the rest of the file still runs.
+--
+-- WHY THE EMAIL MATTERS: it must match the address used when creating that
+-- person's login account, exactly. That match is the entire mechanism by
+-- which an existing member inherits their years of ratings and reviews — the
+-- trigger in migration 0002 looks for a members row with this email and no
+-- account attached, and links the two.
 --
 -- Leaving an email null is completely safe. The member row, their ratings and
--- their reviews all stay exactly as they are and keep showing in the club —
--- that person simply cannot log in until an email is set. So fill in only the
--- addresses you are ready to use, and comment the others out with `--`.
+-- their reviews all stay exactly as they are and keep showing in the club;
+-- that person simply cannot log in until an address is set.
 
 update members set email = 'REPLACE_WITH_HEENAL_EMAIL' where id = 'heenal' and email is null;
 
--- Fill these in when you are ready to give Maya and Mina accounts, or leave
--- them commented out for now.
+-- Same for these two — set them from the SQL Editor when you are ready to
+-- give Maya and Mina accounts. Leave them commented out here.
 -- update members set email = 'REPLACE_WITH_MAYA_EMAIL' where id = 'maya' and email is null;
 -- update members set email = 'REPLACE_WITH_MINA_EMAIL' where id = 'mina' and email is null;
 
