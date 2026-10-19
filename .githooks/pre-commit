@@ -87,4 +87,33 @@ for jwt in $jwts; do
   fi
 done
 
+# ----------------------------------------------------------------------------
+# 4. Personal data — email addresses
+# ----------------------------------------------------------------------------
+# This repository is public. An email address committed here is an address
+# published on the internet, scraped within days, and not removable from git
+# history afterwards. CLAUDE.md rule 8 covers this; the hook now enforces it.
+#
+# Rules 2 and 3 above look for secrets and would never flag an address, which
+# is how one survived in a migration comment for several commits.
+#
+# Documentation domains are allowed, because examples need to look like
+# examples. example.com, .org, .net and .edu are reserved by RFC 2606 for
+# exactly this and can never belong to a real person.
+emails=$(echo "$added" \
+  | grep -oiE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}' \
+  | grep -viE '@(example\.(com|org|net|edu)|email\.com|test\.com|localhost|sentry\.io)$' \
+  | grep -viE '^(you|your|user|name|someone|admin|noreply|no-reply|test|email)@' \
+  | sort -u)
+
+if [ -n "$emails" ]; then
+  echo "Commit blocked: a real-looking email address is staged:"
+  echo "$emails" | sed 's/^/  /'
+  echo
+  echo "This repo is public. Use an example.com address in documentation, or"
+  echo "set real addresses from the Supabase SQL Editor so they never touch a"
+  echo "file. If this is genuinely a placeholder, add its domain to rule 4."
+  exit 1
+fi
+
 exit 0
