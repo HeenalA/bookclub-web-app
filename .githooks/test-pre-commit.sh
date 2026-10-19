@@ -40,3 +40,21 @@ for pair in "anon:ALLOW:$hdr.$anon_body.sig" "service_role:BLOCK:$hdr.$svc_body.
   if decode_role "$jwt" | grep -q 'service_role'; then got=BLOCK; else got=ALLOW; fi
   [ "$got" = "$expect" ] && echo "  pass  [$got] $name key" || echo "  FAIL  expected $expect got $got — $name key"
 done
+
+echo
+echo "Rule 4 — email addresses (this repo is public):"
+email_check() {
+  local label="$1" expect="$2" line="$3"
+  got=ALLOW
+  if echo "$line" | grep -oiE '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}' \
+     | grep -viE '@(example\.(com|org|net|edu)|email\.com|test\.com|localhost|sentry\.io)$' \
+     | grep -viE '^(you|your|user|name|someone|admin|noreply|no-reply|test|email)@' \
+     | grep -q .; then got=BLOCK; fi
+  [ "$got" = "$expect" ] && echo "  pass  [$got] $label" || echo "  FAIL  expected $expect got $got — $label"
+}
+email_check "real gmail address in a comment"  BLOCK "+-- Turns 'Heenal.Amin+books@gmail.com' into a slug"
+email_check "real address in SQL"              BLOCK "+update members set email = 'someone.real@outlook.com';"
+email_check "example.com is fine"              ALLOW "+-- Turns 'Sam.Okafor+books@example.com' into a slug"
+email_check "mockup @email.com is fine"        ALLOW '+  <p>maya@email.com · requested 2 days ago</p>'
+email_check "you@ placeholder is fine"         ALLOW "+VITE_SUPABASE_URL=you@example.com"
+email_check "no email at all"                  ALLOW "+const updatePassword = useCallback(async (password) => {"
