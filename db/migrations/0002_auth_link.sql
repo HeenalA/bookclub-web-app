@@ -22,8 +22,8 @@
 -- ============================================================
 -- Slug generation
 -- ============================================================
--- Turns 'Heenal.Amin+books@gmail.com' into 'heenal_amin', then adds a numeric
--- suffix if that is taken ('heenal_amin2', 'heenal_amin3', ...).
+-- Turns 'Sam.Okafor+books@example.com' into 'sam_okafor', then adds a numeric
+-- suffix if that is taken ('sam_okafor2', 'sam_okafor3', ...).
 create or replace function app.generate_member_slug(p_email text, p_name text)
 returns text
 language plpgsql
