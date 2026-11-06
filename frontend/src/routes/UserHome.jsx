@@ -211,7 +211,10 @@ function ProfileModal({ open, onClose }) {
 
 function ClubsTab() {
   const { member } = useAuth();
-  const memberships = useAsync(() => listMyMemberships(), []);
+  const memberships = useAsync(
+    () => listMyMemberships(member.id),
+    [member.id]
+  );
   const approvals = useAsync(() => listPendingApprovals(), []);
 
   const [creating, setCreating] = useState(false);
@@ -243,9 +246,9 @@ function ClubsTab() {
   const actionable = useMemo(
     () =>
       (approvals.data ?? []).filter(
-        (r) => myAdminClubIds.has(r.club_id) && r.member_id !== member?.id
+        (r) => myAdminClubIds.has(r.club_id) && r.member_id !== member.id
       ),
-    [approvals.data, myAdminClubIds, member?.id]
+    [approvals.data, myAdminClubIds, member.id]
   );
 
   async function run(fn, successMessage) {
