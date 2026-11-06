@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useAuth } from "../lib/hooks/useAuth.jsx";
-import { useClub, useClubId } from "../lib/hooks/useClub.jsx";
+import { useClubId } from "../lib/hooks/useClub.jsx";
 import { useAsync } from "../lib/hooks/useAsync.js";
 import { listClubBooks } from "../lib/api/books.js";
 import {
@@ -33,7 +33,6 @@ const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 export default function ClubMeetings() {
   const clubId = useClubId();
   const { member } = useAuth();
-  const { isAdmin } = useClub();
 
   const meetings = useAsync(() => listClubMeetings(clubId), [clubId]);
   const books = useAsync(() => listClubBooks(clubId), [clubId]);
@@ -185,15 +184,20 @@ export default function ClubMeetings() {
                   <Button size="sm" onClick={() => setEditing(meeting)}>
                     Edit
                   </Button>
-                  {isAdmin && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setConfirmDelete(meeting)}
-                    >
-                      Delete
-                    </Button>
-                  )}
+                  {/* Any active member can edit or delete a meeting, which
+                      matches the meetings_delete_club policy exactly. Gating
+                      this to admins in the UI only would have been theatre:
+                      the database would still allow it, so the restriction
+                      would stop an honest member and nobody else. Deleting a
+                      meeting is also not destructive — unlike a book, it
+                      cascades to nothing. */}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setConfirmDelete(meeting)}
+                  >
+                    Delete
+                  </Button>
                 </>
               }
             />
