@@ -1,0 +1,395 @@
+/* ============================================================================
+   Bookshelf.module.css — the illustrated shelf scene.
+   ============================================================================
+   The woodwork here is CSS, not images. Gradients and shadows stay sharp at
+   any size and on any display, and the header arch can hold a club name of
+   any length as real text. The supplied PNGs are used only for the
+   illustrations that genuinely need to be drawings — the cat, the plant, the
+   globe — at or below their native size so they stay crisp.
+   ============================================================================ */
+
+.scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  border-radius: var(--scene-radius);
+  overflow: hidden;
+  background:
+    /* candle glow, upper left of the main bay */
+    radial-gradient(60% 50% at 32% 30%, rgba(255, 196, 120, 0.16), transparent 70%),
+    /* vertical plank seams */
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.16) 0 1px,
+      transparent 1px 84px),
+    linear-gradient(180deg, var(--wood-dark) 0%, var(--wood-darkest) 100%);
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 860px) {
+  .scene { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------- the arch */
+
+.arch {
+  position: relative;
+  grid-column: 1 / -1;
+  margin: 0 auto var(--space-6);
+  padding: var(--space-3) var(--space-10) var(--space-4);
+  max-width: 760px;
+  text-align: center;
+  border-radius: 190px 190px 10px 10px / 70px 70px 10px 10px;
+  background:
+    linear-gradient(180deg,
+      var(--wood-highlight) 0%,
+      var(--wood-light) 18%,
+      var(--wood) 55%,
+      var(--wood-dark) 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.28),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.45),
+    0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+/* The carved inner line that gives the arch its depth. */
+.arch::after {
+  content: "";
+  position: absolute;
+  inset: 7px 14px 8px;
+  border-radius: 180px 180px 6px 6px / 62px 62px 6px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  border-top-color: rgba(255, 220, 170, 0.16);
+  pointer-events: none;
+}
+
+.clubName {
+  position: relative;
+  font-family: var(--font-display);
+  /* Scales with the viewport so a long club name stays on one line and still
+     fills the arch on a wide screen. */
+  font-size: clamp(1.25rem, 3.4vw, 2.25rem);
+  line-height: 1.15;
+  color: #fdf1dc;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(255, 196, 120, 0.3);
+  word-break: break-word;
+}
+
+.sprig {
+  color: var(--brass);
+  opacity: 0.85;
+  font-size: 0.7em;
+  padding: 0 0.45em;
+  vertical-align: 0.18em;
+}
+
+/* --------------------------------------------------------------- main bay */
+
+.bay { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  min-height: 118px;
+  padding: 0 var(--space-4) var(--space-1);
+}
+
+/* A shelf plank: lit top face, dark front edge, shadow cast below. */
+.plank {
+  position: relative;
+  height: 16px;
+  border-radius: 3px;
+  background: linear-gradient(180deg,
+    var(--shelf-lip) 0%,
+    var(--shelf-top) 38%,
+    var(--shelf-face) 62%,
+    var(--wood-edge) 100%);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 14px 22px -6px rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------------------------------------------ the plaque */
+
+.plaque {
+  position: relative;
+  flex: 0 0 auto;
+  padding: var(--space-3) var(--space-5);
+  text-align: center;
+  color: var(--plaque-ink);
+  background: linear-gradient(180deg, #faeed6 0%, var(--plaque-paper) 100%);
+  border: 2px solid var(--plaque-edge);
+  /* The notched corners of the reference plaque, without an image. */
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.5),
+    inset 0 0 22px rgba(180, 140, 80, 0.2),
+    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.plaqueLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-subtitle);
+  margin-bottom: var(--space-1);
+}
+.plaqueDate {
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-3);
+}
+.plaqueEmpty {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.countdown { display: flex; gap: var(--space-2); justify-content: center; }
+
+.timeCell {
+  min-width: 46px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--plaque-edge);
+}
+.timeNum {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.timeUnit {
+  display: block;
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+/* -------------------------------------------------------- currently reading */
+
+.currentWrap { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+.ribbon {
+  position: relative;
+  z-index: 2;
+  margin-bottom: -10px;
+  padding: 3px var(--space-3);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  color: var(--plaque-ink);
+  background: linear-gradient(180deg, #faeed6, var(--plaque-paper));
+  border: 1px solid var(--plaque-edge);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+/* A standing book, drawn rather than photographed, so any title works. */
+.currentBook {
+  width: 118px;
+  min-height: 160px;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 3px 6px 6px 3px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.45) 0 6px, transparent 6px),
+    linear-gradient(160deg, var(--member-base, #3b2f63) 0%, rgba(0,0,0,0.75) 160%);
+  box-shadow:
+    inset -1px 0 0 rgba(255,255,255,0.12),
+    0 10px 20px rgba(0, 0, 0, 0.55);
+}
+.currentTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+  color: #f6ead6;
+  line-height: 1.25;
+}
+.currentAuthor {
+  font-size: var(--text-micro);
+  color: rgba(246, 234, 214, 0.7);
+  margin-top: var(--space-2);
+}
+
+/* Nothing being read is a normal state for a club between books, so it gets
+   a slimmer, quieter book rather than a full-size slab of placeholder text. */
+.currentBookEmpty {
+  width: 92px;
+  min-height: 118px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.4) 0 5px, transparent 5px),
+    linear-gradient(160deg, #4a3a2a 0%, #2a1f16 140%);
+  border: 1px dashed rgba(212, 162, 76, 0.35);
+}
+
+/* ------------------------------------------------------------- member books */
+
+.membersRow { align-items: flex-end; flex-wrap: wrap; }
+
+.memberBook {
+  position: relative;
+  flex: 1 1 64px;
+  max-width: 104px;
+  min-width: 52px;
+  /* Varied heights read as a row of real books rather than a bar chart. */
+  height: var(--spine-height, 128px);
+  padding: var(--space-2) var(--space-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  border-radius: 2px 6px 6px 2px;
+  cursor: pointer;
+  /* Coloured from the member's own colour in the database, so a new member
+     needs no new artwork and no stylesheet change.
+     Layered back to front: the two gold bands near the head and tail of the
+     spine, the rolled spine edge, then the cloth itself. */
+  background:
+    linear-gradient(180deg, transparent 13%, var(--brass-dim) 13% 14.2%,
+                    transparent 14.2% 82%, var(--brass-dim) 82% 83.2%,
+                    transparent 83.2%),
+    linear-gradient(90deg,
+      rgba(0,0,0,0.55) 0 3px,
+      rgba(255,255,255,0.10) 3px 7px,
+      transparent 7px),
+    linear-gradient(100deg,
+      color-mix(in srgb, var(--member-base) 88%, #fff) 0%,
+      var(--member-base) 22%,
+      color-mix(in srgb, var(--member-base) 58%, #16100a) 100%);
+  box-shadow:
+    inset -2px 0 3px rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+    0 9px 18px rgba(0, 0, 0, 0.55);
+  transition: transform var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+
+.memberBook:hover,
+.memberBook:focus-visible {
+  transform: translateY(-7px);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.2),
+    0 14px 24px rgba(0, 0, 0, 0.6),
+    0 0 0 1px var(--brass);
+}
+
+.memberName {
+  font-family: var(--font-display);
+  font-size: var(--text-caption);
+  color: #fdf3e3;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.memberRole {
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(253, 243, 227, 0.72);
+}
+.memberLeaf { color: var(--brass); opacity: 0.6; font-size: 0.7rem; }
+
+/* A couple of unlabelled books at each end, so the shelf is not bare when a
+   club has only three members. */
+.fillerGroup { display: flex; align-items: flex-end; gap: 3px; flex: 0 0 auto; }
+.fillerGroupGrow { flex: 1 1 auto; justify-content: flex-end; }
+
+/* Unlabelled books, so a three-person club still looks like a shelf rather
+   than three cards floating on a plank. Muted on purpose — they must not
+   compete with the members, who are the content. */
+.filler {
+  flex: 0 0 auto;
+  width: var(--filler-width, 16px);
+  height: var(--spine-height, 110px);
+  border-radius: 1px 3px 3px 1px;
+  background:
+    linear-gradient(180deg, transparent 16%, rgba(212,162,76,0.35) 16% 17.4%,
+                    transparent 17.4% 80%, rgba(212,162,76,0.35) 80% 81.4%,
+                    transparent 81.4%),
+    linear-gradient(100deg, var(--filler-tint, #6d4a33) 0%,
+                    color-mix(in srgb, var(--filler-tint, #6d4a33) 55%, #140d07) 100%);
+  box-shadow:
+    inset -1px 0 2px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    0 8px 14px rgba(0,0,0,0.45);
+}
+
+/* ------------------------------------------------------------- small labels */
+
+.shelfLabel {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  margin-bottom: var(--space-2);
+  padding: 2px var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-caption);
+  color: var(--plaque-ink);
+  background: linear-gradient(180deg, #faeed6, var(--plaque-paper));
+  border: 1px solid var(--plaque-edge);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.labelRow { display: flex; justify-content: center; }
+
+/* ------------------------------------------------------- decorative column */
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-2);
+}
+@media (max-width: 860px) { .column { display: none; } }
+
+.nook {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: var(--space-2);
+  min-height: 96px;
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+.art {
+  display: block;
+  /* Capped at native size — upscaling a 150px illustration is what makes
+     this kind of artwork look soft. */
+  max-height: 86px;
+  width: auto;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.5));
+}
+.artTall { max-height: 110px; }
+
+/* The trailing vine, draped over the top-left corner of the whole scene. */
+.vine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 116px;
+  opacity: 0.95;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+}
+
+.empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: rgba(253, 243, 227, 0.6);
+  font-size: var(--text-small);
+}

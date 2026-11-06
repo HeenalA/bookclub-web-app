@@ -16,6 +16,7 @@ import {
   Spinner,
 } from "../components/ui/Feedback.jsx";
 import { Countdown } from "../components/club/Countdown.jsx";
+import { Bookshelf } from "../components/club/Bookshelf.jsx";
 import { memberColors } from "../lib/util/color.js";
 import styles from "./StyleGuide.module.css";
 
@@ -28,6 +29,14 @@ const SAMPLE = [
   { id: "heenal", name: "Heenal", initials: "H", color: "#9E7BC9" },
   { id: "sam", name: "Sam Okafor", initials: "SO", color: "#7BC9A4" },
 ];
+
+/* Computed once at module load rather than during render. Reading the clock
+   while rendering is impure — React can render a component twice and get two
+   different answers — which the compiler rules correctly flag. */
+const SAMPLE_MEETING = {
+  meeting_date: new Date(Date.now() + 12 * 86400000).toISOString().slice(0, 10),
+  meeting_time: "6:00 PM PST",
+};
 
 const SURFACES = [
   ["Accent", "--accent"],
@@ -340,6 +349,43 @@ export default function StyleGuide() {
             <Countdown meeting={null} />
           </div>
         </div>
+      </section>
+
+      {/* ---- Bookshelf ---- */}
+      <section className={styles.group}>
+        <h2 className={styles.groupTitle}>Bookshelf scene</h2>
+        <p className={styles.caption}>
+          Woodwork is CSS so it stays sharp and fits any club name; the cat,
+          plant and globe are illustrations. Member spines take their colour
+          from the member's own row — try changing one of the sample colours
+          above and watch the shelf follow. Spines are real buttons: press Tab.
+        </p>
+        <Bookshelf
+          clubName="To Read or Not to Read"
+          members={SAMPLE.slice(0, 3).map((m, i) =>
+            i === 2 ? { ...m, role: "admin" } : m
+          )}
+          memberById={Object.fromEntries(SAMPLE.map((m) => [m.id, m]))}
+          currentBook={{
+            title: "Everything I Never Told You",
+            author: "Celeste Ng",
+            picked_by: "heenal",
+          }}
+          nextMeeting={SAMPLE_MEETING}
+          onMemberClick={(m) => window.alert(`Clicked ${m.name}`)}
+        />
+
+        <p className={styles.caption} style={{ marginTop: "var(--space-5)" }}>
+          The same component with four members, no current book and no meeting
+          scheduled — the states a new club actually starts in.
+        </p>
+        <Bookshelf
+          clubName="Sci-Fi Sunday"
+          members={SAMPLE}
+          memberById={Object.fromEntries(SAMPLE.map((m) => [m.id, m]))}
+          currentBook={null}
+          nextMeeting={null}
+        />
       </section>
 
       {/* ---- Modal ---- */}
