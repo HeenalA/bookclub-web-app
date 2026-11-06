@@ -12,8 +12,25 @@
 import { sb } from "../supabase.js";
 import { unwrap } from "./errors.js";
 
-/** Every club the current member is attached to — active, pending or left. */
-export async function listMyMemberships() {
+/**
+ * Every club the given member is attached to — active, pending or left.
+ *
+ * LEARNING: the `.eq("member_id", ...)` is load-bearing, and leaving it out
+ * was a real bug — the clubs page showed one card per *member* of a club
+ * rather than one per club, so a three-person club appeared three times.
+ *
+ * The mistake was assuming row-level security would narrow this to "my rows".
+ * It does not, and should not: the policy on `club_members` deliberately
+ * returns your clubmates' rows as well, because the settings page has to list
+ * everyone. RLS decides what you are *allowed* to see. It is not a substitute
+ * for asking the right question.
+ *
+ * The general rule this points at: filter for correctness in the query, and
+ * let RLS be the thing that stops you seeing what you should not. Treating a
+ * security boundary as a query filter gets you wrong answers inside the
+ * boundary.
+ */
+export async function listMyMemberships(memberId) {
   return unwrap(
     await sb
       .from("club_members")
@@ -21,6 +38,7 @@ export async function listMyMemberships() {
         "club_id, status, role, requested_at, joined_at, left_at, " +
           "clubs ( id, name, visibility, status, founded_date )"
       )
+      .eq("member_id", memberId)
       .order("joined_at", { ascending: false, nullsFirst: false })
   );
 }
