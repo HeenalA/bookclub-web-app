@@ -2,7 +2,8 @@
 import { sb } from "../supabase.js";
 import { unwrap } from "./errors.js";
 
-const BOOK_FIELDS = "id, club_id, title, author, picked_by, status, year";
+const BOOK_FIELDS =
+  "id, club_id, title, author, picked_by, status, year, cover_url";
 
 /** Every book on one club's shelf, oldest first (so #1 is the club's first). */
 export async function listClubBooks(clubId) {
@@ -15,7 +16,7 @@ export async function listClubBooks(clubId) {
   );
 }
 
-export async function addBook(clubId, { title, author, pickedBy, status, year }) {
+export async function addBook(clubId, { title, author, pickedBy, status, year, coverUrl }) {
   return unwrap(
     await sb
       .from("books")
@@ -26,6 +27,7 @@ export async function addBook(clubId, { title, author, pickedBy, status, year })
         picked_by: pickedBy || null,
         status: status || "to_read",
         year: year || new Date().getFullYear(),
+        cover_url: coverUrl?.trim() || null,
       })
       .select(BOOK_FIELDS)
       .single()
@@ -39,6 +41,7 @@ export async function updateBook(bookId, patch) {
   if (patch.pickedBy !== undefined) next.picked_by = patch.pickedBy || null;
   if (patch.status !== undefined) next.status = patch.status;
   if (patch.year !== undefined) next.year = patch.year;
+  if (patch.coverUrl !== undefined) next.cover_url = patch.coverUrl?.trim() || null;
 
   return unwrap(
     await sb.from("books").update(next).eq("id", bookId).select(BOOK_FIELDS).single()

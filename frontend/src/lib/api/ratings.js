@@ -75,7 +75,7 @@ export async function listMyRatings(memberId) {
   return unwrap(
     await sb
       .from("ratings")
-      .select("book_id, value, books ( id, title, club_id, clubs ( id, name ) )")
+      .select("book_id, value, books ( id, title, cover_url, picked_by, club_id, clubs ( id, name ) )")
       .eq("member_id", memberId)
       .order("value", { ascending: false })
   );
