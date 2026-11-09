@@ -10,25 +10,50 @@
 
 .scene {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: var(--space-5);
-  padding: var(--space-6) var(--space-6) var(--space-8);
   border-radius: var(--scene-radius);
-  overflow: hidden;
+  /* The carcass: solid wood on all four sides. The padding IS the frame, so
+     the shelves inside genuinely end at a wall instead of floating in space,
+     which is what a bookcase actually looks like. */
+  padding: var(--space-3) 18px 20px;
   background:
-    /* candle glow, upper left of the main bay */
-    radial-gradient(60% 50% at 32% 30%, rgba(255, 196, 120, 0.16), transparent 70%),
-    /* vertical plank seams */
-    repeating-linear-gradient(90deg,
-      rgba(0,0,0,0.16) 0 1px,
-      transparent 1px 84px),
+    linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 42%, var(--wood-dark) 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.22),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* The recess the shelves sit in: darker, and shadowed by the frame around it. */
+.interior {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 248px;
+  overflow: hidden;
+  border-radius: 6px;
+  background:
+    radial-gradient(60% 50% at 32% 28%, rgba(255, 196, 120, 0.15), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 78px),
     linear-gradient(180deg, var(--wood-dark) 0%, var(--wood-darkest) 100%);
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 0 0 1px var(--wood-edge),
+    inset 7px 0 12px -6px rgba(0,0,0,0.75),
+    inset -7px 0 12px -6px rgba(0,0,0,0.75),
+    inset 0 9px 14px -7px rgba(0,0,0,0.8);
+}
+
+/* The upright that divides the wide bay from the narrow one. */
+.divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 248px;
+  width: 9px;
+  background: linear-gradient(90deg, var(--wood-edge), var(--wood) 45%, var(--wood-dark));
+  box-shadow: 2px 0 7px rgba(0,0,0,0.5), -2px 0 7px rgba(0,0,0,0.5);
+  z-index: 1;
 }
 
 @media (max-width: 860px) {
-  .scene { grid-template-columns: 1fr; }
+  .interior { grid-template-columns: 1fr; }
+  .divider { display: none; }
 }
 
 /* ---------------------------------------------------------------- the arch */
@@ -88,31 +113,51 @@
 
 /* --------------------------------------------------------------- main bay */
 
-.bay { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.bay {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  padding: var(--space-5) 0 0;
+}
+.bay > div:last-child .row { min-height: 150px; }
 
 .row {
   position: relative;
   display: flex;
   align-items: flex-end;
-  gap: var(--space-4);
-  min-height: 118px;
-  padding: 0 var(--space-4) var(--space-1);
+  gap: var(--space-3);
+  min-height: 150px;
+  /* Books sit ON the plank, so nothing between them and it. */
+  padding: 0 var(--space-5) 0;
 }
 
 /* A shelf plank: lit top face, dark front edge, shadow cast below. */
+/* A shelf board, running wall to wall. The negative margins are what make it
+   meet the carcass instead of stopping short of it. */
 .plank {
   position: relative;
-  height: 16px;
-  border-radius: 3px;
+  height: 17px;
+  margin: 0 0 var(--space-6);
+  border-radius: 0;
   background: linear-gradient(180deg,
     var(--shelf-lip) 0%,
-    var(--shelf-top) 38%,
-    var(--shelf-face) 62%,
+    var(--shelf-top) 34%,
+    var(--shelf-face) 58%,
     var(--wood-edge) 100%);
   box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.35),
-    0 14px 22px -6px rgba(0, 0, 0, 0.6);
+    inset 0 1px 0 rgba(255, 225, 180, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.4),
+    0 16px 20px -8px rgba(0, 0, 0, 0.7);
 }
+.plank::after {           /* the board's front lip, catching the light */
+  content: "";
+  position: absolute;
+  inset: auto 0 -4px;
+  height: 4px;
+  background: linear-gradient(180deg, var(--wood-edge), rgba(0,0,0,0.5));
+}
+.plank:last-child { margin-bottom: 0; }
 
 /* ------------------------------------------------------------ the plaque */
 
@@ -237,96 +282,104 @@
 
 .memberBook {
   position: relative;
-  flex: 1 1 64px;
-  max-width: 104px;
-  min-width: 52px;
-  /* Varied heights read as a row of real books rather than a bar chart. */
-  height: var(--spine-height, 128px);
-  padding: var(--space-2) var(--space-1);
+  flex: 0 0 auto;
+  /* Narrow, because this is a book seen SPINE ON, standing on a shelf —
+     not a cover facing the room. That is what makes a row of them read as
+     a shelf of books. */
+  width: 46px;
+  height: var(--spine-height, 150px);
+  padding: var(--space-3) 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
-  border-radius: 2px 6px 6px 2px;
+  gap: var(--space-2);
+  border-radius: 2px 4px 4px 2px;
   cursor: pointer;
-  /* Coloured from the member's own colour in the database, so a new member
-     needs no new artwork and no stylesheet change.
-     Layered back to front: the two gold bands near the head and tail of the
-     spine, the rolled spine edge, then the cloth itself. */
+  /* Coloured from the member's own row in the database, so a new member
+     needs no new artwork.
+     Back to front: gold bands near the head and tail of the spine, the
+     rolled edge where the spine meets the cover, then the cloth. */
   background:
-    linear-gradient(180deg, transparent 13%, var(--brass-dim) 13% 14.2%,
-                    transparent 14.2% 82%, var(--brass-dim) 82% 83.2%,
-                    transparent 83.2%),
+    linear-gradient(180deg, transparent 10%, var(--brass-dim) 10% 11.4%,
+                    transparent 11.4% 86%, var(--brass-dim) 86% 87.4%,
+                    transparent 87.4%),
     linear-gradient(90deg,
-      rgba(0,0,0,0.55) 0 3px,
-      rgba(255,255,255,0.10) 3px 7px,
-      transparent 7px),
+      rgba(0,0,0,0.5) 0 2px,
+      rgba(255,255,255,0.13) 2px 5px,
+      transparent 5px,
+      transparent calc(100% - 4px),
+      rgba(0,0,0,0.35) calc(100% - 4px)),
     linear-gradient(100deg,
-      color-mix(in srgb, var(--member-base) 88%, #fff) 0%,
-      var(--member-base) 22%,
-      color-mix(in srgb, var(--member-base) 58%, #16100a) 100%);
+      color-mix(in srgb, var(--member-base) 90%, #fff) 0%,
+      var(--member-base) 26%,
+      color-mix(in srgb, var(--member-base) 55%, #140d07) 100%);
   box-shadow:
-    inset -2px 0 3px rgba(0, 0, 0, 0.35),
-    inset 0 2px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
-    0 9px 18px rgba(0, 0, 0, 0.55);
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35),
+    2px 10px 16px rgba(0, 0, 0, 0.55);
   transition: transform var(--duration-fast) var(--ease),
               box-shadow var(--duration-fast) var(--ease);
 }
 
 .memberBook:hover,
 .memberBook:focus-visible {
-  transform: translateY(-7px);
+  transform: translateY(-9px);
   box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.2),
-    0 14px 24px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    2px 16px 24px rgba(0, 0, 0, 0.6),
     0 0 0 1px var(--brass);
 }
 
+/* The name runs down the spine, the way it does on a real book. Vertical
+   text also means any length fits — a 46px-wide spine cannot hold "Sam
+   Okafor" horizontally, and shrinking the type until it does makes it
+   unreadable. */
 .memberName {
+  writing-mode: vertical-rl;
   font-family: var(--font-display);
-  font-size: var(--text-caption);
+  font-size: var(--text-small);
+  letter-spacing: 0.04em;
   color: #fdf3e3;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  text-align: center;
-  line-height: 1.2;
-  word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 100%;
 }
-.memberRole {
-  font-size: 0.5625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(253, 243, 227, 0.72);
-}
-.memberLeaf { color: var(--brass); opacity: 0.6; font-size: 0.7rem; }
 
-/* A couple of unlabelled books at each end, so the shelf is not bare when a
-   club has only three members. */
-.fillerGroup { display: flex; align-items: flex-end; gap: 3px; flex: 0 0 auto; }
-.fillerGroupGrow { flex: 1 1 auto; justify-content: flex-end; }
+.memberRole {
+  writing-mode: vertical-rl;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(253, 243, 227, 0.7);
+}
+
+.memberLeaf { display: none; }
+
+.fillerGroup { display: flex; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
+.fillerGroupGrow { flex: 0 0 auto; }
 
 /* Unlabelled books, so a three-person club still looks like a shelf rather
-   than three cards floating on a plank. Muted on purpose — they must not
-   compete with the members, who are the content. */
+   than three objects on a plank. Muted, so they never compete with the
+   members, who are the content. */
 .filler {
   flex: 0 0 auto;
-  width: var(--filler-width, 16px);
-  height: var(--spine-height, 110px);
+  width: var(--filler-width, 15px);
+  height: var(--spine-height, 128px);
   border-radius: 1px 3px 3px 1px;
   background:
-    linear-gradient(180deg, transparent 16%, rgba(212,162,76,0.35) 16% 17.4%,
-                    transparent 17.4% 80%, rgba(212,162,76,0.35) 80% 81.4%,
-                    transparent 81.4%),
+    linear-gradient(180deg, transparent 12%, rgba(212,162,76,0.3) 12% 13.4%,
+                    transparent 13.4% 84%, rgba(212,162,76,0.3) 84% 85.4%,
+                    transparent 85.4%),
     linear-gradient(100deg, var(--filler-tint, #6d4a33) 0%,
-                    color-mix(in srgb, var(--filler-tint, #6d4a33) 55%, #140d07) 100%);
+                    color-mix(in srgb, var(--filler-tint, #6d4a33) 50%, #120b06) 100%);
   box-shadow:
-    inset -1px 0 2px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 8px 14px rgba(0,0,0,0.45);
+    inset -1px 0 2px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    1px 9px 14px rgba(0,0,0,0.5);
 }
-
-/* ------------------------------------------------------------- small labels */
 
 .shelfLabel {
   position: relative;
@@ -365,6 +418,9 @@
   min-height: 96px;
   padding: 0 var(--space-2) var(--space-2);
 }
+
+/* The one thing that floats to the far end of the shelf. */
+.artPushed { margin-left: auto; }
 
 .art {
   display: block;

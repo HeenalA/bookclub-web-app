@@ -25,7 +25,21 @@ const ART = "/bookshelf";
 /* Spine heights, cycled so a row of books looks like books rather than a bar
    chart. Keyed off position, not member, so the shelf is stable between
    renders. */
-const SPINE_HEIGHTS = [132, 118, 140, 124, 146, 112, 136, 126];
+/* Decorative books with no owner, to fill the plank. Heights and widths are
+   varied so a row reads as books rather than a bar chart. */
+const FILLERS_LEFT = [
+  { "--spine-height": "126px", "--filler-width": "13px", "--filler-tint": "#5d3f2b" },
+  { "--spine-height": "140px", "--filler-width": "17px", "--filler-tint": "#7a5236" },
+  { "--spine-height": "118px", "--filler-width": "12px", "--filler-tint": "#4a3324" },
+];
+const FILLERS_RIGHT = [
+  { "--spine-height": "134px", "--filler-width": "15px", "--filler-tint": "#6b4a32" },
+  { "--spine-height": "122px", "--filler-width": "12px", "--filler-tint": "#53392737" },
+  { "--spine-height": "146px", "--filler-width": "18px", "--filler-tint": "#7d5739" },
+  { "--spine-height": "112px", "--filler-width": "13px", "--filler-tint": "#45301f" },
+];
+
+const SPINE_HEIGHTS = [152, 138, 160, 144, 166, 132, 156, 146];
 
 function Countdown({ meeting }) {
   const [left, setLeft] = useState(() =>
@@ -112,7 +126,9 @@ export function Bookshelf({
         </h2>
       </header>
 
-      <div className={styles.bay}>
+      <div className={styles.interior}>
+        <span className={styles.divider} aria-hidden="true" />
+        <div className={styles.bay}>
         {/* ---- upper shelf: meeting and current book ---- */}
         <div>
           <div className={styles.row}>
@@ -161,7 +177,11 @@ export function Bookshelf({
           </div>
 
           <div className={`${styles.row} ${styles.membersRow}`}>
-            <span className={styles.filler} style={{ "--spine-height": "104px" }} />
+            <span className={styles.fillerGroup}>
+              {FILLERS_LEFT.map((f, i) => (
+                <span key={i} className={styles.filler} style={f} />
+              ))}
+            </span>
 
             {members.length === 0 ? (
               <p className={styles.empty}>No members yet.</p>
@@ -184,24 +204,27 @@ export function Bookshelf({
                   {member.role === "admin" && (
                     <span className={styles.memberRole}>Admin</span>
                   )}
-                  <span className={styles.memberLeaf} aria-hidden="true">
-                    ❧
-                  </span>
                 </button>
               ))
             )}
 
+            <span className={`${styles.fillerGroup} ${styles.fillerGroupGrow}`}>
+              {FILLERS_RIGHT.map((f, i) => (
+                <span key={i} className={styles.filler} style={f} />
+              ))}
+            </span>
+
             <img
               src={`${ART}/plant.png`}
               alt=""
-              className={`${styles.art} ${styles.artTall}`}
+              className={`${styles.art} ${styles.artTall} ${styles.artPushed}`}
             />
           </div>
           <div className={styles.plank} />
         </div>
       </div>
 
-      {/* ---- the narrow decorative column ---- */}
+      {/* ---- the narrow decorative bay ---- */}
       <aside className={styles.column} aria-hidden="true">
         <div>
           <div className={styles.nook}>
@@ -232,6 +255,7 @@ export function Bookshelf({
           <div className={styles.plank} />
         </div>
       </aside>
+      </div>
     </section>
   );
 }
