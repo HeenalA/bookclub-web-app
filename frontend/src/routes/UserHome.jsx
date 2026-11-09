@@ -22,6 +22,7 @@ import { formatMonthYear, formatFullDate, relativeTime } from "../lib/util/date.
 import { AppShell, Page } from "../components/layout/AppShell.jsx";
 import { Avatar } from "../components/ui/Avatar.jsx";
 import { Badge, StatusBadge } from "../components/ui/Badge.jsx";
+import { BookCover } from "../components/ui/BookCover.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Card, SectionLabel, Hint } from "../components/ui/Card.jsx";
 import { Field, ColorField } from "../components/ui/Field.jsx";
@@ -711,6 +712,7 @@ function MyBooksTab() {
       {rows.map((book) => (
         <ListRow
           key={book.id}
+          lead={<BookCover book={book} size="md" />}
           name={book.title}
           meta={
             <>
@@ -754,6 +756,7 @@ function MyRatingsTab() {
       {rows.map((row) => (
         <ListRow
           key={row.book_id}
+          lead={<BookCover book={row.books} size="md" />}
           name={row.books.title}
           meta={row.books.clubs?.name}
           actions={
@@ -790,9 +793,14 @@ function MyReviewsTab() {
     <List>
       {rows.map((row) => (
         <div key={row.book_id} className={styles.reviewBlock}>
-          <p className={styles.reviewTitle}>{row.books.title}</p>
-          <p className={styles.reviewMeta}>{row.books.clubs?.name}</p>
-          <p className={styles.reviewText}>{row.text}</p>
+          <div style={{ display: "flex", gap: "var(--space-3)" }}>
+            <BookCover book={row.books} size="md" />
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <p className={styles.reviewTitle}>{row.books.title}</p>
+              <p className={styles.reviewMeta}>{row.books.clubs?.name}</p>
+              <p className={styles.reviewText}>{row.text}</p>
+            </div>
+          </div>
         </div>
       ))}
     </List>

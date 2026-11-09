@@ -6,6 +6,7 @@ import { listClubRatings, averageRating } from "../lib/api/ratings.js";
 import { toAppError } from "../lib/api/errors.js";
 import { Page } from "../components/layout/AppShell.jsx";
 import { Badge } from "../components/ui/Badge.jsx";
+import { BookCover } from "../components/ui/BookCover.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Card } from "../components/ui/Card.jsx";
 import { Field, FieldRow } from "../components/ui/Field.jsx";
@@ -167,6 +168,7 @@ export default function ClubBooks() {
             return (
               <ListRow
                 key={book.id}
+                lead={<BookCover book={book} picker={picker} size="md" />}
                 name={
                   <>
                     <span style={{ color: "var(--text-muted)" }}>
@@ -246,6 +248,7 @@ function BookEditor({ editing, members, onClose, onSave }) {
   const [year, setYear] = useState("");
   const [status, setStatus] = useState("to_read");
   const [pickedBy, setPickedBy] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [loadedId, setLoadedId] = useState(undefined);
 
@@ -258,6 +261,7 @@ function BookEditor({ editing, members, onClose, onSave }) {
     setYear(editing.year ? String(editing.year) : String(new Date().getFullYear()));
     setStatus(editing.status ?? "to_read");
     setPickedBy(editing.picked_by ?? "");
+    setCoverUrl(editing.cover_url ?? "");
   }
 
   if (!editing) return null;
@@ -271,6 +275,7 @@ function BookEditor({ editing, members, onClose, onSave }) {
         year: year ? Number(year) : null,
         status,
         pickedBy: pickedBy || null,
+        coverUrl,
       });
     } catch {
       /* shown by the page's banner */
@@ -336,6 +341,22 @@ function BookEditor({ editing, members, onClose, onSave }) {
           </select>
         )}
       </Field>
+
+      {/* Covers are matched automatically where the title is unambiguous, but
+          a title-only lookup gets some books confidently wrong. This is how a
+          wrong or missing one gets fixed without a developer. */}
+      <Field
+        label="Cover image URL"
+        value={coverUrl}
+        onChange={(e) => setCoverUrl(e.target.value)}
+        placeholder="https://…"
+        help="Right-click any book cover online and copy the image address. Leave blank for none."
+      />
+      {coverUrl && (
+        <div style={{ marginBottom: "var(--space-4)" }}>
+          <BookCover book={{ title, cover_url: coverUrl }} size="lg" />
+        </div>
+      )}
 
       <ModalActions>
         <Button variant="primary" busy={busy} busyLabel="Saving…" onClick={submit}>

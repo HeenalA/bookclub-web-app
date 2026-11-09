@@ -14,6 +14,7 @@ import { toAppError } from "../lib/api/errors.js";
 import { Page } from "../components/layout/AppShell.jsx";
 import { Avatar } from "../components/ui/Avatar.jsx";
 import { Badge } from "../components/ui/Badge.jsx";
+import { BookCover } from "../components/ui/BookCover.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Field } from "../components/ui/Field.jsx";
 import { Modal, ModalActions } from "../components/ui/Modal.jsx";
@@ -179,6 +180,9 @@ export default function ClubReviews() {
                   )}
                   <tr>
                     <td className={styles.bookCell}>
+                      <div style={{ display: "flex", gap: "var(--space-3)" }}>
+                        <BookCover book={book} picker={picker} size="md" />
+                        <div style={{ minWidth: 0 }}>
                       <p className={styles.bookNum}>#{displayNumbers[book.id]}</p>
                       <p className={styles.bookTitle}>{book.title}</p>
                       {picker && (
@@ -186,6 +190,8 @@ export default function ClubReviews() {
                           {picker.name}
                         </Badge>
                       )}
+                        </div>
+                      </div>
                     </td>
 
                     {activeMembers.map((m) => {

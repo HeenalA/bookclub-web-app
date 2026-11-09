@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { memberColorVars } from "../../lib/util/color.js";
+import { BookCover } from "../ui/BookCover.jsx";
 import { countdownTo, formatFullDate } from "../../lib/util/date.js";
 import styles from "./Bookshelf.module.css";
 
@@ -144,15 +145,21 @@ export function Bookshelf({
             {currentBook ? (
               <div className={styles.currentWrap}>
                 <span className={styles.ribbon}>Currently reading</span>
-                <div
-                  className={styles.currentBook}
-                  style={memberColorVars(picker?.color ?? "#4b3b7a")}
-                >
-                  <p className={styles.currentTitle}>{currentBook.title}</p>
-                  {currentBook.author && (
-                    <p className={styles.currentAuthor}>{currentBook.author}</p>
-                  )}
-                </div>
+                {currentBook.cover_url ? (
+                  /* A real cover beats a drawn stand-in, so when the book has
+                     one it is shown as the book itself. */
+                  <BookCover book={currentBook} picker={picker} size="lg" />
+                ) : (
+                  <div
+                    className={styles.currentBook}
+                    style={memberColorVars(picker?.color ?? "#4b3b7a")}
+                  >
+                    <p className={styles.currentTitle}>{currentBook.title}</p>
+                    {currentBook.author && (
+                      <p className={styles.currentAuthor}>{currentBook.author}</p>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <div className={styles.currentWrap}>
