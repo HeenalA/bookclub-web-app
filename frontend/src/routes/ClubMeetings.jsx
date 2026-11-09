@@ -10,6 +10,7 @@ import {
   addMeeting,
   updateMeeting,
   deleteMeeting,
+  setMeetingBooks,
 } from "../lib/api/meetings.js";
 import { toAppError } from "../lib/api/errors.js";
 import { formatFullDate, todayISO } from "../lib/util/date.js";
@@ -56,9 +57,11 @@ export default function ClubMeetings() {
     try {
       if (editing?.id) {
         await updateMeeting(editing.id, fields);
+        await setMeetingBooks(editing.id, fields.bookIds);
         setNotice("Meeting updated.");
       } else {
-        await addMeeting(clubId, member.id, fields);
+        const created = await addMeeting(clubId, member.id, fields);
+        await setMeetingBooks(created.id, fields.bookIds);
         setNotice("Meeting added.");
       }
       setEditing(null);
@@ -125,8 +128,8 @@ export default function ClubMeetings() {
           <div className={styles.info}>
             <p className={styles.num}>#{upcoming.number}</p>
             <h3 className={styles.discussing}>
-              {upcoming.books?.title
-                ? `Discussing: ${upcoming.books.title}`
+              {upcoming.books?.length
+                ? `Discussing: ${upcoming.books.map((b) => b.title).join(" and ")}`
                 : "No book chosen yet"}
             </h3>
             <p className={styles.where}>
@@ -169,7 +172,11 @@ export default function ClubMeetings() {
             <ListRow
               key={meeting.id}
               lead={<span className={styles.pastNum}>#{meeting.number}</span>}
-              name={meeting.books?.title || "No book recorded"}
+              name={
+                meeting.books?.length
+                  ? meeting.books.map((b) => b.title).join(" · ")
+                  : "No book recorded"
+              }
               meta={
                 [
                   formatFullDate(meeting.meeting_date),
@@ -233,7 +240,7 @@ function MeetingEditor({ editing, books, onClose, onSave }) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
-  const [bookId, setBookId] = useState("");
+  const [bookIds, setBookIds] = useState([""]);
   const [busy, setBusy] = useState(false);
   const [loadedId, setLoadedId] = useState(undefined);
 
@@ -244,7 +251,9 @@ function MeetingEditor({ editing, books, onClose, onSave }) {
     setDate(editing.meeting_date ?? todayISO());
     setTime(editing.meeting_time ?? "");
     setLocation(editing.location ?? "");
-    setBookId(editing.book_id ? String(editing.book_id) : "");
+    setBookIds(
+      editing.books?.length ? editing.books.map((b) => String(b.id)) : [""]
+    );
   }
 
   if (!editing) return null;
@@ -252,11 +261,15 @@ function MeetingEditor({ editing, books, onClose, onSave }) {
   async function submit() {
     setBusy(true);
     try {
+      const chosen = bookIds.filter(Boolean).map(Number);
       await onSave({
         date,
         time,
         location,
-        bookId: bookId ? Number(bookId) : null,
+        // Kept for the meetings row itself; the join table is the real record
+        // and its trigger keeps this in step.
+        bookId: chosen[0] ?? null,
+        bookIds: chosen,
       });
     } catch {
       /* shown by the page's banner */
@@ -296,18 +309,54 @@ function MeetingEditor({ editing, books, onClose, onSave }) {
         placeholder="e.g. Maya's place, or Zoom"
         maxLength={120}
       />
-      <Field label="Book being discussed">
+      {/* A meeting often covers two books, so this is a list rather than one
+          picker. The first is the meeting's main book. */}
+      <Field
+        label={bookIds.length > 1 ? "Books being discussed" : "Book being discussed"}
+        help="The first is the main book. Add another if you discussed two."
+      >
         {(props) => (
-          <select {...props} value={bookId} onChange={(e) => setBookId(e.target.value)}>
-            <option value="">Not decided</option>
-            {[...books]
-              .sort((a, b) => b.id - a.id)
-              .map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.title}
-                </option>
-              ))}
-          </select>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+            {bookIds.map((id, i) => (
+              <div key={i} style={{ display: "flex", gap: "var(--space-2)" }}>
+                <select
+                  {...(i === 0 ? props : {})}
+                  className={props.className}
+                  value={id}
+                  aria-label={`Book ${i + 1}`}
+                  onChange={(e) => {
+                    const next = [...bookIds];
+                    next[i] = e.target.value;
+                    setBookIds(next);
+                  }}
+                >
+                  <option value="">Not decided</option>
+                  {[...books]
+                    .sort((a, b) => b.id - a.id)
+                    .map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.title}
+                      </option>
+                    ))}
+                </select>
+                {bookIds.length > 1 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setBookIds(bookIds.filter((_, j) => j !== i))}
+                    aria-label={`Remove book ${i + 1}`}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            ))}
+            <div>
+              <Button size="sm" onClick={() => setBookIds([...bookIds, ""])}>
+                + Add another book
+              </Button>
+            </div>
+          </div>
         )}
       </Field>
 

@@ -12,6 +12,13 @@ import { unwrap } from "./errors.js";
 const MEETING_FIELDS =
   "id, club_id, meeting_date, meeting_time, location, book_id, created_by";
 
+/* A meeting can discuss more than one book — 11 of the club's 79 do. The
+   books come from the meeting_books join table; meetings.book_id is kept as
+   a cache of the first one, maintained by a trigger, so the home page
+   countdown can read it without a join. */
+const MEETING_WITH_BOOKS =
+  MEETING_FIELDS + ", meeting_books ( book_id, position, books ( id, title ) )";
+
 /**
  * A club's meetings, oldest first, each tagged with its display number.
  * Number 1 is the club's first-ever meeting.
@@ -20,12 +27,20 @@ export async function listClubMeetings(clubId) {
   const rows = unwrap(
     await sb
       .from("meetings")
-      .select(MEETING_FIELDS + ", books ( id, title )")
+      .select(MEETING_WITH_BOOKS)
       .eq("club_id", clubId)
       .order("meeting_date", { ascending: true })
   );
 
-  return rows.map((row, index) => ({ ...row, number: index + 1 }));
+  return rows.map((row, index) => ({
+    ...row,
+    number: index + 1,
+    // Flattened and ordered, so callers never deal with the join table shape.
+    books: (row.meeting_books ?? [])
+      .filter((mb) => mb.books)
+      .sort((a, b) => a.position - b.position)
+      .map((mb) => mb.books),
+  }));
 }
 
 /**
@@ -90,4 +105,24 @@ export async function updateMeeting(meetingId, fields) {
 
 export async function deleteMeeting(meetingId) {
   unwrap(await sb.from("meetings").delete().eq("id", meetingId));
+}
+
+
+/**
+ * Replace the set of books a meeting discussed.
+ *
+ * Done as delete-then-insert rather than a diff. For a handful of books that
+ * is simpler to reason about and cannot leave a stale row behind, and the
+ * trigger on meeting_books keeps meetings.book_id pointing at whatever ends
+ * up at position 0.
+ */
+export async function setMeetingBooks(meetingId, bookIds) {
+  unwrap(await sb.from("meeting_books").delete().eq("meeting_id", meetingId));
+
+  const rows = bookIds
+    .filter(Boolean)
+    .map((bookId, position) => ({ meeting_id: meetingId, book_id: bookId, position }));
+
+  if (rows.length === 0) return [];
+  return unwrap(await sb.from("meeting_books").insert(rows).select("book_id, position"));
 }
