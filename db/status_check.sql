@@ -14,7 +14,7 @@
 
 with step as (
 
-  select 1 as ord, 'Migrations 0001-0005 applied' as step,
+  select 1::numeric as ord, 'Migrations 0001-0005 applied' as step,
          (select count(*) = 9 from pg_class c
             join pg_namespace n on n.oid = c.relnamespace
            where n.nspname = 'public' and c.relkind = 'r'
@@ -75,6 +75,38 @@ with step as (
   select 8, 'Reviews present (should be 206)',
          (select count(*) >= 206 from reviews),
          (select count(*)::text || ' reviews' from reviews)
+
+  -- These two are REQUIRED BY THE APP CODE, not optional. The frontend reads
+  -- meeting_books and books.cover_url, so if either is missing the Meetings
+  -- or Books pages fail with "column does not exist".
+  union all
+  select 5.1, 'Migration 0006 — meeting_books table (REQUIRED by the app)',
+         (select count(*) = 1 from pg_class c
+            join pg_namespace n on n.oid = c.relnamespace
+           where n.nspname = 'public' and c.relname = 'meeting_books'),
+         'db/migrations/0006_meeting_books.sql'
+
+  union all
+  select 5.2, 'Migration 0007 — books.cover_url column (REQUIRED by the app)',
+         (select count(*) = 1 from information_schema.columns
+           where table_schema = 'public' and table_name = 'books'
+             and column_name = 'cover_url'),
+         'db/migrations/0007_book_covers.sql'
+
+  union all
+  select 6.1, 'Second books for two-book meetings (seed batch 7)',
+         (select count(*) >= 10 from (select meeting_id from meeting_books
+                                       group by meeting_id having count(*) > 1) d),
+         (select count(*)::text || ' meetings discuss two or more books'
+            from (select meeting_id from meeting_books
+                   group by meeting_id having count(*) > 1) d)
+
+  union all
+  select 6.2, 'Covers and authors (seed batch 8)',
+         (select count(*) >= 78 from books where cover_url is not null),
+         (select count(*) filter (where cover_url is not null)::text || ' with a cover, '
+               || count(*) filter (where author is not null)::text || ' with an author'
+            from books)
 
   union all
   select 9, 'Public signup is off (check the dashboard too)',
