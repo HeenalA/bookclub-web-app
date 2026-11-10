@@ -104,8 +104,8 @@ with step as (
   union all
   select 6.2, 'Covers and authors (seed batch 8)',
          (select count(*) >= 78 from books where cover_url is not null),
-         (select count(*) filter (where cover_url is not null)::text || ' with a cover, '
-               || count(*) filter (where author is not null)::text || ' with an author'
+         (select (count(*) filter (where cover_url is not null))::text || ' with a cover, '
+               || (count(*) filter (where author is not null))::text || ' with an author'
             from books)
 
   union all
