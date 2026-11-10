@@ -53,30 +53,72 @@ See [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md) for the full roadmap.
 - Node.js 18+
 - A Supabase account (free tier)
 
-### Backend
+## Running it
 
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env           # Fill in your Supabase credentials
-uvicorn app.main:app --reload
+bash scripts/start.sh
 ```
 
-Backend runs at `http://localhost:8000`
-API docs available at `http://localhost:8000/docs`
+That is all. It installs dependencies on first run, warns if the environment
+file is missing, and opens **http://localhost:3000**.
 
-### Frontend
+Equivalent, if you prefer doing it by hand:
 
 ```bash
 cd frontend
-npm install
-cp .env.example .env           # Fill in your Supabase credentials
+npm install     # first time only
 npm run dev
 ```
 
-Frontend runs at `http://localhost:5173`
+### Other commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with hot reload, on port 3000 |
+| `npm run build` | Production build into `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint, including the React Compiler rules |
+| `npm run smoke` | Headless-browser checks against a running preview |
+
+All of the above run from `frontend/`.
+
+### The style guide
+
+```
+http://localhost:3000/style
+```
+
+Every component in every state, on one page. It reads no database, so it
+works before the app is connected to anything.
+
+### Configuration
+
+`frontend/.env.local`, which is gitignored:
+
+```
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=<the anon key>
+```
+
+Both are safe to expose — access is controlled by row-level security in the
+database, not by hiding the key. The `service_role` key must never go here.
+
+### There is no backend to start
+
+Earlier versions of this file described a FastAPI service on port 8000.
+There isn't one, and there is not meant to be: the browser talks to Supabase
+directly and authorisation lives in the database. `backend/` holds a single
+validator and its tests, which exist to give the CI pipeline real logic to
+test. See `docs/DECISIONS.md`.
+
+### Coming back after a break
+
+```bash
+cat db/status_check.sql | pbcopy
+```
+
+Paste into the Supabase SQL Editor. It reports which setup steps are done and
+which are outstanding, so you do not have to remember.
 
 ### Run Tests
 
