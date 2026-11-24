@@ -650,7 +650,31 @@ time.
 
 | Feature | Priority | Notes |
 | --- | --- | --- |
+| Animated member avatars on the bookshelf | Later — after the bookshelf redesign ships | A small illustrated character for each member stands on the member shelf in front of that member's book, tied to real member data. Ideas: gentle idle motion, short walks along the shelf, turning toward the visitor when their book is hovered, waving on click, and opening a member information card. **Not built yet, on purpose.** See the architecture note below. |
+| Full profile page redesign | Later — after the shared design tokens are approved and applied | The signed-in home at `/clubs` (`UserHome.jsx`) only gets the shared colours, type, buttons and panels for now; its layout and every form stay as they are. A proper redesign of its structure is a separate piece of work. No woodwork or illustrations on this page. |
+| Dedicated mobile design phase | Later — desktop comes first | The bookshelf is designed for desktop (1440px and wider) and laptops (1024–1366px). Small screens get a simplified, working fallback with no horizontal overflow, not a polished layout. A real phone design, including how the bookcase and its navigation rail rearrange, needs its own phase and its own mockups. |
 |  |  |  |
+
+**Architecture note — member avatars.** The redesigned member shelf is built so
+this can be added without restructuring it:
+
+- Each member is one wrapper element holding two things: the book spine (the
+  button) and an empty **avatar slot** that sits on the front lip of the shelf,
+  in front of the spine. The slot renders nothing today. Because it is
+  positioned over the shelf rather than in the row's flow, filling it later does
+  not move or resize any book.
+- Hover, focus and click are handled on the wrapper, not on the spine alone, so
+  an avatar placed in the slot can react to the same events the spine does
+  (turn and wave) with no new event wiring.
+- Click already goes through the `onMemberClick(member)` prop, which is where
+  "reveal member information" attaches.
+- Where it lands: the bookshelf components in `components/club/`. Avatar artwork
+  would live beside the other illustrations in `public/bookshelf/`. If members
+  choose their own avatar, `members` gains one column and a migration; a fixed
+  set assigned by the app needs no schema change.
+- Animation should follow the same rules as the rest of the scene: cleaned up
+  when the component unmounts, and still (no idle motion, no wave) under
+  `prefers-reduced-motion`.
 
 ---
 
