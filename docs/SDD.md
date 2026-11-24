@@ -650,10 +650,28 @@ time.
 
 | Feature | Priority | Notes |
 | --- | --- | --- |
+| Keep `CLAUDE.md` current as the project's working rules | Ongoing — review when a convention changes | `CLAUDE.md` is read at the start of every AI session and is the first thing a new collaborator should read. It has drifted before: it described a FastAPI backend and a global admin flag months after both were gone. Treat it as code — when a rule changes, change it there in the same commit. Known gaps today: the Design System block still lists `--color-maya` and friends, which were deleted when member colours moved into the database. |
+| Onboarding a collaborator | Before granting write access | The repo is **public**, so a collaborator inherits that. Checklist: they run `git config core.hooksPath .githooks` on their clone (the hook is not active otherwise); they get their own Supabase login rather than sharing one; branch protection on `main` so the "never push to main" rule is enforced rather than remembered; and they never need the `service_role` key for anything. |
+| Mobile: make the existing pages usable on a phone | Soon — smaller than a redesign | Not a redesign, a pass to remove the sharp edges. Four known ones, measured at 390px: `touch-action` is set nowhere, so on a touchscreen the browser treats a drag as a scroll and rating chips cannot be dragged at all; the ratings and reviews grids are a column per member and scroll sideways inside their box; `--text-micro` is 11px and `--text-caption` 12px, which is small on a phone; and a number of tap targets are under the 44px that fingers need. Estimated at a few hours. The pages themselves already stack and do not overflow the viewport. |
 | Animated member avatars on the bookshelf | Later — after the bookshelf redesign ships | A small illustrated character for each member stands on the member shelf in front of that member's book, tied to real member data. Ideas: gentle idle motion, short walks along the shelf, turning toward the visitor when their book is hovered, waving on click, and opening a member information card. **Not built yet, on purpose.** See the architecture note below. |
 | Full profile page redesign | Later — after the shared design tokens are approved and applied | The signed-in home at `/clubs` (`UserHome.jsx`) only gets the shared colours, type, buttons and panels for now; its layout and every form stay as they are. A proper redesign of its structure is a separate piece of work. No woodwork or illustrations on this page. |
 | Dedicated mobile design phase | Later — desktop comes first | The bookshelf is designed for desktop (1440px and wider) and laptops (1024–1366px). Small screens get a simplified, working fallback with no horizontal overflow, not a polished layout. A real phone design, including how the bookcase and its navigation rail rearrange, needs its own phase and its own mockups. |
 |  |  |  |
+
+
+**Architecture note — mobile.** The groundwork is better than it looks. The
+pages already stack (`ClubHome` at 820px, list rows at 560px, the bookshelf
+drops its decorative bay at 860px) and nothing overflows the viewport at
+390px, so there is no horizontal page scroll to chase. Every size in the app
+is a token in `src/styles/tokens.css`, so raising the type and spacing scale
+on small screens is one media query redefining those tokens rather than a
+sweep through every stylesheet.
+
+The genuinely hard part is the ratings and reviews grids. Both are a column
+per member, which is the wrong shape for a 390px screen however it is styled
+— the answer is probably one member at a time with a switcher, which is a
+different layout rather than a narrower one. That is the piece that belongs
+in the dedicated mobile phase; the rest is the few-hour pass above.
 
 **Architecture note — member avatars.** The redesigned member shelf is built so
 this can be added without restructuring it:
