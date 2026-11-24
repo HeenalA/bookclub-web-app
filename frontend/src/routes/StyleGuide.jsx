@@ -17,8 +17,8 @@ import {
 } from "../components/ui/Feedback.jsx";
 import { Countdown } from "../components/club/Countdown.jsx";
 import { Bookshelf } from "../components/club/Bookshelf.jsx";
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
-import { DraggableChip, DropCell } from "../components/club/RatingDnd.jsx";
+import { DndContext, PointerSensor, useSensor, useSensors, pointerWithin } from "@dnd-kit/core";
+import { DraggableChip, DropCell, RatingDragOverlay } from "../components/club/RatingDnd.jsx";
 import { memberColors } from "../lib/util/color.js";
 import styles from "./StyleGuide.module.css";
 
@@ -76,7 +76,10 @@ function DragDemo() {
   const [rows, setRows] = useState({
     10: [{ id: 1, title: "A Darker Shade of Magic", picker: SAMPLE[2] }],
     8: [{ id: 2, title: "The Night Circus", picker: SAMPLE[0] }],
-    5: [{ id: 3, title: "Heartless", picker: SAMPLE[1] }],
+    5: [
+      { id: 3, title: "Verity", picker: SAMPLE[1] },
+      { id: 4, title: "Circe", picker: SAMPLE[0] },
+    ],
   });
   const [dragging, setDragging] = useState(null);
   const sensors = useSensors(
@@ -106,7 +109,7 @@ function DragDemo() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={pointerWithin}
       onDragStart={(e) => setDragging(find(e.active.data.current?.bookId))}
       onDragCancel={() => setDragging(null)}
       onDragEnd={onDragEnd}
@@ -124,10 +127,13 @@ function DragDemo() {
                   value={value}
                   className=""
                 >
-                  <div style={{ minHeight: 44, padding: "var(--space-2)", borderBottom: "1px solid var(--border-hairline)" }}>
-                    {(rows[value] ?? []).map((b) => (
+                  <div data-testid={`mine-${value}`} style={{ minHeight: 44, padding: "var(--space-2)", borderBottom: "1px solid var(--border-hairline)" }}>
+                    {[...(rows[value] ?? [])]
+                      .sort((a, b) => a.title.localeCompare(b.title))
+                      .map((b) => (
                       <DraggableChip
                         key={b.id}
+                        memberId="me"
                         bookId={b.id}
                         label={b.title}
                         picker={b.picker}
@@ -136,16 +142,19 @@ function DragDemo() {
                     ))}
                   </div>
                 </DropCell>
+                <td data-testid={`other-${value}`} style={{ padding: "var(--space-2)", borderBottom: "1px solid var(--border-hairline)", borderLeft: "1px solid var(--border-hairline)", opacity: 1 }}>
+                  {[...(rows[value] ?? [])]
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .map((b) => (
+                      <Chip key={`o${b.id}`} label={b.title} picker={b.picker} />
+                    ))}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <DragOverlay dropAnimation={null}>
-        {dragging ? (
-          <Chip label={dragging.title} picker={dragging.picker} showHandle />
-        ) : null}
-      </DragOverlay>
+      <RatingDragOverlay book={dragging} picker={dragging?.picker} />
     </DndContext>
   );
 }

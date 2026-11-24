@@ -1,11 +1,10 @@
 import { useMemo, useState } from "react";
 import {
   DndContext,
-  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  pointerWithin,
 } from "@dnd-kit/core";
 import { useAuth } from "../lib/hooks/useAuth.jsx";
 import { useClub, useClubId } from "../lib/hooks/useClub.jsx";
@@ -22,7 +21,11 @@ import { Page } from "../components/layout/AppShell.jsx";
 import { Avatar } from "../components/ui/Avatar.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Chip } from "../components/ui/Chip.jsx";
-import { DraggableChip, DropCell } from "../components/club/RatingDnd.jsx";
+import {
+  DraggableChip,
+  DropCell,
+  RatingDragOverlay,
+} from "../components/club/RatingDnd.jsx";
 import { Modal, ModalActions } from "../components/ui/Modal.jsx";
 import { ErrorBanner, LoadingRow, EmptyState } from "../components/ui/Feedback.jsx";
 import styles from "./ClubTable.module.css";
@@ -184,22 +187,30 @@ export default function ClubRatings() {
       return <span className={styles.cellEmpty}>—</span>;
     }
 
-    return bookIds.map((bookId) => {
-      const book = bookById[bookId];
-      if (!book) return null;
-      const picker = book.picked_by ? memberById[book.picked_by] : null;
+    return bookIds
+      .map((bookId) => bookById[bookId])
+      .filter(Boolean)
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((book) => {
+        const picker = book.picked_by ? memberById[book.picked_by] : null;
 
-      return (
-        <DraggableChip
-          key={bookId}
-          bookId={bookId}
-          label={book.title}
-          picker={picker}
-          disabled={!isMine}
-          onClick={isMine ? () => setEditing({ book, current: value }) : undefined}
-        />
-      );
-    });
+        /* Only your own chips are draggable, and only they become dnd-kit
+           draggables at all. Registering the other columns' chips gave three
+           elements the same id, so dnd-kit treated them as one item and
+           dimmed all three when you picked up yours. */
+        return isMine ? (
+          <DraggableChip
+            key={book.id}
+            memberId={memberId}
+            bookId={book.id}
+            label={book.title}
+            picker={picker}
+            onClick={() => setEditing({ book, current: value })}
+          />
+        ) : (
+          <Chip key={book.id} label={book.title} picker={picker} />
+        );
+      });
   }
 
   return (
@@ -228,7 +239,9 @@ export default function ClubRatings() {
 
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        /* Drops where the pointer is. closestCenter compares centres, which
+           in a tall grid puts the chip on a row the cursor never touched. */
+        collisionDetection={pointerWithin}
         onDragStart={(e) => setDraggingBook(bookById[e.active.data.current?.bookId])}
         onDragCancel={() => setDraggingBook(null)}
         onDragEnd={handleDragEnd}
@@ -320,20 +333,30 @@ export default function ClubRatings() {
                     {pending.length === 0 ? (
                       <span className={styles.cellEmpty}>all rated</span>
                     ) : (
-                      pending.map((book) => (
-                        <DraggableChip
-                          key={book.id}
-                          bookId={book.id}
-                          label={book.title}
-                          picker={book.picked_by ? memberById[book.picked_by] : null}
-                          disabled={!isMine}
-                          onClick={
-                            isMine
-                              ? () => setEditing({ book, current: null })
-                              : undefined
-                          }
-                        />
-                      ))
+                      [...pending]
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map((book) =>
+                          isMine ? (
+                            <DraggableChip
+                              key={book.id}
+                              memberId={m.id}
+                              bookId={book.id}
+                              label={book.title}
+                              picker={
+                                book.picked_by ? memberById[book.picked_by] : null
+                              }
+                              onClick={() => setEditing({ book, current: null })}
+                            />
+                          ) : (
+                            <Chip
+                              key={book.id}
+                              label={book.title}
+                              picker={
+                                book.picked_by ? memberById[book.picked_by] : null
+                              }
+                            />
+                          )
+                        )
                     )}
                   </DropCell>
                 );
@@ -343,19 +366,14 @@ export default function ClubRatings() {
         </table>
       </div>
 
-      {/* A copy of the chip follows the cursor. Dragging the original would
-          make the row it came from reflow under the pointer. */}
-      <DragOverlay dropAnimation={null}>
-        {draggingBook ? (
-          <Chip
-            label={draggingBook.title}
-            picker={
-              draggingBook.picked_by ? memberById[draggingBook.picked_by] : null
-            }
-            showHandle
-          />
-        ) : null}
-      </DragOverlay>
+      {/* A copy follows the cursor; the original stays put and dims, so the
+          row it came from does not reflow under the pointer. */}
+      <RatingDragOverlay
+        book={draggingBook}
+        picker={
+          draggingBook?.picked_by ? memberById[draggingBook.picked_by] : null
+        }
+      />
       </DndContext>
 
       <RatingPicker

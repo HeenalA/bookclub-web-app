@@ -58,7 +58,7 @@ await row10.scrollIntoViewIfNeeded();
 {
   const chip = row10.locator("button").first();
   const src = await chip.boundingBox();
-  const dst = await row5.locator("td").last().boundingBox();
+  const dst = await page.getByTestId("mine-5").boundingBox();
   await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
   await page.mouse.down();
   // Stepped, so the 8px activation threshold is genuinely crossed.
@@ -77,10 +77,62 @@ const chipTag = await row5.locator("button").first().evaluate((el) => el.tagName
 const keyboardIntact = chipTag === "BUTTON";
 console.log(`${keyboardIntact ? "PASS" : "FAIL"}  chips are still buttons (keyboard path intact)`);
 
+// The same book appears in every member's column. When all three shared one
+// draggable id, picking up your copy dimmed everyone else's — so this checks
+// a neighbouring column stays opaque mid-drag.
+//
+// Reloaded first: the drag above emptied row 10, and this needs a chip to
+// pick up.
+await page.reload({ waitUntil: "networkidle" });
+await row10.scrollIntoViewIfNeeded();
+{
+  const chip = row10.locator("button").first();
+  const src = await chip.boundingBox();
+  if (src) {
+    await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(src.x + 24, src.y + 24, { steps: 8 });
+    await page.waitForTimeout(150);
+  }
+}
+const otherOpacity = await page
+  .getByTestId("other-5")
+  .locator("span")
+  .first()
+  .evaluate((el) => {
+    let n = el, o = 1;
+    while (n && n !== document.body) {
+      o *= parseFloat(getComputedStyle(n).opacity);
+      n = n.parentElement;
+    }
+    return o;
+  })
+  .catch(() => 1);
+await page.mouse.up();
+await page.waitForTimeout(200);
+const columnsIndependent = otherOpacity > 0.9;
+console.log(`${columnsIndependent ? "PASS" : "FAIL"}  other members' chips unaffected by your drag`);
+
+// Chips within one cell read alphabetically.
+const cellTitles = (await page.getByTestId("mine-5").locator("button").allInnerTexts())
+  .map((t) => t.replace(/⠿\s*/g, "").trim());
+const sortedOk =
+  cellTitles.length >= 2 &&
+  JSON.stringify(cellTitles) ===
+    JSON.stringify([...cellTitles].sort((a, b) => a.localeCompare(b)));
+console.log(`${sortedOk ? "PASS" : "FAIL"}  chips sorted alphabetically within a cell`);
+
 await page.screenshot({ path: "/private/tmp/claude-501/-Users-heenalamin-Desktop-git-bookclub-web-app/f802fc34-b167-4e5b-917e-3923a180c3e4/scratchpad/styleguide.png", fullPage: true });
 await browser.close();
 process.exit(
-  allOk && dialogVisible && dialogClosed && selected === "true" && moved && keyboardIntact
+  allOk &&
+  dialogVisible &&
+  dialogClosed &&
+  selected === "true" &&
+  moved &&
+  keyboardIntact &&
+  columnsIndependent &&
+  sortedOk
     ? 0
     : 1
 );
