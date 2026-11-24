@@ -47,6 +47,40 @@ await page.getByRole("tab", { name: "Ratings" }).click();
 const selected = await page.getByRole("tab", { name: "Ratings" }).getAttribute("aria-selected");
 console.log(`${selected === "true" ? "PASS" : "FAIL"}  tab selection updates aria-selected`);
 
+// --- rating chips drag between rows -------------------------------------
+// Worth a real drag rather than asserting the handler exists: the failure
+// mode here is silent. Everything renders, the handle shows, and nothing
+// moves — which is exactly the state this shipped in before.
+await page.goto(BASE + "/style", { waitUntil: "networkidle" });
+const row10 = page.getByTestId("row-10");
+const row5 = page.getByTestId("row-5");
+await row10.scrollIntoViewIfNeeded();
+{
+  const chip = row10.locator("button").first();
+  const src = await chip.boundingBox();
+  const dst = await row5.locator("td").last().boundingBox();
+  await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
+  await page.mouse.down();
+  // Stepped, so the 8px activation threshold is genuinely crossed.
+  await page.mouse.move(src.x + src.width / 2 + 20, src.y + src.height / 2 + 20, { steps: 8 });
+  await page.mouse.move(dst.x + 60, dst.y + dst.height / 2, { steps: 20 });
+  await page.waitForTimeout(200);
+  await page.mouse.up();
+  await page.waitForTimeout(350);
+}
+const moved =
+  !(await row10.innerText()).includes("Darker Shade") &&
+  (await row5.innerText()).includes("Darker Shade");
+console.log(`${moved ? "PASS" : "FAIL"}  rating chip drags between rows`);
+
+const chipTag = await row5.locator("button").first().evaluate((el) => el.tagName);
+const keyboardIntact = chipTag === "BUTTON";
+console.log(`${keyboardIntact ? "PASS" : "FAIL"}  chips are still buttons (keyboard path intact)`);
+
 await page.screenshot({ path: "/private/tmp/claude-501/-Users-heenalamin-Desktop-git-bookclub-web-app/f802fc34-b167-4e5b-917e-3923a180c3e4/scratchpad/styleguide.png", fullPage: true });
 await browser.close();
-process.exit(allOk && dialogVisible && dialogClosed && selected === "true" ? 0 : 1);
+process.exit(
+  allOk && dialogVisible && dialogClosed && selected === "true" && moved && keyboardIntact
+    ? 0
+    : 1
+);
