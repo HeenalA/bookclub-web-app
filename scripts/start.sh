@@ -1,32 +1,30 @@
-#!/bin/bash
-# start.sh — starts the local dev server and opens the app in your browser
-# Usage: bash scripts/start.sh
-# Stop with Ctrl+C
+#!/usr/bin/env bash
+# ============================================================================
+# start.sh — run the app locally.
+# ============================================================================
+# The app is a Vite + React project living in frontend/. This script installs
+# dependencies on first run, checks the environment file exists, and starts
+# the dev server (which opens a browser on http://localhost:3000).
+# ============================================================================
+set -euo pipefail
 
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-FRONTEND_DIR="$PROJECT_DIR/frontend"
-PORT=3000
-URL="http://localhost:$PORT/pages/home.html"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT/frontend"
 
-echo ""
-echo "📚 To Read or Not to Read"
-echo "   Starting local server..."
-echo "   Project: $PROJECT_DIR"
-echo ""
-
-# Check if something is already running on port 3000
-if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
-  echo "⚠️  Port $PORT is already in use. Stop the existing server first with Ctrl+C"
-  echo "   Or find and kill it: lsof -i :$PORT"
-  exit 1
+if [[ ! -d node_modules ]]; then
+  echo "Installing dependencies (first run only)…"
+  npm install
 fi
 
-# Open the browser after a short delay (gives the server time to start)
-sleep 1 && open "$URL" &
+if [[ ! -f .env.local ]]; then
+  echo
+  echo "⚠  No frontend/.env.local found."
+  echo "   The app will start, but it will show the 'Not connected yet' screen"
+  echo "   until you create that file. Copy frontend/.env.example and fill in"
+  echo "   your Supabase URL and anon key — see docs/RUNBOOK.md."
+  echo
+  echo "   The style guide at http://localhost:3000/style works either way."
+  echo
+fi
 
-# Start the server
-cd "$FRONTEND_DIR"
-echo "✅ Server running at $URL"
-echo "   Press Ctrl+C to stop"
-echo ""
-python3 -m http.server $PORT
+npm run dev

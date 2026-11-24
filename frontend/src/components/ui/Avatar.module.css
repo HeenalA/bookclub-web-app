@@ -1,0 +1,30 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+  user-select: none;
+  /* Set by the `style` prop from the member's own colour. */
+  background: var(--member-base, var(--text-secondary));
+}
+
+.sm { width: 20px;  height: 20px;  font-size: 0.5rem; }
+.md { width: 26px;  height: 26px;  font-size: 0.625rem; }
+.lg { width: 34px;  height: 34px;  font-size: 0.75rem; }
+.xl { width: 48px;  height: 48px;  font-size: 1rem; }
+
+/* Used on the dark hero band, where avatars overlap. */
+.ringed { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35); }
+
+.group {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Overlapping stack. The negative margin is on every child but the first. */
+.group > * + * { margin-left: -7px; }

@@ -1,0 +1,185 @@
+/* ============================================================================
+   tokens.css — THE design file.
+   ============================================================================
+   Every aesthetic decision in this app is a variable in here. Colours, fonts,
+   type sizes, spacing, corner radii, shadows, animation speed. Components
+   reference these names and never hardcode a value, so changing the look of
+   the whole app means editing this file and nothing else.
+
+   To see the effect of a change on everything at once, open /style in the
+   running app — it renders every component in every state on one page.
+
+   HOW TO USE THIS FILE
+   - Want a different palette?        -> edit the "BRAND & SURFACES" block.
+   - Want different fonts?            -> edit "TYPEFACES" (and the <link> in
+                                         index.html if you change families).
+   - Want rounder or sharper corners? -> edit "RADII".
+   - Want a roomier or tighter app?   -> edit "SPACING".
+
+   WHAT IS DELIBERATELY *NOT* HERE
+   Member colours. Maya's blue, Mina's pink and Heenal's purple used to be
+   tokens (--color-maya and friends), which quietly limited the app to exactly
+   those three people. Member colours now live in the database, on each
+   member's row, and the chip shades are derived from them at runtime by
+   src/lib/util/color.js. A fourth member just works.
+
+   LEARNING: these are CSS custom properties. Unlike a Sass variable, they are
+   live at runtime — the browser resolves them on every paint. That is what
+   lets a theme be swapped by setting a different value on a parent element,
+   and it is why the dark hero section below can simply redefine --text-primary
+   for everything inside it rather than every child needing a special class.
+   ============================================================================ */
+
+:root {
+  /* ==========================================================
+     BRAND & SURFACES
+     The warm-paper palette. "Cozy bookshop meets playful social
+     app", per docs/DESIGN_SPEC.md.
+     ========================================================== */
+
+  /* The signature purple. Used for primary actions, active nav,
+     focus rings and accents. */
+  --accent:            #9E7BC9;
+  --accent-strong:     #7E5BA9;
+  --accent-soft:       #e8dcf5;
+  --accent-contrast:   #ffffff;
+
+  /* Page and panel surfaces, lightest to darkest. */
+  --surface-page:      #f5f0eb;  /* the warm paper the app sits on */
+  --surface-sunken:    #ede4d8;  /* recessed areas, highlighted columns */
+  --surface-card:      #ffffff;  /* cards, tables, panels */
+  --surface-dark:      #1e130a;  /* the hero band, "dark shelf" */
+
+  /* Text, strongest to faintest. */
+  --text-primary:      #2c3e50;
+  --text-secondary:    #8a7a6a;
+  --text-muted:        #b0a090;
+  --text-on-dark:      rgba(255, 255, 255, 0.92);
+  --text-on-dark-dim:  rgba(255, 255, 255, 0.55);
+
+  /* Lines. */
+  --border:            #e0d8d0;
+  --border-strong:     #c8bdb0;
+  --border-hairline:   rgba(0, 0, 0, 0.06);
+
+  /* ==========================================================
+     STATUS COLOURS
+     Kept separate from the brand palette so a restyle of the
+     app does not accidentally make an error message look
+     decorative.
+     ========================================================== */
+  --status-success-bg:   #e4f1e8;
+  --status-success-text: #2f6b45;
+  --status-warning-bg:   #faf0da;
+  --status-warning-text: #8a6516;
+  --status-danger-bg:    #fae3e3;
+  --status-danger-text:  #9b3030;
+  --status-info-bg:      #e3ecf7;
+  --status-info-text:    #2d5280;
+  --status-neutral-bg:   #ece7e1;
+  --status-neutral-text: #6d625a;
+
+  /* The "admin only" accent — a muted gold, distinct from both the
+     brand purple and the status colours. */
+  --admin-accent:      #b89a3f;
+  --admin-bg:          #fdf9ed;
+
+  /* ==========================================================
+     TYPEFACES
+     Lora (serif) for titles and numbers — it gives the numeric
+     ratings their bookish character. DM Sans for everything
+     else. If you swap these, update the Google Fonts <link> in
+     index.html too.
+     ========================================================== */
+  --font-display: "Lora", Georgia, serif;
+  --font-body:    "DM Sans", system-ui, -apple-system, sans-serif;
+
+  /* Type scale. Named by role rather than by size, so that
+     "make all captions bigger" is one edit here instead of a
+     search for every 11px in the codebase. */
+  --text-display:  1.75rem;  /* 28px — hero titles, countdown numbers */
+  --text-title:    1.125rem; /* 18px — page and card titles */
+  --text-subtitle: 1rem;     /* 16px */
+  --text-body:     0.875rem; /* 14px — default reading size */
+  --text-small:    0.8125rem;/* 13px */
+  --text-caption:  0.75rem;  /* 12px — metadata, helper text */
+  --text-micro:    0.6875rem;/* 11px — chips, badges, labels */
+
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+
+  --leading-tight: 1.25;
+  --leading-body:  1.5;
+  --leading-loose: 1.7;
+
+  /* ==========================================================
+     SPACING
+     A 4px-based scale. Using a scale rather than arbitrary
+     numbers is what keeps a growing app visually consistent:
+     there is no "is this 13px or 14px?" decision to make.
+     ========================================================== */
+  --space-1:  0.25rem; /*  4px */
+  --space-2:  0.5rem;  /*  8px */
+  --space-3:  0.75rem; /* 12px */
+  --space-4:  1rem;    /* 16px */
+  --space-5:  1.25rem; /* 20px */
+  --space-6:  1.5rem;  /* 24px */
+  --space-8:  2rem;    /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+
+  /* ==========================================================
+     RADII
+     ========================================================== */
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   14px;
+  --radius-pill: 999px;
+
+  /* ==========================================================
+     ELEVATION
+     ========================================================== */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+
+  /* ==========================================================
+     LAYOUT
+     ========================================================== */
+  --page-max:    1040px;
+  --page-gutter: var(--space-5);
+  --nav-height:  52px;
+
+  /* ==========================================================
+     MOTION
+     Short and subtle. Set --duration-fast and --duration-base to
+     0s to turn all animation off app-wide.
+     ========================================================== */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ==========================================================
+     STACKING
+     Centralised so a new overlay never has to guess a number and
+     hope. Higher wins.
+     ========================================================== */
+  --z-nav:     100;
+  --z-overlay: 200;
+  --z-modal:   210;
+  --z-toast:   300;
+}
+
+/* ============================================================
+   Respect the OS "reduce motion" setting.
+   Not a nice-to-have: for some people animation causes real
+   nausea and dizziness, and the browser already knows who they
+   are. Honouring it costs four lines.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}

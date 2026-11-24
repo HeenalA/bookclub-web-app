@@ -1,0 +1,44 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: 100%;
+  padding: 3px var(--space-2);
+  margin: 2px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: 1.5;
+  text-align: left;
+  /* Coloured by WHO PICKED the book, not by whose column it sits in — the
+     club's own convention, so one book is the same colour across the table. */
+  background: var(--member-bg, var(--surface-sunken));
+  color: var(--member-text, var(--text-secondary));
+  border: 1px solid transparent;
+  transition: border-color var(--duration-fast) var(--ease),
+              transform var(--duration-fast) var(--ease);
+}
+
+.editable { cursor: pointer; }
+.editable:hover { border-color: var(--member-text, var(--border-strong)); }
+
+.readonly { cursor: default; }
+
+/* A book nobody has picked yet. */
+.unpicked {
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-strong);
+}
+
+.handle {
+  font-size: 0.625rem;
+  opacity: 0.4;
+  flex: 0 0 auto;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

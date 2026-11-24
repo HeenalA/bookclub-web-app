@@ -1,0 +1,123 @@
+.hero {
+  position: relative;
+  background: var(--surface-dark);
+  padding: var(--space-8) var(--page-gutter);
+  overflow: hidden;
+}
+
+/* A placeholder band until admin-selectable background photos exist
+   (Phase 2). Kept as a gradient rather than an <img> so there is nothing to
+   load and nothing to lay out around. */
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2a1b0f 0%, #1e130a 55%, #3a2418 100%);
+}
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 75% 30%,
+    rgba(158, 123, 201, 0.22),
+    transparent 60%
+  );
+}
+
+.heroContent {
+  position: relative;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  color: var(--text-on-dark);
+  margin-bottom: var(--space-1);
+}
+.sub { font-size: var(--text-caption); color: var(--text-on-dark-dim); }
+.avatars { margin-top: var(--space-4); }
+
+.body {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--page-gutter) var(--space-12);
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-8);
+}
+@media (max-width: 820px) {
+  .body { grid-template-columns: 1fr; gap: var(--space-6); }
+}
+
+.section { margin-bottom: var(--space-8); }
+
+.readingCard { display: flex; gap: var(--space-4); align-items: stretch; }
+.spine {
+  width: 34px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--member-base, var(--text-secondary));
+}
+.spineText {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: var(--text-micro);
+  color: rgba(255, 255, 255, 0.85);
+  padding: var(--space-2) 0;
+  max-height: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.readingTitle { font-family: var(--font-display); font-size: var(--text-subtitle); }
+
+.announce {
+  border-left: 3px solid var(--member-base, var(--border));
+  background: var(--member-bg, var(--surface-sunken));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+  position: relative;
+}
+.announceText { font-size: var(--text-small); white-space: pre-wrap; }
+.announceMeta {
+  font-size: var(--text-micro);
+  color: var(--text-secondary);
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.announceDelete { margin-left: auto; }
+
+.pickerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+.pickerRow:last-child { border-bottom: none; }
+.pickerNum { font-size: var(--text-micro); color: var(--text-muted); width: 14px; }
+.pickerName { font-size: var(--text-small); flex: 1; }
+
+.shelf {
+  background: var(--surface-sunken);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--text-secondary);
+}
+.shelfIcon { font-size: 1.75rem; margin-bottom: var(--space-2); }
+.shelfTitle { font-family: var(--font-display); font-size: var(--text-subtitle); margin-bottom: var(--space-2); }
+.shelfSub { font-size: var(--text-micro); color: var(--text-muted); }
