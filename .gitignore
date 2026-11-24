@@ -64,3 +64,7 @@ build/
 
 # Vite
 frontend/.vite/
+# Supabase CLI local state. supabase/.temp is per-machine scratch (project
+# ref, service versions, pooler URL) that the CLI rewrites on every command —
+# it belongs to the clone, not the project.
+supabase/.temp/
