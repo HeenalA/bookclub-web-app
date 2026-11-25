@@ -76,6 +76,6 @@ echo
 if [[ "$FAILURES" -eq 0 ]]; then
   echo "PASS — the anon key cannot read any data or call any function."
 else
-  echo "FAIL — $FAILURES problem(s) above. Re-run db/migrations/0005_rls.sql."
+  echo "FAIL — $FAILURES problem(s) above. Re-run supabase/migrations/0005_rls.sql."
   exit 1
 fi

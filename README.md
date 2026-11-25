@@ -113,7 +113,7 @@ bash .githooks/test-pre-commit.sh          # the secret-scanning rules
 | Restyle one component | That component's `.module.css` |
 | Add a page | A file in `src/routes/` + two lines in `App.jsx` |
 | Add a database call | The matching module in `src/lib/api/` |
-| Change a permission rule | `db/migrations/0005_rls.sql`, then re-run it |
+| Change a permission rule | `supabase/migrations/0005_rls.sql`, then re-run it |
 
 **Conventions**
 

@@ -3,7 +3,7 @@
    ============================================================================
    Notice the split: reads are plain table queries (RLS decides what comes
    back), while every write is an `rpc(...)` call. That mirrors the database
-   design in db/migrations/0004_rpc.sql — `clubs` and `club_members` have no
+   design in supabase/migrations/0004_rpc.sql — `clubs` and `club_members` have no
    write policies at all, so there is no way to change membership except
    through a function that checks permission first. If you ever find yourself
    wanting `sb.from("club_members").update(...)` here, it will fail, and that

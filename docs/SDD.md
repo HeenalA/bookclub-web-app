@@ -224,7 +224,7 @@ verification script checks this automatically for every such function.
 ## Data model
 
 Nine tables. Four already exist with real data; five are new. The authoritative
-definition is `db/migrations/0001_core_schema.sql` — this section explains the
+definition is `supabase/migrations/0001_core_schema.sql` — this section explains the
 shape and the reasoning.
 
 ### Tables
@@ -367,8 +367,8 @@ clone before the project is connected.
 | Restyle one component | That component's `.module.css` |
 | Add a page | A file in `src/routes/` + two lines in `App.jsx` |
 | Add a database call | The matching module in `src/lib/api/` |
-| Change a permission rule | `db/migrations/0005_rls.sql`, then re-run it |
-| Add a membership action | `db/migrations/0004_rpc.sql` + a wrapper in `lib/api/clubs.js` |
+| Change a permission rule | `supabase/migrations/0005_rls.sql`, then re-run it |
+| Add a membership action | `supabase/migrations/0004_rpc.sql` + a wrapper in `lib/api/clubs.js` |
 
 ### Patterns used throughout
 

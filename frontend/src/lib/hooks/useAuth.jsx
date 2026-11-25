@@ -9,7 +9,7 @@
                 ratings, reviews and memberships all reference it.
 
    They are linked by `members.auth_user_id`, which the trigger in
-   db/migrations/0002_auth_link.sql sets when an account is created.
+   supabase/migrations/0002_auth_link.sql sets when an account is created.
 
    LEARNING — why React Context: almost every page needs the current member,
    and threading it down from the router to a nested table cell would mean

@@ -131,16 +131,23 @@ bookclub-web-app/
 ├── CLAUDE.md
 ├── Jenkinsfile                 ← CI pipeline as code
 │
-├── db/
-│   ├── migrations/             ← run in order: 0001 → 0005
-│   │   ├── 0001_core_schema.sql
-│   │   ├── 0002_auth_link.sql
-│   │   ├── 0003_internal_helpers.sql
-│   │   ├── 0004_rpc.sql        ← the membership write API
-│   │   └── 0005_rls.sql        ← Row Level Security
+├── supabase/
+│   └── migrations/             ← ⭐ the schema. Run in order: 0001 → 0007
+│       ├── 0001_core_schema.sql
+│       ├── 0002_auth_link.sql
+│       ├── 0003_internal_helpers.sql
+│       ├── 0004_rpc.sql        ← the membership write API
+│       ├── 0005_rls.sql        ← Row Level Security
+│       ├── 0006_meeting_books.sql
+│       └── 0007_book_covers.sql
+│
+├── db/                         ← everything that is NOT a migration
 │   ├── seeds/0001_bootstrap_club.sql
 │   ├── preflight_check.sql     ← run BEFORE migrating
-│   └── verify_security.sql     ← run AFTER migrating, all 6 must PASS
+│   ├── verify_security.sql     ← run AFTER migrating, all 6 must PASS
+│   ├── status_check.sql        ← is the DB where the app expects?
+│   ├── check_auth_links.sql    ← who does each login resolve to?
+│   └── check_logins.sql        ← why was a password rejected?
 │
 ├── frontend/                   ← Vite root (Vercel "Root Directory")
 │   ├── src/
@@ -199,7 +206,10 @@ bookclub-web-app/
 
 ## 🗄️ Data Models
 
-**The schema is defined in `db/migrations/` and explained in `docs/SCHEMA.md`.**
+**The schema is defined in `supabase/migrations/` and explained in
+`docs/SCHEMA.md`.** That path is the Supabase CLI's own layout, which is what
+lets `supabase migration list` and `supabase db push` see the real state of
+the database rather than an empty history.
 Do not restate column lists here — a third copy only drifts out of date.
 
 Nine tables: `members`, `clubs`, `club_members`, `club_join_codes`, `books`,

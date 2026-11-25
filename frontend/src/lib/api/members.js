@@ -7,7 +7,7 @@ import { AppError } from "./errors.js";
  * The `members` row belonging to the current auth account.
  *
  * Returns null when there is no row — which should not happen, because the
- * trigger in db/migrations/0002_auth_link.sql creates one for every new auth
+ * trigger in supabase/migrations/0002_auth_link.sql creates one for every new auth
  * account. If it does, the account was created before that migration ran, and
  * the UI says so rather than showing a blank app.
  */

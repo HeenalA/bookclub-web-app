@@ -84,14 +84,14 @@ with step as (
          (select count(*) = 1 from pg_class c
             join pg_namespace n on n.oid = c.relnamespace
            where n.nspname = 'public' and c.relname = 'meeting_books'),
-         'db/migrations/0006_meeting_books.sql'
+         'supabase/migrations/0006_meeting_books.sql'
 
   union all
   select 5.2, 'Migration 0007 — books.cover_url column (REQUIRED by the app)',
          (select count(*) = 1 from information_schema.columns
            where table_schema = 'public' and table_name = 'books'
              and column_name = 'cover_url'),
-         'db/migrations/0007_book_covers.sql'
+         'supabase/migrations/0007_book_covers.sql'
 
   union all
   select 6.1, 'Second books for two-book meetings (seed batch 7)',

@@ -4,7 +4,7 @@
    Two different kinds of error arrive from Supabase and they need opposite
    treatment:
 
-   1. Errors RAISED BY OUR OWN FUNCTIONS in db/migrations/0004_rpc.sql. Those
+   1. Errors RAISED BY OUR OWN FUNCTIONS in supabase/migrations/0004_rpc.sql. Those
       messages were written to be read by a user ("You are the only admin.
       Make someone else an admin before you leave.") and should be shown as-is.
 

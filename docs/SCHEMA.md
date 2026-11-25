@@ -1,12 +1,12 @@
 # SCHEMA.md — Database Reference
 
-Plain-language companion to the DDL in `db/migrations/`. **When they disagree,
-`db/migrations/` is the source of truth** — this file is for understanding the
+Plain-language companion to the DDL in `supabase/migrations/`. **When they disagree,
+`supabase/migrations/` is the source of truth** — this file is for understanding the
 shape and the *why*.
 
 **Status legend**
 - ✅ **Live** — exists in the Supabase database today
-- 📝 **Written** — defined in `db/migrations/`, not yet run
+- 📝 **Written** — defined in `supabase/migrations/`, not yet run
 
 > As of 18 Oct 2026, migrations 0001–0005 are **written but not yet applied**.
 > Everything marked 📝 becomes ✅ the moment `docs/RUNBOOK.md` step 2 is done.

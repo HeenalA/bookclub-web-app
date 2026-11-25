@@ -44,14 +44,49 @@ succeeds before moving on:
 
 | # | File | What it does |
 |---|---|---|
-| 1 | `db/migrations/0001_core_schema.sql` | All tables + constraints. Adds columns to your existing tables. |
-| 2 | `db/migrations/0002_auth_link.sql` | Trigger linking auth accounts to member rows |
-| 3 | `db/migrations/0003_internal_helpers.sql` | Helper functions used by the policies |
-| 4 | `db/migrations/0004_rpc.sql` | The membership write API |
-| 5 | `db/migrations/0005_rls.sql` | **Row Level Security — this is the fix** |
+| 1 | `supabase/migrations/0001_core_schema.sql` | All tables + constraints. Adds columns to your existing tables. |
+| 2 | `supabase/migrations/0002_auth_link.sql` | Trigger linking auth accounts to member rows |
+| 3 | `supabase/migrations/0003_internal_helpers.sql` | Helper functions used by the policies |
+| 4 | `supabase/migrations/0004_rpc.sql` | The membership write API |
+| 5 | `supabase/migrations/0005_rls.sql` | **Row Level Security — this is the fix** |
+| 6 | `supabase/migrations/0006_meeting_books.sql` | Books discussed at a meeting |
+| 7 | `supabase/migrations/0007_book_covers.sql` | `books.cover_url` |
 
 They are written to be safe to re-run, so if one half-fails you can fix the
 cause and run it again.
+
+### Why the files live under `supabase/`, not `db/`
+
+That is the layout the Supabase CLI looks in. It matters even though we apply
+migrations by hand in the SQL Editor, because the CLI keeps its own record of
+what it thinks has been applied, in `supabase_migrations.schema_migrations`.
+
+Applying a migration through the SQL Editor does **not** write that record. So
+the CLI's history sat empty while all seven migrations were in fact live — and
+in that state `supabase db push` would have tried to run all seven again
+against production. The migrations are written to be re-runnable, so it would
+probably have been survivable, but "probably survivable" is not a thing to
+leave armed in a deployment path.
+
+The history was reconciled once, on 2026-11-24, with:
+
+```bash
+supabase migration repair --remote --status applied 0001 0002 0003 0004 0005 0006 0007
+```
+
+`repair` only writes the bookkeeping row — it never runs the SQL in the file.
+Confirm the result with either of these; the first should list all seven with
+`local` and `remote` matching, the second should say **up to date**:
+
+```bash
+supabase migration list --remote
+supabase db push --remote --dry-run
+```
+
+**If you add a migration from here on:** put the file in
+`supabase/migrations/`, run it in the SQL Editor as usual, then immediately
+`supabase migration repair --remote --status applied <version>` so the record
+stays honest. Skipping that step is how the history drifted in the first place.
 
 **After 0005, the app will stop working until you finish step 3.** That is
 expected and correct: the anon key now has no access, and there are no

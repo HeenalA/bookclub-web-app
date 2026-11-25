@@ -20,9 +20,11 @@ over plain HTTP. After: all nine tables return `HTTP 401` to that key, and
 every membership function refuses anonymous callers. Verified against
 production with `scripts/verify_anon_lockdown.sh`, not assumed.
 
-**Branch:** `main`. One branch is open and unmerged: `fix/ascii-sql-output`
-(readable SQL output, the login diagnostic, and a real address removed from a
-test fixture).
+**Branch:** `main`. Everything through PR #17 is merged. The only remote
+branch is `main`; every merged branch has been deleted locally and on GitHub.
+One local-only branch remains on purpose: `backup/pre-email-rewrite`, which
+holds pre-rewrite history **including a real address** in
+`.githooks/test-pre-commit.sh`. It has no upstream and must never be pushed.
 
 **The full specification lives in `docs/SDD.md`** — architecture, security
 model, data model, app structure, testing, backlog and glossary. This file is
@@ -45,9 +47,28 @@ the running status; that one is the reference.
   own test fixture — the string proving the hook *blocks* real addresses. The
   test was correct; the address should still not have been in a public repo.
 
+### Migrations moved to `supabase/migrations/`
+
+The seven migration files moved out of `db/migrations/` into
+`supabase/migrations/`, which is the layout the Supabase CLI reads. The
+numbering did not change, so `0001_core_schema.sql` is still
+`0001_core_schema.sql`.
+
+The reason was a live foot-gun. Applying a migration by hand in the SQL Editor
+does not write the CLI's bookkeeping row, so its history table sat **empty**
+while all seven were in fact applied — and `supabase db push` in that state
+would have re-run all seven against production. Reconciled with
+`supabase migration repair --remote --status applied 0001 ... 0007`, which
+writes only the bookkeeping row and never runs the SQL. `db push --dry-run`
+now reports **up to date**. Full explanation and the rule for future
+migrations: `docs/RUNBOOK.md`, step 2.
+
+`db/` keeps everything that is not a migration: seeds, the preflight and
+verification scripts, and the diagnostics.
+
 ### The trigger trap, written down so it is not rediscovered
 
-`db/migrations/0002_auth_link.sql` puts a trigger on `auth.users`. When an
+`supabase/migrations/0002_auth_link.sql` puts a trigger on `auth.users`. When an
 account is created it tries to attach it to a `members` row by matching email:
 
 - **Case 1** — a row already has that email and no login yet → **links them**,
@@ -79,6 +100,13 @@ cat ~/Desktop/git/bookclub-web-app/db/check_auth_links.sql   | pbcopy   # who do
 cat ~/Desktop/git/bookclub-web-app/db/check_logins.sql       | pbcopy   # why was a password rejected?
 ```
 
+One more script writes rather than reads, so it says so in its header and
+names the exact rows it will touch:
+
+```bash
+cat ~/Desktop/git/bookclub-web-app/db/delete_stray_members.sql | pbcopy  # remove trigger-invented member rows
+```
+
 ### Verified
 
 | Check | Result |
@@ -108,16 +136,11 @@ cat ~/Desktop/git/bookclub-web-app/db/check_logins.sql       | pbcopy   # why wa
    `averageRating()` and shown on Books. The original spec said no average
    column on Ratings; revisit.
 4. **Book covers seed** — `data/source/seed_batch8_covers.sql`, parked.
-5. **Wire the bookshelf into the club home page** — built and viewable at
-   `/style`, not yet wired in.
-6. **Supabase CLI migration restructure.** The tracking table shows **zero**
-   migrations while seven are applied, so `supabase migration repair --status
-   applied` must run before any `db push`.
-7. **Housekeeping:** trim the stale `fastapi`/`sqlalchemy`/`psycopg2` entries
+5. **Housekeeping:** trim the stale `fastapi`/`sqlalchemy`/`psycopg2` entries
    from `backend/requirements.txt` that made Vercel detect a phantom backend;
-   delete the merged branches `feat/multi-club-auth-build`, `sync/catch-main`
-   and `fix/auth-link-repair`; remove the unused `testuser@example.com`
-   account.
+   remove the unused `testuser@example.com` account (left in place on
+   purpose for now); optionally add `http://localhost:5173/**` to the
+   Supabase redirect allowlist so local password resets work.
 
 ### How to run locally
 
