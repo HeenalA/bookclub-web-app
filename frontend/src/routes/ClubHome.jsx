@@ -22,6 +22,7 @@ import { Field } from "../components/ui/Field.jsx";
 import { Modal, ModalActions } from "../components/ui/Modal.jsx";
 import { ErrorBanner, LoadingRow, EmptyState } from "../components/ui/Feedback.jsx";
 import { Countdown } from "../components/club/Countdown.jsx";
+import { Bookshelf } from "../components/club/Bookshelf.jsx";
 import styles from "./ClubHome.module.css";
 
 export default function ClubHome() {
@@ -167,18 +168,24 @@ export default function ClubHome() {
           </section>
         </div>
 
-        {/* ---- Shelf placeholder ---- */}
+        {/* ---- The group shelf ----
+             The component has lived at /style since it was built; this is it
+             wired to real club data rather than the style guide's samples.
+
+             It takes the FIRST book with status "reading" rather than the
+             whole list, because the shelf scene has one display slot. If the
+             club is between books `reading[0]` is undefined, so `?? null` is
+             load-bearing: the component renders its empty state for null, and
+             passing undefined would fall through to its default instead. */}
         <div>
           <SectionLabel>Group shelf</SectionLabel>
-          <div className={styles.shelf}>
-            <div className={styles.shelfIcon} aria-hidden="true">
-              📚
-            </div>
-            <p className={styles.shelfTitle}>Bookshelf coming soon</p>
-            <p className={styles.shelfSub}>
-              Top rated books · jail section · member icons
-            </p>
-          </div>
+          <Bookshelf
+            clubName={club.name}
+            members={activeMembers}
+            memberById={memberById}
+            currentBook={reading[0] ?? null}
+            nextMeeting={upcoming}
+          />
         </div>
       </div>
     </>
