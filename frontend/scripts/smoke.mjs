@@ -47,6 +47,92 @@ await page.getByRole("tab", { name: "Ratings" }).click();
 const selected = await page.getByRole("tab", { name: "Ratings" }).getAttribute("aria-selected");
 console.log(`${selected === "true" ? "PASS" : "FAIL"}  tab selection updates aria-selected`);
 
+// --- rating chips drag between rows -------------------------------------
+// Worth a real drag rather than asserting the handler exists: the failure
+// mode here is silent. Everything renders, the handle shows, and nothing
+// moves — which is exactly the state this shipped in before.
+await page.goto(BASE + "/style", { waitUntil: "networkidle" });
+const row10 = page.getByTestId("row-10");
+const row5 = page.getByTestId("row-5");
+await row10.scrollIntoViewIfNeeded();
+{
+  const chip = row10.locator("button").first();
+  const src = await chip.boundingBox();
+  const dst = await page.getByTestId("mine-5").boundingBox();
+  await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
+  await page.mouse.down();
+  // Stepped, so the 8px activation threshold is genuinely crossed.
+  await page.mouse.move(src.x + src.width / 2 + 20, src.y + src.height / 2 + 20, { steps: 8 });
+  await page.mouse.move(dst.x + 60, dst.y + dst.height / 2, { steps: 20 });
+  await page.waitForTimeout(200);
+  await page.mouse.up();
+  await page.waitForTimeout(350);
+}
+const moved =
+  !(await row10.innerText()).includes("Darker Shade") &&
+  (await row5.innerText()).includes("Darker Shade");
+console.log(`${moved ? "PASS" : "FAIL"}  rating chip drags between rows`);
+
+const chipTag = await row5.locator("button").first().evaluate((el) => el.tagName);
+const keyboardIntact = chipTag === "BUTTON";
+console.log(`${keyboardIntact ? "PASS" : "FAIL"}  chips are still buttons (keyboard path intact)`);
+
+// The same book appears in every member's column. When all three shared one
+// draggable id, picking up your copy dimmed everyone else's — so this checks
+// a neighbouring column stays opaque mid-drag.
+//
+// Reloaded first: the drag above emptied row 10, and this needs a chip to
+// pick up.
+await page.reload({ waitUntil: "networkidle" });
+await row10.scrollIntoViewIfNeeded();
+{
+  const chip = row10.locator("button").first();
+  const src = await chip.boundingBox();
+  if (src) {
+    await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(src.x + 24, src.y + 24, { steps: 8 });
+    await page.waitForTimeout(150);
+  }
+}
+const otherOpacity = await page
+  .getByTestId("other-5")
+  .locator("span")
+  .first()
+  .evaluate((el) => {
+    let n = el, o = 1;
+    while (n && n !== document.body) {
+      o *= parseFloat(getComputedStyle(n).opacity);
+      n = n.parentElement;
+    }
+    return o;
+  })
+  .catch(() => 1);
+await page.mouse.up();
+await page.waitForTimeout(200);
+const columnsIndependent = otherOpacity > 0.9;
+console.log(`${columnsIndependent ? "PASS" : "FAIL"}  other members' chips unaffected by your drag`);
+
+// Chips within one cell read alphabetically.
+const cellTitles = (await page.getByTestId("mine-5").locator("button").allInnerTexts())
+  .map((t) => t.replace(/⠿\s*/g, "").trim());
+const sortedOk =
+  cellTitles.length >= 2 &&
+  JSON.stringify(cellTitles) ===
+    JSON.stringify([...cellTitles].sort((a, b) => a.localeCompare(b)));
+console.log(`${sortedOk ? "PASS" : "FAIL"}  chips sorted alphabetically within a cell`);
+
 await page.screenshot({ path: "/private/tmp/claude-501/-Users-heenalamin-Desktop-git-bookclub-web-app/f802fc34-b167-4e5b-917e-3923a180c3e4/scratchpad/styleguide.png", fullPage: true });
 await browser.close();
-process.exit(allOk && dialogVisible && dialogClosed && selected === "true" ? 0 : 1);
+process.exit(
+  allOk &&
+  dialogVisible &&
+  dialogClosed &&
+  selected === "true" &&
+  moved &&
+  keyboardIntact &&
+  columnsIndependent &&
+  sortedOk
+    ? 0
+    : 1
+);

@@ -16,6 +16,9 @@ import {
   Spinner,
 } from "../components/ui/Feedback.jsx";
 import { Countdown } from "../components/club/Countdown.jsx";
+import { Bookshelf } from "../components/club/Bookshelf.jsx";
+import { DndContext, PointerSensor, useSensor, useSensors, pointerWithin } from "@dnd-kit/core";
+import { DraggableChip, DropCell, RatingDragOverlay } from "../components/club/RatingDnd.jsx";
 import { memberColors } from "../lib/util/color.js";
 import styles from "./StyleGuide.module.css";
 
@@ -28,6 +31,14 @@ const SAMPLE = [
   { id: "heenal", name: "Heenal", initials: "H", color: "#9E7BC9" },
   { id: "sam", name: "Sam Okafor", initials: "SO", color: "#7BC9A4" },
 ];
+
+/* Computed once at module load rather than during render. Reading the clock
+   while rendering is impure — React can render a component twice and get two
+   different answers — which the compiler rules correctly flag. */
+const SAMPLE_MEETING = {
+  meeting_date: new Date(Date.now() + 12 * 86400000).toISOString().slice(0, 10),
+  meeting_time: "6:00 PM PST",
+};
 
 const SURFACES = [
   ["Accent", "--accent"],
@@ -59,6 +70,95 @@ const TYPE_SCALE = [
  * can see the whole system respond instead of checking eight pages one at a
  * time.
  */
+/* Exercises DraggableChip and DropCell exactly as the ratings grid uses
+   them, so the drag mechanism can be checked without a login or a database. */
+function DragDemo() {
+  const [rows, setRows] = useState({
+    10: [{ id: 1, title: "A Darker Shade of Magic", picker: SAMPLE[2] }],
+    8: [{ id: 2, title: "The Night Circus", picker: SAMPLE[0] }],
+    5: [
+      { id: 3, title: "Verity", picker: SAMPLE[1] },
+      { id: 4, title: "Circe", picker: SAMPLE[0] },
+    ],
+  });
+  const [dragging, setDragging] = useState(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const find = (id) =>
+    Object.values(rows).flat().find((b) => b.id === id) ?? null;
+
+  function onDragEnd({ active, over }) {
+    setDragging(null);
+    if (!over) return;
+    const bookId = active.data.current?.bookId;
+    const target = over.data.current?.value;
+    const book = find(bookId);
+    if (!book || target == null) return;
+    setRows((prev) => {
+      const next = {};
+      for (const [k, list] of Object.entries(prev)) {
+        next[k] = list.filter((b) => b.id !== bookId);
+      }
+      next[target] = [...(next[target] ?? []), book];
+      return next;
+    });
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={pointerWithin}
+      onDragStart={(e) => setDragging(find(e.active.data.current?.bookId))}
+      onDragCancel={() => setDragging(null)}
+      onDragEnd={onDragEnd}
+    >
+      <div style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
+          <tbody>
+            {[10, 8, 5].map((value) => (
+              <tr key={value} data-testid={`row-${value}`}>
+                <td style={{ width: 54, padding: "var(--space-3)", fontFamily: "var(--font-display)", fontSize: "var(--text-subtitle)", borderBottom: "1px solid var(--border-hairline)" }}>
+                  {value}
+                </td>
+                <DropCell
+                  id={`demo:${value}`}
+                  value={value}
+                  className=""
+                >
+                  <div data-testid={`mine-${value}`} style={{ minHeight: 44, padding: "var(--space-2)", borderBottom: "1px solid var(--border-hairline)" }}>
+                    {[...(rows[value] ?? [])]
+                      .sort((a, b) => a.title.localeCompare(b.title))
+                      .map((b) => (
+                      <DraggableChip
+                        key={b.id}
+                        memberId="me"
+                        bookId={b.id}
+                        label={b.title}
+                        picker={b.picker}
+                        onClick={() => {}}
+                      />
+                    ))}
+                  </div>
+                </DropCell>
+                <td data-testid={`other-${value}`} style={{ padding: "var(--space-2)", borderBottom: "1px solid var(--border-hairline)", borderLeft: "1px solid var(--border-hairline)", opacity: 1 }}>
+                  {[...(rows[value] ?? [])]
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .map((b) => (
+                      <Chip key={`o${b.id}`} label={b.title} picker={b.picker} />
+                    ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <RatingDragOverlay book={dragging} picker={dragging?.picker} />
+    </DndContext>
+  );
+}
+
 export default function StyleGuide() {
   const [tab, setTab] = useState("one");
   const [modalOpen, setModalOpen] = useState(false);
@@ -340,6 +440,54 @@ export default function StyleGuide() {
             <Countdown meeting={null} />
           </div>
         </div>
+      </section>
+
+      {/* ---- Drag and drop ---- */}
+      <section className={styles.group}>
+        <h2 className={styles.groupTitle}>Rating chips — drag and drop</h2>
+        <p className={styles.caption}>
+          The real components from the ratings grid, on sample data. Drag a
+          chip to another row to move it. Chips are also buttons, so Tab and
+          Enter still work — drag is an addition, never the only way.
+        </p>
+        <DragDemo />
+      </section>
+
+      {/* ---- Bookshelf ---- */}
+      <section className={styles.group}>
+        <h2 className={styles.groupTitle}>Bookshelf scene</h2>
+        <p className={styles.caption}>
+          Woodwork is CSS so it stays sharp and fits any club name; the cat,
+          plant and globe are illustrations. Member spines take their colour
+          from the member's own row — try changing one of the sample colours
+          above and watch the shelf follow. Spines are real buttons: press Tab.
+        </p>
+        <Bookshelf
+          clubName="To Read or Not to Read"
+          members={SAMPLE.slice(0, 3).map((m, i) =>
+            i === 2 ? { ...m, role: "admin" } : m
+          )}
+          memberById={Object.fromEntries(SAMPLE.map((m) => [m.id, m]))}
+          currentBook={{
+            title: "Everything I Never Told You",
+            author: "Celeste Ng",
+            picked_by: "heenal",
+          }}
+          nextMeeting={SAMPLE_MEETING}
+          onMemberClick={(m) => window.alert(`Clicked ${m.name}`)}
+        />
+
+        <p className={styles.caption} style={{ marginTop: "var(--space-5)" }}>
+          The same component with four members, no current book and no meeting
+          scheduled — the states a new club actually starts in.
+        </p>
+        <Bookshelf
+          clubName="Sci-Fi Sunday"
+          members={SAMPLE}
+          memberById={Object.fromEntries(SAMPLE.map((m) => [m.id, m]))}
+          currentBook={null}
+          nextMeeting={null}
+        />
       </section>
 
       {/* ---- Modal ---- */}

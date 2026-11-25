@@ -1,0 +1,11 @@
+/* The chip left behind while its copy follows the cursor. Dimmed rather than
+   removed, so the row it came from keeps its shape and nothing jumps. */
+.dragging { opacity: 0.3; }
+
+/* The cell under the cursor. A clear target matters more here than subtlety:
+   the rows are close together and dropping on the wrong one silently writes
+   the wrong rating. */
+.over {
+  background: var(--accent-soft) !important;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}

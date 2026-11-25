@@ -1,4 +1,11 @@
 import { useMemo, useState } from "react";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  pointerWithin,
+} from "@dnd-kit/core";
 import { useAuth } from "../lib/hooks/useAuth.jsx";
 import { useClub, useClubId } from "../lib/hooks/useClub.jsx";
 import { useAsync } from "../lib/hooks/useAsync.js";
@@ -14,6 +21,11 @@ import { Page } from "../components/layout/AppShell.jsx";
 import { Avatar } from "../components/ui/Avatar.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Chip } from "../components/ui/Chip.jsx";
+import {
+  DraggableChip,
+  DropCell,
+  RatingDragOverlay,
+} from "../components/club/RatingDnd.jsx";
 import { Modal, ModalActions } from "../components/ui/Modal.jsx";
 import { ErrorBanner, LoadingRow, EmptyState } from "../components/ui/Feedback.jsx";
 import styles from "./ClubTable.module.css";
@@ -36,6 +48,13 @@ export default function ClubRatings() {
 
   const [editing, setEditing] = useState(null);
   const [actionError, setActionError] = useState(null);
+  const [draggingBook, setDraggingBook] = useState(null);
+
+  /* An 8px threshold before a press counts as a drag. Without it every click
+     on a chip starts a drag and the rating picker never opens. */
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
 
   const bookById = useMemo(
     () => Object.fromEntries((books.data ?? []).map((b) => [b.id, b])),
@@ -81,16 +100,50 @@ export default function ClubRatings() {
     return out;
   }, [activeMembers, books.data, index]);
 
+  /**
+   * Write a rating, updating the screen first and rolling back if the write
+   * fails.
+   *
+   * LEARNING: for a drag this is not a nicety. Reloading the whole table
+   * after each drop means the chip snaps back to where it was for as long as
+   * the round trip takes, then jumps to its new row — which reads as the drag
+   * having failed. Applying the change locally and reverting only on a real
+   * error keeps the chip where it was dropped.
+   */
   async function save(bookId, value) {
     setActionError(null);
+    const previous = ratings.data;
+
+    ratings.setData((previous ?? []).filter(
+      (r) => !(r.member_id === member.id && r.book_id === bookId)
+    ).concat(
+      value === null ? [] : [{ member_id: member.id, book_id: bookId, value }]
+    ));
+    setEditing(null);
+
     try {
       if (value === null) await clearMyRating(member.id, bookId);
       else await setMyRating(member.id, bookId, value);
-      setEditing(null);
-      ratings.reload();
     } catch (err) {
+      ratings.setData(previous);
       setActionError(toAppError(err));
     }
+  }
+
+  function handleDragEnd(event) {
+    setDraggingBook(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const bookId = active.data.current?.bookId;
+    const target = over.data.current?.value;   // number, JAIL_VALUE, or null
+    if (bookId == null || target === undefined) return;
+
+    const current = index.byMemberBook.get(`${member.id}:${bookId}`);
+    // Dropping a chip back where it started is not an edit.
+    if (current === target || (current === undefined && target === null)) return;
+
+    save(bookId, target);
   }
 
   if (books.loading || ratings.loading) {
@@ -134,22 +187,30 @@ export default function ClubRatings() {
       return <span className={styles.cellEmpty}>—</span>;
     }
 
-    return bookIds.map((bookId) => {
-      const book = bookById[bookId];
-      if (!book) return null;
-      const picker = book.picked_by ? memberById[book.picked_by] : null;
+    return bookIds
+      .map((bookId) => bookById[bookId])
+      .filter(Boolean)
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((book) => {
+        const picker = book.picked_by ? memberById[book.picked_by] : null;
 
-      return (
-        <Chip
-          key={bookId}
-          label={book.title}
-          picker={picker}
-          editable={isMine}
-          showHandle={isMine}
-          onClick={isMine ? () => setEditing({ book, current: value }) : undefined}
-        />
-      );
-    });
+        /* Only your own chips are draggable, and only they become dnd-kit
+           draggables at all. Registering the other columns' chips gave three
+           elements the same id, so dnd-kit treated them as one item and
+           dimmed all three when you picked up yours. */
+        return isMine ? (
+          <DraggableChip
+            key={book.id}
+            memberId={memberId}
+            bookId={book.id}
+            label={book.title}
+            picker={picker}
+            onClick={() => setEditing({ book, current: value })}
+          />
+        ) : (
+          <Chip key={book.id} label={book.title} picker={picker} />
+        );
+      });
   }
 
   return (
@@ -170,11 +231,21 @@ export default function ClubRatings() {
       </div>
       <p className={styles.note}>
         Chip colour = who picked the book · you can only edit your own column ·
-        click any of your chips to change its rating
+        drag a chip to another row to change its rating, or click it to pick
+        one
       </p>
 
       <ErrorBanner error={actionError} onDismiss={() => setActionError(null)} />
 
+      <DndContext
+        sensors={sensors}
+        /* Drops where the pointer is. closestCenter compares centres, which
+           in a tall grid puts the chip on a row the cursor never touched. */
+        collisionDetection={pointerWithin}
+        onDragStart={(e) => setDraggingBook(bookById[e.active.data.current?.bookId])}
+        onDragCancel={() => setDraggingBook(null)}
+        onDragEnd={handleDragEnd}
+      >
       <div className={styles.wrap}>
         <table className={styles.table}>
           <thead>
@@ -201,8 +272,11 @@ export default function ClubRatings() {
                   <span className={styles.scaleLabel}>{value}</span>
                 </td>
                 {activeMembers.map((m) => (
-                  <td
+                  <DropCell
                     key={m.id}
+                    id={`${m.id}:${value}`}
+                    value={value}
+                    disabled={m.id !== member.id}
                     className={[
                       styles.cell,
                       m.id === member.id ? styles.ownCol : "",
@@ -211,7 +285,7 @@ export default function ClubRatings() {
                       .join(" ")}
                   >
                     {cell(m.id, value)}
-                  </td>
+                  </DropCell>
                 ))}
               </tr>
             ))}
@@ -222,14 +296,17 @@ export default function ClubRatings() {
                 <span className={styles.scaleLabelSmall}>−1000</span>
               </td>
               {activeMembers.map((m) => (
-                <td
+                <DropCell
                   key={m.id}
+                  id={`${m.id}:jail`}
+                  value={JAIL_VALUE}
+                  disabled={m.id !== member.id}
                   className={[styles.cell, m.id === member.id ? styles.ownCol : ""]
                     .filter(Boolean)
                     .join(" ")}
                 >
                   {cell(m.id, JAIL_VALUE)}
-                </td>
+                </DropCell>
               ))}
             </tr>
 
@@ -242,8 +319,13 @@ export default function ClubRatings() {
                 const isMine = m.id === member.id;
                 const pending = unratedByMember[m.id] ?? [];
                 return (
-                  <td
+                  /* Dropping here clears the rating, which is the only way to
+                     un-rate a book by dragging. */
+                  <DropCell
                     key={m.id}
+                    id={`${m.id}:unrated`}
+                    value={null}
+                    disabled={!isMine}
                     className={[styles.cell, isMine ? styles.ownCol : ""]
                       .filter(Boolean)
                       .join(" ")}
@@ -251,27 +333,48 @@ export default function ClubRatings() {
                     {pending.length === 0 ? (
                       <span className={styles.cellEmpty}>all rated</span>
                     ) : (
-                      pending.map((book) => (
-                        <Chip
-                          key={book.id}
-                          label={book.title}
-                          picker={book.picked_by ? memberById[book.picked_by] : null}
-                          editable={isMine}
-                          onClick={
-                            isMine
-                              ? () => setEditing({ book, current: null })
-                              : undefined
-                          }
-                        />
-                      ))
+                      [...pending]
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map((book) =>
+                          isMine ? (
+                            <DraggableChip
+                              key={book.id}
+                              memberId={m.id}
+                              bookId={book.id}
+                              label={book.title}
+                              picker={
+                                book.picked_by ? memberById[book.picked_by] : null
+                              }
+                              onClick={() => setEditing({ book, current: null })}
+                            />
+                          ) : (
+                            <Chip
+                              key={book.id}
+                              label={book.title}
+                              picker={
+                                book.picked_by ? memberById[book.picked_by] : null
+                              }
+                            />
+                          )
+                        )
                     )}
-                  </td>
+                  </DropCell>
                 );
               })}
             </tr>
           </tbody>
         </table>
       </div>
+
+      {/* A copy follows the cursor; the original stays put and dims, so the
+          row it came from does not reflow under the pointer. */}
+      <RatingDragOverlay
+        book={draggingBook}
+        picker={
+          draggingBook?.picked_by ? memberById[draggingBook.picked_by] : null
+        }
+      />
+      </DndContext>
 
       <RatingPicker
         editing={editing}

@@ -62,6 +62,44 @@
   --border-strong:     #c8bdb0;
   --border-hairline:   rgba(0, 0, 0, 0.06);
 
+
+  /* ==========================================================
+     BOOKSHELF SCENE
+     The illustrated shelf on a club's home page. Kept in its
+     own block because it is the one part of the app with a
+     palette of its own — deep walnut and candlelight rather
+     than warm paper — and tuning it should not disturb
+     anything else.
+
+     The woodwork is drawn in CSS rather than used as images,
+     for two reasons. It stays sharp at any size and on any
+     display, where the supplied artwork was cut from a
+     1536px sheet and would be upscaled roughly 3x on a
+     retina screen. And the header arch carries the club's
+     real name as live text, instead of lettering baked into
+     a PNG that only ever says one thing.
+     ========================================================== */
+  --wood-darkest:  #2b1a0f;
+  --wood-dark:     #43281a;
+  --wood:          #5c3a24;
+  --wood-light:    #7a4f30;
+  --wood-highlight:#9c6a42;
+  --wood-edge:     #22140b;
+
+  --shelf-face:    #6b4226;
+  --shelf-top:     #8a5733;
+  --shelf-lip:     #a97244;
+
+  --brass:         #d4a24c;
+  --brass-dim:     #a87c33;
+  --candlelight:   #ffd9a0;
+
+  --plaque-paper:  #f3e4c8;
+  --plaque-edge:   #c9a05c;
+  --plaque-ink:    #5c3a24;
+
+  --scene-radius:  18px;
+
   /* ==========================================================
      STATUS COLOURS
      Kept separate from the brand palette so a restyle of the
