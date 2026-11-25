@@ -55,6 +55,15 @@
   .body { grid-template-columns: 1fr; gap: var(--space-6); }
 }
 
+/* The shelf scene spans the full body grid rather than sitting in one
+   column. Its interior is a flexible bay plus a FIXED 248px bay, so the
+   component dictates the width it needs and the container has to give it --
+   the usual relationship, inverted. In the 1fr sidebar it overflowed. */
+.shelfBand {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-4);
+}
+
 .section { margin-bottom: var(--space-8); }
 
 .readingCard { display: flex; gap: var(--space-4); align-items: stretch; }

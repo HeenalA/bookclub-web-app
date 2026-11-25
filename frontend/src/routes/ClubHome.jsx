@@ -88,6 +88,35 @@ export default function ClubHome() {
       </div>
 
       <div className={styles.body}>
+        {/* ---- The group shelf ----
+             The component has lived at /style since it was built; this is it
+             wired to real club data rather than the style guide's samples.
+
+             It spans the whole body grid (`.shelfBand`). The scene's own
+             interior is a flexible bay plus a FIXED 248px narrow bay, and its
+             header arch is up to 760px of real text, so it needs most of the
+             page to read as a bookcase. Sat in the ~370px sidebar it did
+             render -- it just clipped its own right-hand bay off the edge and
+             grew a long empty back panel underneath. A fixed-width interior
+             is the tell: the container has to be sized to the component, not
+             the other way round.
+
+             It takes the FIRST book with status "reading" rather than the
+             whole list, because the shelf scene has one display slot. If the
+             club is between books `reading[0]` is undefined, so `?? null` is
+             load-bearing: the component renders its empty state for null, and
+             passing undefined would fall through to its default instead. */}
+        <div className={styles.shelfBand}>
+          <SectionLabel>Group shelf</SectionLabel>
+          <Bookshelf
+            clubName={club.name}
+            members={activeMembers}
+            memberById={memberById}
+            currentBook={reading[0] ?? null}
+            nextMeeting={upcoming}
+          />
+        </div>
+
         <div>
           {/* ---- Currently reading ---- */}
           <section className={styles.section}>
@@ -145,7 +174,9 @@ export default function ClubHome() {
 
           {/* ---- Announcements ---- */}
           <AnnouncementsSection clubId={clubId} state={announcements} />
+        </div>
 
+        <div>
           {/* ---- Picker order ---- */}
           <section className={styles.section}>
             <SectionLabel>Picker order</SectionLabel>
@@ -166,26 +197,6 @@ export default function ClubHome() {
               )}
             </Card>
           </section>
-        </div>
-
-        {/* ---- The group shelf ----
-             The component has lived at /style since it was built; this is it
-             wired to real club data rather than the style guide's samples.
-
-             It takes the FIRST book with status "reading" rather than the
-             whole list, because the shelf scene has one display slot. If the
-             club is between books `reading[0]` is undefined, so `?? null` is
-             load-bearing: the component renders its empty state for null, and
-             passing undefined would fall through to its default instead. */}
-        <div>
-          <SectionLabel>Group shelf</SectionLabel>
-          <Bookshelf
-            clubName={club.name}
-            members={activeMembers}
-            memberById={memberById}
-            currentBook={reading[0] ?? null}
-            nextMeeting={upcoming}
-          />
         </div>
       </div>
     </>
