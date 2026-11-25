@@ -1,5 +1,5 @@
 -- ============================================================================
--- check_auth_links.sql — who can sign in, and as whom?
+-- check_auth_links.sql - who can sign in, and as whom?
 -- ============================================================================
 -- Paste the whole file into the Supabase SQL Editor and press Run.
 --
@@ -19,8 +19,8 @@ select * from (
     m.id                                           as member_id,
     coalesce(m.email, '(no email)')                as email,
     case
-      when m.auth_user_id is null then 'NO LOGIN — cannot sign in'
-      else 'OK — can sign in'
+      when m.auth_user_id is null then 'NO LOGIN - cannot sign in'
+      else 'OK - can sign in'
     end                                            as verdict,
     (select count(*) from ratings  r where r.member_id = m.id)::text
       || ' ratings, '
@@ -45,15 +45,15 @@ select * from (
     u.email                                        as email,
     case
       when not exists (select 1 from members m where m.auth_user_id = u.id)
-        then 'ORPHAN — signs in, resolves to no member'
+        then 'ORPHAN - signs in, resolves to no member'
       when exists (
         select 1 from members m
           join club_members cm on cm.member_id = m.id and cm.status = 'active'
          where m.auth_user_id = u.id
-      ) then 'OK — resolves to a member in a club'
-      else 'NO CLUB — signs in, sees an empty app'
+      ) then 'OK - resolves to a member in a club'
+      else 'NO CLUB - signs in, sees an empty app'
     end                                            as verdict,
-    'confirmed: ' || coalesce(u.email_confirmed_at::text, 'NO — must confirm')
+    'confirmed: ' || coalesce(u.email_confirmed_at::text, 'NO - must confirm')
       as detail
   from auth.users u
 

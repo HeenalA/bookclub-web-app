@@ -2,94 +2,122 @@
 ## Living Project State — Updated Every Session
 
 **Paste this file into any new Claude chat to restore full project context instantly.**
-Last updated: October 18, 2026
+Last updated: November 24, 2026
 
 ---
 
 ## 📍 Where We Are Right Now
 
-**Current phase:** Phase 2 — multi-club support with real authentication. The
-app has been **rebuilt in React 19 + Vite**, the full database schema and
-security model are written, and the data is verified compatible. The
-migrations have **not been run yet**.
+**Current phase:** Phase 2 is complete and **the app is live**. The migrations
+have been run, Row Level Security is enforced, and all three members can sign
+in to the hosted site with their real history attached.
 
-**The one thing that matters most:** the live database still has
-permissive read policies, so the anon key published in this public repo can
-read every review over plain HTTP. This was confirmed live, not theorised.
-`db/migrations/0005_rls.sql` is the fix and `docs/RUNBOOK.md` step 2 is how to
-apply it.
+**Live URL:** `https://bookclub-web-app-five.vercel.app`
 
-**Branch:** `feat/multi-club-auth-build`
+**The data exposure described in earlier versions of this file is closed.**
+Before: the anon key published in this public repo could read every review
+over plain HTTP. After: all nine tables return `HTTP 401` to that key, and
+every membership function refuses anonymous callers. Verified against
+production with `scripts/verify_anon_lockdown.sh`, not assumed.
 
-**The full specification now lives in `docs/SDD.md`** — architecture, security
+**Branch:** `main`. One branch is open and unmerged: `fix/ascii-sql-output`
+(readable SQL output, the login diagnostic, and a real address removed from a
+test fixture).
+
+**The full specification lives in `docs/SDD.md`** — architecture, security
 model, data model, app structure, testing, backlog and glossary. This file is
 the running status; that one is the reference.
 
 ### What changed this session
 
-- **Rewrote the frontend in React 19 + Vite.** The deciding factor was
-  editing, not page count: the old `renderRatingsTable()` rebuilt the whole
-  table's HTML on every change, which breaks focus and half-typed text the
-  moment cells become editable. 12 routes, 10 UI primitives, 19 CSS modules.
-- **Wrote the whole database layer** — 5 migrations plus a preflight checker,
-  a security verifier and a bootstrap seed.
-- **Settled four architecture decisions** (React, no backend, invite-only
-  auth, CSS Modules) — all written up in `docs/DECISIONS.md`.
-- **A design-token system** so aesthetic changes are one file, plus a `/style`
-  route rendering every component in every state.
-- **Member colours now come from the database**, with chip shades derived in
-  `src/lib/util/color.js`. `.chip.maya` and friends are gone — a fourth member
-  works now.
-- **Fixed a real bug in `is_valid_rating()`**: it accepted `7.3`, which the
-  database constraint correctly rejects. The whole point of that function is
-  to mirror the constraint. 8 tests now, up from 4.
-- **`Jenkinsfile` moved into the repo** with frontend lint, build, `npm audit`
-  and a grep that fails the build if a `service_role` key ever appears in
-  frontend code.
-- **Caught the Supabase project was paused, not deleted.** An earlier read of
-  `NXDOMAIN` as deletion was wrong — a paused free project stops resolving,
-  which looks identical. All data intact.
+- **Deployed to Vercel** from the `frontend` directory as a single project,
+  with CSP and six other security headers served from `frontend/vercel.json`.
+- **Pointed Supabase Auth at the live domain** — Site URL plus a
+  `/set-password` redirect. Verified by probing the redirect allowlist: the
+  allowlisted path is honoured and a non-allowlisted domain is rejected back
+  to the Site URL.
+- **Linked the two other members' logins to their existing member rows**, so
+  their years of ratings and reviews stayed attached rather than landing on
+  empty duplicates. See the trigger trap below.
+- **Added three diagnostic scripts** under `db/`, written to be run cold weeks
+  later with no memory of the context.
+- **Removed a real email address** that was sitting in the pre-commit hook's
+  own test fixture — the string proving the hook *blocks* real addresses. The
+  test was correct; the address should still not have been in a public repo.
 
-### Three fixes that came from the project being alive rather than fresh
+### The trigger trap, written down so it is not rediscovered
 
-1. **The live `ratings` table has no unique constraint on
-   `(member_id, book_id)`.** The app saves with an upsert, which *requires*
-   one — without it every rating edit would fail. Migration 0001 adds the
-   index explicitly, because on an existing table the `create table` that
-   declares the primary key is skipped entirely.
-2. **Constraint-existence checks were keyed on `conname` alone**, which is
-   unique per table in Postgres, not globally. Now scoped by `conrelid`.
-3. **Both SQL check scripts were a series of separate `SELECT`s.** The
-   Supabase SQL Editor only displays the *last* statement's result, so 16 of
-   17 preflight checks and 5 of 6 security checks were silently hidden.
-   Rewritten as single statements returning one table.
+`db/migrations/0002_auth_link.sql` puts a trigger on `auth.users`. When an
+account is created it tries to attach it to a `members` row by matching email:
+
+- **Case 1** — a row already has that email and no login yet → **links them**,
+  and the member keeps all their ratings and reviews.
+- **Case 2** — nothing matches → **invents a new member row** with a generated
+  slug like `raomaya11`.
+
+**So `members.email` must be set BEFORE the account is created.** Creating the
+account first makes Case 2 fire: the person can sign in, but
+`app.current_member_id()` resolves them to an empty member with no club and no
+history. `db/fix_auth_links.sql` repairs it, and because `members.email` is now
+populated, deleting and re-creating a login relinks correctly via Case 1.
+
+Order of operations was the entire bug. Nothing was wrong with the schema.
+
+### The diagnostic scripts
+
+All three are single statements, because the Supabase SQL Editor only displays
+the result of the **last** statement it ran — several statements means
+silently seeing only the last answer. All three are pure ASCII, because the
+strings they `select` are data, not comments, and the editor renders em dashes
+as mojibake.
+
+Copy to the clipboard, then paste into Supabase → SQL Editor → New query → Run.
+
+```bash
+cat ~/Desktop/git/bookclub-web-app/db/status_check.sql       | pbcopy   # is the DB where the app expects?
+cat ~/Desktop/git/bookclub-web-app/db/check_auth_links.sql   | pbcopy   # who does each login resolve to?
+cat ~/Desktop/git/bookclub-web-app/db/check_logins.sql       | pbcopy   # why was a password rejected?
+```
 
 ### Verified
 
 | Check | Result |
 |---|---|
-| `npm run build` | clean |
-| ESLint 10 + React Compiler rules | 0 errors, 0 warnings |
-| `npm audit` | 0 vulnerabilities |
-| Headless-browser smoke tests | 7/7 pass |
-| Preflight against live data | 16/16 pass |
-| Backend pytest | 8/8 pass |
-
-**Not verified:** anything involving auth, permissions or multi-club
-behaviour — no migration has been applied, so none of it has run in practice.
-The migration SQL has also never been executed anywhere; it is reviewed, not
-tested.
+| `scripts/verify_anon_lockdown.sh` against production | **PASS** — 9/9 tables `401` |
+| Supabase `disable_signup` | `true` — invite-only holds |
+| Redirect allowlist | `/set-password` honoured, hostile redirect rejected |
+| Security headers on the live site | 7/7 present |
+| `npm audit --omit=dev` | 0 vulnerabilities |
+| ESLint `--max-warnings 0` | clean |
+| Vite build | ✓ |
+| Backend validator tests | 8 passed |
+| Pre-commit hook suite | 17 passed |
+| Ratings and reviews vs the source document | 216/216 and 206/206, zero discrepancies |
+| All three members sign in and resolve to a club | ✅ |
 
 ### Next steps, in order
 
-1. **Run `docs/RUNBOOK.md` steps 1–5** — preflight, migrations 0001–0005,
-   `verify_security.sql`, the bootstrap seed, then create accounts and disable
-   public signup. This closes the data exposure.
-2. Sign in and click through everything (runbook step 7 has the list).
-3. Fix whatever that review turns up.
-4. Design and aesthetic pass — `src/styles/tokens.css` and `/style`.
-5. Final security check, then deploy to Vercel.
-6. Then: more design polish, then features from the `docs/SDD.md` backlog.
+1. **Search-to-add a book with autofill** of title, author and cover from the
+   Open Library API. Adding a book currently means typing both fields by hand.
+   `books.cover_url` already exists (migration 0007).
+2. **Mobile pass** (~a few hours). At 390px there is no horizontal overflow,
+   but `touch-action` is unset so **drag-and-drop does not work on touch at
+   all**, type drops to 11–12px, and tap targets are under 32px. Until this
+   lands, members should rate and review on a laptop.
+3. **Average rating on the Ratings page.** Already computed by
+   `averageRating()` and shown on Books. The original spec said no average
+   column on Ratings; revisit.
+4. **Book covers seed** — `data/source/seed_batch8_covers.sql`, parked.
+5. **Wire the bookshelf into the club home page** — built and viewable at
+   `/style`, not yet wired in.
+6. **Supabase CLI migration restructure.** The tracking table shows **zero**
+   migrations while seven are applied, so `supabase migration repair --status
+   applied` must run before any `db push`.
+7. **Housekeeping:** trim the stale `fastapi`/`sqlalchemy`/`psycopg2` entries
+   from `backend/requirements.txt` that made Vercel detect a phantom backend;
+   delete the merged branches `feat/multi-club-auth-build`, `sync/catch-main`
+   and `fix/auth-link-repair`; remove the unused `testuser@example.com`
+   account.
 
 ### How to run locally
 
@@ -99,6 +127,10 @@ bash ~/Desktop/git/bookclub-web-app/scripts/start.sh
 
 Opens `http://localhost:3000`. `frontend/.env.local` is already configured.
 The style guide at `/style` works without a database connection.
+
+Note: `http://localhost:5173/**` is **not** in the Supabase redirect
+allowlist, so a password reset triggered locally will land on production. Add
+it under Authentication → URL Configuration if local resets are needed.
 
 ---
 

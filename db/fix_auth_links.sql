@@ -1,5 +1,5 @@
 -- ============================================================================
--- fix_auth_links.sql — point an existing member row at an existing login
+-- fix_auth_links.sql - point an existing member row at an existing login
 -- ============================================================================
 -- WHEN YOU NEED THIS
 --
@@ -13,7 +13,7 @@
 -- Case 2 is the trap. If the account is created BEFORE members.email is set,
 -- the trigger has nothing to match on, so it invents a new member. That person
 -- can sign in but resolves to an empty member with no club, no ratings and no
--- reviews — their real history stays attached to the original 'maya' row.
+-- reviews - their real history stays attached to the original 'maya' row.
 --
 -- This script moves the login onto the right row. Run check_auth_links.sql
 -- first and again afterwards.
@@ -24,7 +24,7 @@
 -- 1. Edit the two email addresses in the `values` list below. Use the exact
 --    addresses the accounts were created with.
 -- 2. Paste the WHOLE file into the Supabase SQL Editor and press Run.
--- 3. The table it prints at the end is the verification — read the `verdict`
+-- 3. The table it prints at the end is the verification - read the `verdict`
 --    column.
 --
 -- SAFE BY DESIGN: this script never deletes a row. It only ever UNLINKS a
@@ -42,10 +42,10 @@ begin
   for r in
     select * from (values
 
-      -- ▼▼▼ EDIT THESE TWO LINES ▼▼▼
+      -- vvv EDIT THESE TWO LINES vvv
       ('maya', 'MAYA_EMAIL'),
       ('mina', 'MINA_EMAIL')
-      -- ▲▲▲ EDIT THESE TWO LINES ▲▲▲
+      -- ^^^ EDIT THESE TWO LINES ^^^
 
     ) as t(member_id, email)
   loop
@@ -128,7 +128,7 @@ order by (m.auth_user_id is null), m.id;
 
 
 -- ============================================================================
--- OPTIONAL CLEANUP — only after the verification above looks right
+-- OPTIONAL CLEANUP - only after the verification above looks right
 -- ============================================================================
 -- Any member row the trigger auto-created is now unlinked and empty. It is not
 -- in club_members, so it does not appear anywhere in the app. If you want it

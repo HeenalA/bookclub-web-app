@@ -110,14 +110,3 @@
 .pickerNum { font-size: var(--text-micro); color: var(--text-muted); width: 14px; }
 .pickerName { font-size: var(--text-small); flex: 1; }
 
-.shelf {
-  background: var(--surface-sunken);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius);
-  padding: var(--space-8) var(--space-4);
-  text-align: center;
-  color: var(--text-secondary);
-}
-.shelfIcon { font-size: 1.75rem; margin-bottom: var(--space-2); }
-.shelfTitle { font-family: var(--font-display); font-size: var(--text-subtitle); margin-bottom: var(--space-2); }
-.shelfSub { font-size: var(--text-micro); color: var(--text-muted); }
